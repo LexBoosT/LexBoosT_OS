@@ -1,0 +1,33 @@
+---
+title: Configure Explorer -> Context Menu
+description: Configure the context menu in Windows Explorer
+privilege: TrustedInstaller
+actions:
+  # Enables the classic right click context menu in Explorer on Windows 11
+  - !registryValue: {
+      path: 'HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32',
+      value: "",
+      type: REG_SZ,
+      data: "",
+      option: "configure-lcm",
+    }
+
+  # Adds a "Install this update" option to the context menu for .cab files, which runs the DISM command to install the update
+  - !registryValue: {
+      path: 'HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs',
+      value: "(Default)",
+      type: REG_SZ,
+      data: "Install this update",
+    }
+  - !registryValue: {
+      path: 'HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs',
+      value: "HasLUAShield",
+      type: REG_SZ,
+      data: "",
+    }
+  - !registryValue: {
+      path: 'HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs\Command',
+      value: "(Default)",
+      type: REG_SZ,
+      data: 'cmd /k dism /online /add-package /packagepath:"%1"',
+    }

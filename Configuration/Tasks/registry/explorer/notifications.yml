@@ -1,0 +1,142 @@
+---
+title: Configure Explorer -> Notifications
+description: Configure Explorer, Start Menu and Taskbar notifications
+privilege: TrustedInstaller
+actions:
+  # === Let's finish setting up your device - Enabled
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement',
+      value: "ScoobeSystemSettingEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement',
+      value: "ScoobeSystemSettingEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\Context\CloudExperienceHostIntent\Wireless',
+      value: "ScoobeCheckCompleted",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\Context\CloudExperienceHostIntent\Wireless',
+      value: "ScoobeCheckCompleted",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # ============================================
+  # WINDOWS DEFENDER NOTIFICATIONS — enable (HKLM+HKCU)
+  # ============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows Defender Security Center\Notifications',
+      value: "DisableNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications',
+      value: "DisableNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications',
+      value: "DisableEnhancedNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications',
+      value: "DisableNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications',
+      value: "DisableEnhancedNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance',
+      value: "Enabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # HKCU: NOTIFICATIONS GENERAL
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications',
+      value: "ToastEnabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings',
+      value: "NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings',
+      value: "NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications',
+      value: "LockScreenToastEnabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings',
+      value: "NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: NOTIFICATION BELL ICON — Show
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowNotificationIcon",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: CAPABILITY / STARTUP APP TOAST
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.CapabilityAccess',
+      value: "Enabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.StartupApp',
+      value: "Enabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # HKCU: LOCATION PROMPTS / DAYLIGHT SAVING
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location',
+      value: "ShowGlobalPrompts",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Desktop',
+      value: "DstNotification",
+      type: REG_DWORD,
+      data: "1",
+    }

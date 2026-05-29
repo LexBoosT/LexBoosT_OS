@@ -1,0 +1,36 @@
+---
+title: Additional Performance Optimizations
+description: Additional registry tweaks for performance, boot speed, and gaming not covered in other files (DWM consolidated in dwm-optimization.yml)
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # CATÉGORIE 1 : BOOT OPTIMIZATIONS
+  # =============================================
+
+  # === HiberbootEnabled - DISABLED (Fast Startup)
+  # ------> Fast Startup requires Hibernate to function.
+  # ------> Since final.yml runs "powercfg /hibernate off", HiberbootEnabled=1 would have NO effect
+  # ------> and could create confusion in power management. Kept at 0 for consistency.
+  # ------> Boot time reduction is handled by bcdedit /set disabledynamictick yes in FINALIZE1.cmd.
+  # ------> HiberbootEnabled=0 is set by DEVICES.PS1 (Set-HibernationSettings)
+
+  # Cleanup: remove old Policies key that caused "managed by your organization"
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\System',
+      value: "HiberbootEnabled",
+      operation: delete,
+    }
+  # =============================================
+  # CATÉGORIE 2 : BACKGROUND RESOURCE REDUCTION
+  # =============================================
+
+  # === SleepStudyEnabled - DISABLED
+  # ------> Disables Windows from storing sleep study reports (battery drain analysis).
+  # ------> Reduces background diagnostic overhead. Safe for desktop and laptop.
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power',
+      value: "SleepStudyEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }

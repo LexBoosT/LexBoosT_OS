@@ -1,0 +1,119 @@
+---
+title: network-stack-configuration
+description: Configure network stack via PowerShell
+privilege: TrustedInstaller
+actions:
+
+  - !status: {
+      status: "Config TCP/IP Stack",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Performance\\NETSH_TCPIP_APPLY.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+      ignoreErrors: true,
+      onUpgrade: false,
+    }
+
+  # ============================================
+  # ADVANCED TCP/IP OPTIMIZATIONS
+  # ============================================
+  - !status: {
+      status: "Config Advanced TCP/IP",
+      onUpgrade: false,
+    }
+
+  # TcpTimedWaitDelay: 30s (default 240s) — faster connection recycling
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "TcpTimedWaitDelay",
+      type: REG_DWORD,
+      data: "30",
+      onUpgrade: false,
+    }
+  # MaxUserPort: 65534 (default 5000) — more concurrent connections
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "MaxUserPort",
+      type: REG_DWORD,
+      data: "65534",
+      onUpgrade: false,
+    }
+  # TcpMaxDataRetransmissions: 4 (default 5) — faster failure detection on bad connections
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "TcpMaxDataRetransmissions",
+      type: REG_DWORD,
+      data: "4",
+      onUpgrade: false,
+    }
+  # ============================================
+  # TCP POOL ENLARGEMENT — high concurrency
+  # ============================================
+  # MaxFreeTcbs: 65536 — max simultaneous TCP control blocks
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "MaxFreeTcbs",
+      type: REG_DWORD,
+      data: "65536",
+      onUpgrade: false,
+    }
+  # MaxHashTableSize: 65536 — TCP hash table size for fast lookup
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "MaxHashTableSize",
+      type: REG_DWORD,
+      data: "65536",
+      onUpgrade: false,
+    }
+  # GlobalMaxTcpWindowSize: 65535 — max TCP receive window (RWIN)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters',
+      value: "GlobalMaxTcpWindowSize",
+      type: REG_DWORD,
+      data: "65535",
+      onUpgrade: false,
+    }
+  # ============================================
+  # DNS OVER HTTPS (DoH) — WINDOWS 11 NATIVE
+  # ============================================
+  # DohPolicy: 1 = Allow (uses DoH when DNS server supports it, falls back to regular DNS)
+  # Source: Microsoft Docs — "DNS over HTTPS (DoH) in Windows 11"
+  # Prevents ISP DNS throttling/hijacking, zero latency penalty on modern resolvers
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters',
+      value: "DohPolicy",
+      type: REG_DWORD,
+      data: "1",
+      onUpgrade: false,
+    }
+  # ============================================
+  # DNS CACHE OPTIMIZATION
+  # ============================================
+  # MaxCacheTtl: 86400s (24h) — keep positive DNS responses cached longer
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters',
+      value: "MaxCacheTtl",
+      type: REG_DWORD,
+      data: "86400",
+      onUpgrade: false,
+    }
+  # MaxNegativeCacheTtl: 5s — flush failed DNS lookups fast (default 900s)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters',
+      value: "MaxNegativeCacheTtl",
+      type: REG_DWORD,
+      data: "5",
+      onUpgrade: false,
+    }
+  # NegativeSOACacheTime: 0 — don't cache negative SOA records at all
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters',
+      value: "NegativeSOACacheTime",
+      type: REG_DWORD,
+      data: "0",
+      onUpgrade: false,
+    }

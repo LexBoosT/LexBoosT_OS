@@ -1,0 +1,37 @@
+---
+title: Pre-Installation Backup
+description: Creates a full system backup before LexBoosT OS modifications
+privilege: Admin
+actions:
+
+  - !powerShell:
+      command: '.\\Scripts\\Backup\\BACKUP.PS1'
+      exeDir: true
+      runas: currentUserElevated
+      wait: true
+      weight: 500
+      option: "backup"
+
+  - !status: {
+      status: "Saving System Configuration Log",
+      option: "backup",
+    }
+  - !powerShell:
+      command: '.\\Scripts\\Backup\\SAVE-SYSTEMCONFIGURATIONLOG.PS1'
+      exeDir: true
+      runas: currentUserElevated
+      wait: true
+      weight: 50
+      option: "backup"
+
+  - !status: {
+      status: "Deploying Rollback Script",
+      option: "backup",
+    }
+  - !powerShell:
+      command: '.\\Scripts\\Backup\\DEPLOY-ROLLBACKSCRIPT.PS1'
+      exeDir: true
+      runas: currentUserElevated
+      wait: true
+      weight: 50
+      option: "backup"

@@ -1,0 +1,29 @@
+---
+title: disable-modern-standby
+description: Disable Modern Standby (S0 Low Power Idle) — forces S3 sleep
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # MODERN STANBY — DISABLE
+  # =============================================
+  # Modern Standby (S0) causes wake issues, background drain, and input lag.
+  # PlatformAoAcOverride=0 disables S0 and forces legacy S3 where supported.
+
+  # Cleanup: remove old Policies keys that caused "managed by your organization"
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9',
+      value: "ACSettingIndex",
+      operation: delete,
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9',
+      value: "DCSettingIndex",
+      operation: delete,
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power',
+      value: "PlatformAoAcOverride",
+      type: REG_DWORD,
+      data: "0",
+    }

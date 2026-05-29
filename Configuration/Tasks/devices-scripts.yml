@@ -1,0 +1,143 @@
+---
+title: Device optimization
+description: PowerShell-based device optimizations (power scheme, MSI, adapters, drives, IRQ, NDIS, TSX, BCD)
+privilege: TrustedInstaller
+actions:
+
+  # === Configure PowerScheme ===
+  - !status: {
+      status: "Config Power Scheme",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-PowerScheme"'
+
+  # === Drive-specific optimizations ===
+  - !status: {
+      status: "Config Drive Optimizations",
+    }
+  - !run:
+    runas: currentUserElevated
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-Drives"'
+
+  # === MSI optimizations ===
+  - !status: {
+      status: "Config MSI Optimizations",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    runas: currentUserElevated
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES-TWEAKER-AUTO.PS1"'
+
+  # === Configure Adapter ===
+  - !status: {
+      status: "Config Adapters",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-Adapters"'
+
+  # === Configure Power Throttling ===
+  - !status: {
+      status: "Config Power Throttling",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-PowerThrottling"'
+
+  # === Configure IRQ Affinity ===
+  - !status: {
+      status: "Config IRQ Affinity",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-IRQAffinity"'
+
+  # === Configure NDIS Optimizer ===
+  - !status: {
+      status: "Config NDIS Optimizer",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-NDISOptimizer"'
+
+  # === Configure Desktop Power Optimizations ===
+  - !status: {
+      status: "Desktop Power Optimizations",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-DesktopPowerOptimizations"'
+
+  # === Configure TSX (Intel Transactional Synchronization Extensions) ===
+  - !status: {
+      status: "Config TSX",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-TSX"'
+
+  # === Configure BCD Optimizations ===
+  - !status: {
+      status: "Config BCD Optimizations",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-BcdOptimizations"'
+
+  # === Configure Intel Hybrid Visibility ===
+  - !status: {
+      status: "Config Intel Hybrid Visibility",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Configure-IntelHybridVisibility"'
+
+  # === Update Intel chipset drivers ===
+  - !status: {
+      status: "Updating Intel Chipset",
+      option: "intel-chipset",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    runas: currentUserElevated
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Update-Intel-Chipset"'
+    option: "intel-chipset"
+
+  # === Update AMD chipset drivers ===
+  - !status: {
+      status: "Updating AMD Chipset",
+      option: "amd-chipset",
+    }
+  - !run:
+    exeDir: true
+    wait: true
+    runas: currentUserElevated
+    exe: "powershell"
+    args: '-EP Bypass -C ".\\Scripts\\Devices\\DEVICES.PS1 -Device Update-AMD-Chipset"'
+    option: "amd-chipset"

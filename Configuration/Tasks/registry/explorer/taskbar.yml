@@ -1,0 +1,204 @@
+---
+title: Configure Explorer -> Taskbar
+description: Configure Taskbar
+privilege: TrustedInstaller
+actions:
+  # Search
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search',
+      value: "SearchboxTaskbarMode",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    } # 0=Hidden, 1=Show search icon, 2=Show search box  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search', value: "SearchboxTaskbarModeCache", type: REG_DWORD, data: "1", scope: defaultUser, option: 'taskbar-search'}
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search',
+      value: "BingSearchEnabled",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search',
+      value: "HistoryViewEnabled",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search',
+      value: "HasAboveLockTips",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search',
+      value: "AllowSearchToUseLocation",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\SearchSettings',
+      value: "SafeSearchMode",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\InputPersonalization\TrainedDataStore',
+      value: "HarvestContacts",
+      type: REG_DWORD,
+      data: "0",
+      option: "taskbar-search",
+    }
+
+  # === Show Task View button - Disabled
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowTaskViewButton",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowTaskViewButton",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # === LastActiveClick — Clic taskbar ouvre directement la dernière fenêtre active
+  # Évite le passage par le thumbnail preview — réactivité perçue améliorée
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "LastActiveClick",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "LastActiveClick",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Configures the Chat icon on the taskbar - Disabled
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Chat',
+      value: "ChatIcon",
+      type: REG_DWORD,
+      data: "3",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarMn",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarMn",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # ============================================
+  # HKCU: TASKBAR — badges, flashing
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarBadges",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarFlashing",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: MULTI-MONITOR TASKBAR — show on all monitors
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "MMTaskbarEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "MMTaskbarMode",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # HKCU: TASKBAR SHARING / SHOW DESKTOP
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarSn",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarSd",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: TASKBAR GROUPING — never combine
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarGlomLevel",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "MMTaskbarGlomLevel",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # HKCU: SYSTEM TRAY — show all icons
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\TrayNotify',
+      value: "SystemTrayChevronVisibility",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: SYSTEM TRAY — bouton emoji / clavier tactile
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\TabletTip\1.7',
+      value: "TipbandDesiredVisibility",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # HKCU: TASKBAR — Copilot companion, PWA, Recall pins
+  # ============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TaskbarCompanion",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "CopilotPWAPin",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "RecallPin",
+      type: REG_DWORD,
+      data: "0",
+    }

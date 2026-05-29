@@ -1,0 +1,29 @@
+---
+title: lexboost-static-edition
+description: lexboost-static-edition
+privilege: TrustedInstaller
+actions:
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+      value: "EditionSubManufacturer",
+      type: REG_SZ,
+      data: "LexBoosT™ Corp",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+      value: "EditionSubstring",
+      type: REG_SZ,
+      data: "LexBoosT™",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+      value: "EditionSubVersion",
+      type: REG_SZ,
+      data: "LexBoosT OS™ 26.06",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+      value: "RegisteredOrganization",
+      type: REG_SZ,
+      data: "LexBoosT OS™ 26.06",
+    }

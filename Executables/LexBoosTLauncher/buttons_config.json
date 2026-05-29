@@ -1,0 +1,343 @@
+{
+  "categoryOrder": [
+    "Utilities",
+    "Performance",
+    "System",
+    "Appearance",
+    "Security & Cleanup",
+    "Games"
+  ],
+  "buttons": [
+    {
+      "name": "LexBoosT GPU Tweaks",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\GPU_Tools\\GPUTweaks.exe",
+      "category": "Performance",
+      "tooltip": "Nvidia, AMD, Intel Tweaks",
+      "tooltipFr": "Optimisations Nvidia, AMD, Intel"
+    },
+    {
+      "name": "MSI Utility V3",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\MSI_Utility_V3.exe",
+      "category": "Performance",
+      "tooltip": "A powerful tool that helps reduce latency and improve system responsiveness by optimizing how your hardware talks to Windows.",
+      "tooltipFr": "Un outil puissant qui réduit la latence et améliore la réactivité du système en optimisant la communication matériel-Windows."
+    },
+    {
+      "name": "LexBoosT Timer Resolution Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\TimerControl.exe",
+      "category": "Performance",
+      "tooltip": "Control system timer resolution for better performance",
+      "tooltipFr": "Contrôler la résolution du minuteur système pour de meilleures performances"
+    },
+    {
+      "name": "LexBoosT Ram Cleaner Pro",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosTRamCleaner.exe",
+      "category": "Performance",
+      "tooltip": "Free up RAM and improve system performance",
+      "tooltipFr": "Libérer de la RAM et améliorer les performances système"
+    },
+    {
+      "name": "LexBoosT Network Optimizer",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_DNS_Congestion.exe",
+      "category": "Performance",
+      "tooltip": "Optimize network settings and DNS configuration",
+      "tooltipFr": "Optimiser les paramètres réseau et la configuration DNS"
+    },
+    {
+      "name": "LexBoosT Superfetch Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\SuperfetchManager.exe",
+      "category": "Performance",
+      "tooltip": "Manage SysMain (Superfetch) service settings",
+      "tooltipFr": "Gérer les paramètres du service SysMain (Superfetch)"
+    },
+    {
+      "name": "LexBoosT Pagefile Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Pagefile_Manager.exe",
+      "category": "Performance",
+      "tooltip": "Manage virtual memory pagefile settings",
+      "tooltipFr": "Gérer les paramètres du fichier d'échange"
+    },
+    {
+      "name": "Switch Power Scheme",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\Powerplans\\1-sPowers_x64.exe",
+      "category": "Performance",
+      "tooltip": "Switch between different power plans quickly",
+      "tooltipFr": "Basculer rapidement entre les différents modes d'alimentation"
+    },
+    {
+      "name": "Make Restore Point",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\RESTOREPOINT.exe",
+      "category": "System",
+      "tooltip": "Create a system restore point to save your current system state",
+      "tooltipFr": "Créer un point de restauration système pour sauvegarder l'état actuel"
+    },
+    {
+      "name": "LexBoosT Create System Image",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\CreateSystemImage.exe",
+      "category": "System",
+      "tooltip": "Create a complete backup image of your system",
+      "tooltipFr": "Créer une image de sauvegarde complète de votre système"
+    },
+    {
+      "name": "LexBoosT VSS Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\VSS_Manager.exe",
+      "category": "System",
+      "tooltip": "Manage Volume Shadow Copy Service snapshots",
+      "tooltipFr": "Gérer les instantanés du service VSS"
+    },
+    {
+      "name": "LexBoosT Easy Move User Folders",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_FolderMover.exe",
+      "category": "System",
+      "tooltip": "Easily relocate user folders to different drives",
+      "tooltipFr": "Déplacer facilement les dossiers utilisateurs vers d'autres lecteurs"
+    },
+    {
+      "name": "LexBoosT USB Sleep Mode Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\USB_Sleep_Idle_Manager.exe",
+      "category": "System",
+      "tooltip": "Prevent USB devices from entering sleep mode",
+      "tooltipFr": "Empêcher les périphériques USB de passer en mode veille"
+    },
+    {
+      "name": "LexBoosT Hibernation Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\HibernationManager.exe",
+      "category": "System",
+      "tooltip": "Enable or disable Windows hibernation feature",
+      "tooltipFr": "Activer ou désactiver la mise en hibernation Windows"
+    },
+    {
+      "name": "LexBoosT Hyper-V Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\HyperV_Manager.exe",
+      "category": "System",
+      "tooltip": "Manage Hyper-V settings (Valorant, FaceIt and other kernel-level anti-cheats will no longer work with Hyper-V cut)",
+      "tooltipFr": "Gérer les paramètres Hyper-V (Valorant, FaceIt et autres anti-trich au niveau du noyau ne fonctionneront plus avec Hyper-V coupé)"
+    },
+    {
+      "name": "Windows Update Mini Tool",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\WindowsUpdateMiniTool\\wumt_x64.exe",
+      "category": "System",
+      "tooltip": "Manage Windows Update settings and history",
+      "tooltipFr": "Gérer les paramètres et l'historique de Windows Update"
+    },
+    {
+      "name": "Autoruns Systinternals",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Autoruns64.exe",
+      "category": "System",
+      "tooltip": "View and manage auto-starting programs and services",
+      "tooltipFr": "Voir et gérer les programmes et services qui démarrent automatiquement"
+    },
+    {
+      "name": "LexBoosT Remove Windows AI",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\RemoveWindowsAI\\RemoveWindowsAI.exe",
+      "category": "System",
+      "tooltip": "Remove Windows AI features and components",
+      "tooltipFr": "Supprimer les fonctionnalités et composants IA de Windows"
+    },
+    {
+      "name": "LexBoosT Language Bar Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Remove_Langbar_Shortcut.exe",
+      "category": "System",
+      "tooltip": "Remove-Restore language bar keyboard shortcut and language bar visibility",
+      "tooltipFr": "Supprimer-Restaurer le raccourci clavier et la visibilité de la barre de langue"
+    },
+    {
+      "name": "LexBoosT Drive-Folder Compactor",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Lex_Compactor.exe",
+      "category": "System",
+      "tooltip": "Compress drives and folders to save disk space",
+      "tooltipFr": "Compresser les lecteurs et dossiers pour économiser de l'espace"
+    },
+    {
+      "name": "LexBoosT Start Menu Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\StartMenuManager_GUI.exe",
+      "category": "Appearance",
+      "tooltip": "Customize the Windows Start Menu appearance and behavior",
+      "tooltipFr": "Personnaliser l'apparence et le comportement du menu Démarrer"
+    },
+    {
+      "name": "LexBoosT DWM Effect Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\SetDWMEffect.exe",
+      "category": "Appearance",
+      "tooltip": "Configure Desktop Window Manager visual effects",
+      "tooltipFr": "Configurer les effets visuels du Gestionnaire de fenêtres"
+    },
+    {
+      "name": "LexBoosT Lockscreen and Windows Hello",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Lockscreen_WindowsHello.exe",
+      "category": "System",
+      "tooltip": "Customize lockscreen and Windows Hello settings",
+      "tooltipFr": "Personnaliser l'écran de verrouillage et les paramètres Windows Hello"
+    },
+    {
+      "name": "LexBoosT Widget Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\WidgetsManager.exe",
+      "category": "Appearance",
+      "tooltip": "Manage Windows widgets and their settings",
+      "tooltipFr": "Gérer les widgets Windows et leurs paramètres"
+    },
+    {
+      "name": "Nilesoft Shell",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\NilesoftShell\\Lex_Nilesoft_Shell\\shell.exe",
+      "category": "Appearance",
+      "tooltip": "Enhance Windows context menu with additional features",
+      "tooltipFr": "Enrichir le menu contextuel Windows avec des fonctionnalités supplémentaires"
+    },
+    {
+      "name": "Shortcut Arrow Editor",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Shortcut Arrow Editor.exe",
+      "category": "Appearance",
+      "tooltip": "Customize or remove shortcut arrow icons",
+      "tooltipFr": "Personnaliser ou supprimer les icônes flèches des raccourcis"
+    },
+    {
+      "name": "LexBoosT Cursor Installer",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Cursor_Installer.exe",
+      "category": "Appearance",
+      "tooltip": "Customize your mouse with LexBoosT cursors scheme",
+      "tooltipFr": "Personnaliser votre souris avec le schéma de curseurs LexBoosT"
+    },
+    {
+      "name": "Winaero Tweaker",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\WinaeroTweaker\\WinaeroTweaker.exe",
+      "category": "Utilities",
+      "tooltip": "Advanced Windows customization and tweaking tool",
+      "tooltipFr": "Outil avancé de personnalisation et d'optimisation de Windows"
+    },
+    {
+      "name": "Notepad++ VSCode Theme Installer",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_VSCode_Theme_Installer.exe",
+      "category": "Appearance",
+      "tooltip": "Apply VSCode themes to Notepad++",
+      "tooltipFr": "Appliquer des thèmes VSCode à Notepad++"
+    },
+    {
+      "name": "LexBoosT Folder Color Picker",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\FolderColorPicker.exe",
+      "category": "Appearance",
+      "tooltip": "Change folder colors for better organization",
+      "tooltipFr": "Changer les couleurs des dossiers pour une meilleure organisation"
+    },
+    {
+      "name": "LexBoosT Desktop Icons Toggle",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\HideIcons_Desktop.exe",
+      "category": "Appearance",
+      "tooltip": "Small software that allows you to hide/show desktop icons using a mouse key or keyboard shortcut.",
+      "tooltipFr": "Petit utilitaire pour masquer/afficher les icônes du bureau avec une touche de souris ou un raccourci clavier"
+    },
+    {
+      "name": "LexBoosT Packages Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\INSTALLSOFTS.exe",
+      "category": "Utilities",
+      "tooltip": "Install and manage software packages easily",
+      "tooltipFr": "Installer et gérer les logiciels facilement"
+    },
+    {
+      "name": "LexBoosT UUP Dump ISO Downloader",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\UUPDumpWPF.exe",
+      "category": "Utilities",
+      "tooltip": "Download Windows ISO files from UUP dump servers",
+      "tooltipFr": "Télécharger les ISO Windows depuis les serveurs UUP dump"
+    },
+    {
+      "name": "LexBoosT Tree View",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosTTreeView.exe",
+      "category": "Utilities",
+      "tooltip": "Allows you to see in 1 click which folders/files take up the most space and to be able to delete them.",
+      "tooltipFr": "Voir en 1 clic quels dossiers/fichiers occupent le plus d'espace et pouvoir les supprimer."
+    },
+    {
+      "name": "LexBoosT Todo List Manager Pro",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\TodoGUI_Pro.exe",
+      "category": "Utilities",
+      "tooltip": "Manage your tasks and todo lists efficiently",
+      "tooltipFr": "Gérer vos tâches et listes de choses à faire efficacement"
+    },
+    {
+      "name": "LexBoosT ISO Compressor WIM<>ESD",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\ISO_Compressor\\LexBoosT_Windows_Iso_Compressor.exe",
+      "category": "Utilities",
+      "tooltip": "Compress Windows ISO files to save disk space or Make bootable Windows Iso Folder",
+      "tooltipFr": "Compresser les ISO Windows pour économiser de l'espace ou créer un ISO Windows amorçable"
+    },
+    {
+      "name": "LexBoosT Images Compressor & Crop",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Image_Compressor.exe",
+      "category": "Utilities",
+      "tooltip": "Compress image or crop",
+      "tooltipFr": "Compresser des images ou recadrer",
+      "runAsAdmin": false
+    },
+    {
+      "name": "LexBoosT Toolbox",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LEX_TOOLBOX_GUI.exe",
+      "category": "Utilities",
+      "tooltip": "Enable/Disable options in context menu",
+      "tooltipFr": "Activer/Désactiver les options dans le menu contextuel"
+    },
+    {
+      "name": "LexBoosT Icon Converter",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\ICO_Converter.exe",
+      "category": "Utilities",
+      "tooltip": "Create icons files. [Supported files: PNG, JPEG, GIF, BMP, TIFF, WebP.]",
+      "tooltipFr": "Créer des fichiers d'icônes. [Fichiers supportés: PNG, JPEG, GIF, BMP, TIFF, WebP.]",
+      "runAsAdmin": false
+    },
+    {
+      "name": "LexBoosT Secure Password Generator",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\PasswordGenerator\\PasswordGenerator.exe",
+      "category": "Utilities",
+      "tooltip": "Generate secure random passwords",
+      "tooltipFr": "Générer des mots de passe sécurisés aléatoires"
+    },
+    {
+      "name": "Discord Fake Game Presence",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\DiscordFakeGamePresence\\DiscordFakeGamePresence.exe",
+      "category": "Utilities",
+      "tooltip": "Fake playing a game on Discord status",
+      "tooltipFr": "Faire croire que vous jouez à un jeu sur Discord"
+    },
+    {
+      "name": "LexBoosT Defender Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Defender_Manager.exe",
+      "category": "Security & Cleanup",
+      "tooltip": "Configure Windows Defender settings",
+      "tooltipFr": "Configurer les paramètres du Microsoft Defender"
+    },
+    {
+      "name": "LexBoosT UAC Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\UACManager.exe",
+      "category": "Security & Cleanup",
+      "tooltip": "Configure User Account Control settings",
+      "tooltipFr": "Configurer les paramètres du Contrôle de compte d'utilisateur"
+    },
+    {
+      "name": "LexBoosT Devices Cleanup",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Device_Cleanup.exe",
+      "category": "Security & Cleanup",
+      "tooltip": "Clean up unused device drivers and entries",
+      "tooltipFr": "Nettoyer les pilotes et entrées d'appareils inutilisés"
+    },
+    {
+      "name": "LexBoosT Browser Cleaner",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Clean_Browser_Cache.exe",
+      "category": "Security & Cleanup",
+      "tooltip": "Clear browser cache and temporary files",
+      "tooltipFr": "Vider le cache du navigateur et les fichiers temporaires"
+    },
+    {
+      "name": "LexBoosT Discord Debloater",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Discord_Debloat.exe",
+      "category": "Security & Cleanup",
+      "tooltip": "Remove Discord bloatware and optimize performance",
+      "tooltipFr": "Supprimer les éléments superflus de Discord et optimiser les performances"
+    },
+    {
+      "name": "Lex Snake",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Games\\LexSnake\\SnakeGame.exe",
+      "category": "Games",
+      "tooltip": "A Retro classic game make with love for LexBoosT OS users",
+      "tooltipFr": "Un jeu rétro classique fait avec amour pour les utilisateurs de LexBoosT OS"
+    }
+  ]
+}

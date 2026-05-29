@@ -1,0 +1,667 @@
+---
+title: Configure Explorer
+description: Configure general settings for Explorer
+privilege: TrustedInstaller
+actions:
+  # === perf: Disables Automatic Folder Type Discovery
+  # ------> Disabling it fixes the 'folder always loading' issue when a folder contains a lot of media files.
+  # ------> https://www.windowslatest.com/2024/03/04/windows-11-can-open-big-folders-in-file-explorer-faster-if-you-turn-off-folder-discovery/
+  - !registryValue: {
+      path: 'HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell',
+      value: "FolderType",
+      type: REG_SZ,
+      data: "NotSpecified",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell',
+      value: "FolderType",
+      type: REG_SZ,
+      data: "NotSpecified",
+    }
+
+  # === perf: Force explorer to use high performance GPU
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "C:\\Windows\\explorer.exe",
+      type: REG_SZ,
+      data: "GpuPreference=2;",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "C:\\Windows\\explorer.exe",
+      type: REG_SZ,
+      data: "GpuPreference=2;",
+    }
+
+  # === perf: Disable 'Include account-based insights, recent, favorite and recommended' for OneDrive in File Explorer
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer',
+      value: "DisableGraphRecentItems",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Disable 'Show most used apps' in the Start Menu
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer',
+      value: "ShowOrHideMostUsedApps",
+      type: REG_DWORD,
+      data: "2",
+    }
+
+  # === perf: Disable 'Group By' in the Downloads folder to avoid unnecessary dates comparison
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\EXPLORER_FOLDER_TYPES_FIX.PS1',
+      exeDir: true,
+      runas: trustedInstaller,
+      wait: true,
+    }
+
+  # Necesarry to refresh 'Bags'
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\EXPLORER_DOWNLOADS_BAGS_FIX.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+    }
+
+  # === Speed Up UWP app startup delay
+  - !registryValue: {
+      path: 'HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "EnableXamlStartMenu",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # === Disable the new Spotlight icon on Desktop (24H2)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel',
+      value: "{2cc5ca98-6485-489a-920e-b3e88a6ccce3}",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Increased context options time threshold
+  # ------> If selecting and right clicking more than x amount of items, some context options disappear (i.e. Take ownership), this will increase the threshold.
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "MultipleInvokePromptMinimum",
+      type: REG_DWORD,
+      data: "200",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "MultipleInvokePromptMinimum",
+      type: REG_DWORD,
+      data: "200",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Winaero.com\Winaero Tweaker\Changes',
+      value: "pageContextMenuSelectionLimit",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Disable ' - Shortcut.' text on shortcut creation.
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "link",
+      type: REG_BINARY,
+      data: "00000000",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "link",
+      type: REG_BINARY,
+      data: "00000000",
+    }
+
+  # === AutoRun - Disabled
+  # ------> Disable autorun will limit the functionality of autorun.inf on all disks.
+  # ------> https://learn.microsoft.com/en-us/windows/win32/shell/autoplay-reg
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoDriveTypeAutoRun",
+      type: REG_DWORD,
+      data: "255",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoDriveTypeAutoRun",
+      type: REG_DWORD,
+      data: "255",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoAutorun",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoAutorun",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Windows low disk space checking - Disabled
+  # ------> (Also prevents idle hard disks from going into standby)
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoLowDiskSpaceChecks",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "NoLowDiskSpaceChecks",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Speed up shutdown time by lowering the amount of time it takes the OS to close/kill background Services.
+  # ------> Changed to 2 seconds (2000), default is 5 seconds (5000).
+  # ------> https://www.sevenforums.com/tutorials/717-shut-down-speed-up.html
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control',
+      value: "WaitToKillServiceTimeout",
+      type: REG_SZ,
+      data: "2000",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control',
+      value: "WaitToKillServiceTimeout",
+      type: REG_SZ,
+      data: "2000",
+    }
+  - !registryValue: {
+      path: 'HKCU\SYSTEM\Control Panel\Desktop',
+      value: "WaitToKillServiceTimeout",
+      type: REG_SZ,
+      data: "2000",
+    }
+
+  # === Do not track Shell shortcuts during roaming - Enabled
+  # ------> https://admx.help/?Category=Windows_11_2022&Policy=Microsoft.Policies.WindowsExplorer::LinkResolveIgnoreLinkInfo
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "LinkResolveIgnoreLinkInfo",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "LinkResolveIgnoreLinkInfo",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Allow Windows Ink Workspace - Enabled (On, but disallow access above lock)
+  # ------> https://admx.help/?Category=Windows_11_2022&Policy=Microsoft.Policies.WindowsInkWorkspace::AllowSuggestedAppsInWindowsInkWorkspace
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace',
+      value: "AllowWindowsInkWorkspace",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Allow suggested apps in Windows Ink Workspace - Disabled
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace',
+      value: "AllowSuggestedAppsInWindowsInkWorkspace",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # === 'Show account related notifications occasionally in Start' - Disabled
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "Start_AccountNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "Start_AccountNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # === Turn off account notifications in Start (policy-based)
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\AccountNotifications',
+      value: "DisableAccountNotifications",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Disable BAM window hinting throttling
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\BamThrottling',
+      value: "DisableWindowHinting",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === 'End Task' - Enabled
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings',
+      value: "TaskbarEndTask",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings',
+      value: "TaskbarEndTask",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Open File Explorer to This PC by Default
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "LaunchTo",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "LaunchTo",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Show Pop-up Description - Hide
+  # ------> https://www.tenforums.com/tutorials/89239-hide-show-pop-up-descriptions-windows-10-a.html
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowInfoTip",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowInfoTip",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # Accelerate icon display
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "MaxCachedIcons",
+      type: REG_SZ,
+      data: "8192",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ExtendedUIHoverTime",
+      type: REG_DWORD,
+      data: "32",
+      option: "lex-visual",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ThumbnailLivePreviewHoverTime",
+      type: REG_DWORD,
+      data: "32",
+      option: "lex-visual",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent',
+      value: "DisableWelcomeExperience",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowClockInNotificationCenter",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "Start_Layout",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\3895955085',
+      value: "EnabledStateOptions",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\3895955085',
+      value: "EnabledState",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowSecondsInSystemClock",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+    path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes',
+    value: "ThemeChangesMousePointers",
+    data: "0",
+    type: REG_DWORD,
+    }
+  - !registryValue: {
+    path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes',
+    value: "ThemeChangesDesktopIcons",
+    data: "0",
+    type: REG_DWORD,
+    }
+
+  # HKCU: DISABLE WINDOWS TRANSPARENCY (taskbar, Start menu, window borders)
+  - !registryValue: {
+    path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
+    value: "EnableTransparency",
+    data: "0",
+    type: REG_DWORD,
+    option: "transparency",
+    }
+  - !registryValue: {
+    path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
+    value: "EnableTransparency",
+    data: "1",
+    type: REG_DWORD,
+    option: "!transparency",
+    }
+  - !registryValue: {
+    path: 'HKLM\SOFTWARE\Microsoft\Speech_OneCore\Preferences',
+    value: "VoiceActivationEnableAboveLockscreen",
+    type: REG_DWORD,
+    data: "0",
+    }
+
+  # === Disable Store results in Search (25H2)
+  - !registryValue: {
+    path: 'HKLM\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\WinStore.Tasks.WindowsSearchTask',
+    value: "ActivationType",
+    type: REG_DWORD,
+    data: "4294967295",
+    }
+  - !registryValue: {
+    path: 'HKLM\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\WinStore.Tasks.WindowsSearchTask',
+    value: "Server",
+    type: REG_SZ,
+    data: "",
+    }
+
+  # === Prevent WebView2 spawning from SearchHost
+  # ------> https://reddit.com/r/WindowsHelp/comments/1lfu325/comment/n2nk50h
+  - !registryValue: {
+    path: 'HKLM\SYSTEM\ControlSet001\Policies\Microsoft\FeatureManagement\Overrides',
+    value: "1694661260",
+    type: REG_DWORD,
+    data: "0",
+    }
+  - !registryValue: {
+    path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+    value: "ShouldPrelaunchFileExplorer",
+    type: REG_DWORD,
+    data: "0",
+    }
+  - !registryValue: {
+    path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+    value: "SeparateProcess",
+    type: REG_DWORD,
+    data: "0",
+    }
+
+  # HKCU: DRAG FULL WINDOWS
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Desktop',
+      value: "DragFullWindows",
+      type: REG_SZ,
+      data: "1",
+    }
+  # HKCU: ICONS / PREVIEWS / SELECTION
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "IconsOnly",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ListviewAlphaSelect",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # HKCU: FONT SMOOTHING (ClearType)
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Desktop',
+      value: "FontSmoothing",
+      type: REG_SZ,
+      data: "2",
+    }
+  # HKCU: NARRATOR — disable Win+Ctrl+Enter shortcut
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Narrator\NoRoam',
+      value: "WinEnterLaunchEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — ShowRecent, ShowRecommendations, ShowFrequent
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "ShowRecent",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "ShowRecommendations",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "ShowFrequent",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — hide cloud files in QuickAccess
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "ShowCloudFilesInQuickAccess",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER VIEW — compact mode, type overlay, folder info tip
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "UseCompactMode",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowTypeOverlay",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "FolderContentsInfoTip",
+      operation: delete,
+    }
+  # HKCU: EXPLORER — drives, conflicts, superhidden
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "HideDrivesWithNoMedia",
+      operation: delete,
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "HideMergeConflicts",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowSuperHidden",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — persist browsers, drive letters, encrypt color
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "PersistBrowsers",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowEncryptCompressedColor",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — preview handlers, status bar, auto check select
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowPreviewHandlers",
+      operation: delete,
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowStatusBar",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "AutoCheckSelect",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — sharing wizard
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "SharingWizardOn",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # HKCU: EXPLORER — type ahead / nav pane settings
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "TypeAhead",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "NavPaneShowAllCloudStates",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "NavPaneExpandToCurrentFolder",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "NavPaneShowAllFolders",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # HKCU: LIBRARIES in nav pane
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Classes\CLSID\{031E4825-7B94-4dc3-B131-E946B44C8DD5}',
+      value: "System.IsPinnedToNameSpaceTree",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # HKCU: DYNAMIC LIGHTING
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Lighting',
+      value: "AmbientLightingEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Lighting',
+      value: "ControlledByForegroundApp",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # HKCU: DEFAULT PRINTER MODE
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows',
+      value: "LegacyDefaultPrinterMode",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # HKCU: SINGLE/DOUBLE CLICK — IconUnderline
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer',
+      value: "IconUnderline",
+      type: REG_DWORD,
+      data: "3",
+    }
+  # HKCU: PHOTO VIEWER — restore legacy for .bmp
+  - !registryKey:
+    path: 'HKCU\SOFTWARE\Classes\.bmp'
+
+  # HKCU: DATE / TIME / MEASURE FORMATS
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "sShortDate",
+      type: REG_SZ,
+      data: "dd/MM/yyyy",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "iFirstDayOfWeek",
+      type: REG_SZ,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "sDecimal",
+      type: REG_SZ,
+      data: ",",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "sList",
+      type: REG_SZ,
+      data: ";",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "iMeasure",
+      type: REG_SZ,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\International',
+      value: "sMonDecimalSep",
+      type: REG_SZ,
+      data: ",",
+    }
+
+  # HKLM: PREVIOUS VERSIONS TAB — remove from file/folder/drive properties
+  - !registryKey:
+    path: 'HKLM\SOFTWARE\Classes\AllFilesystemObjects\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}'
+    operation: delete
+  - !registryKey:
+    path: 'HKLM\SOFTWARE\Classes\CLSID\{450D8FBA-AD25-11D0-98A8-0800361B1103}\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}'
+    operation: delete
+  - !registryKey:
+    path: 'HKLM\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}'
+    operation: delete
+  - !registryKey:
+    path: 'HKLM\SOFTWARE\Classes\Drive\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}'
+    operation: delete

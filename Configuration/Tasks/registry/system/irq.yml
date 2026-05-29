@@ -1,0 +1,55 @@
+---
+title: configure-irq
+description: configure-irq
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # Priorités des interruptions matérielles (IRQ)
+  # =============================================
+
+  # Configuration pour ControlSet001 (backup)
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control\PriorityControl',
+      value: "IRQ0Priority",
+      type: REG_DWORD,
+      data: "1",  # Haute priorité pour l'horloge CMOS (IRQ 0)
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control\PriorityControl',
+      value: "IRQ8Priority",
+      type: REG_DWORD,
+      data: "1",  # Haute priorité pour l'horloge CMOS (IRQ 8)
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Control\PriorityControl',
+      value: "IRQ16Priority",
+      type: REG_DWORD,
+      data: "2",  # Priorité très haute pour IRQ 16 (généralement GPU/PCH)
+    }
+  # Configuration active (CurrentControlSet)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl',
+      value: "IRQ8Priority",
+      type: REG_DWORD,
+      data: "1",  # Maintient la cohérence avec ControlSet001
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl',
+      value: "IRQ13Priority",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl',
+      value: "IRQ16Priority",
+      type: REG_DWORD,
+      data: "2",  # Priorité GPU maintenue
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl',
+      value: "ThreadBoostType",
+      type: REG_DWORD,
+      data: "2",  # Priorité GPU maintenue
+    }

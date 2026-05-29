@@ -1,0 +1,47 @@
+---
+title: OEM Information
+description: Configure OEM Information
+privilege: TrustedInstaller
+actions:
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "HelpCustomized",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "Manufacturer",
+      type: REG_SZ,
+      data: "LexBoosT™",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "SupportProvider",
+      type: REG_SZ,
+      data: "",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "SupportAppURL",
+      type: REG_SZ,
+      data: "https://ko-fi.com/lexboostdev",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "SupportURL",
+      type: REG_SZ,
+      data: "https://discord.gg/rWhhb4dPYa",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "Model",
+      type: REG_SZ,
+      data: "LexBoosT OS™ 26.06",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
+      value: "RegisteredOrganization",
+      type: REG_SZ,
+      data: "LexBoosT OS™ 26.06",
+    }

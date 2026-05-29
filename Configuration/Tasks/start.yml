@@ -1,0 +1,142 @@
+---
+title: Initialization
+description: Copies LexBoosT™ folders/files, and configures some initial settings
+privilege: TrustedInstaller
+actions:
+  # ============================================
+  # PHASE 0: CUSTOM OS DETECTION (abort if incompatible OS detected)
+  # ============================================
+  - !status: {
+      status: "Checking System Compatibility",
+    }
+  - !powerShell:
+      command: '.\\Scripts\\Setup\\DETECT-CUSTOM-OS.PS1'
+      exeDir: true
+      runas: currentUserElevated
+      wait: true
+      weight: 600
+
+  # ============================================
+  # PHASE 1: POWERSHELL CONFIGURATION
+  # ============================================
+
+  - !status: {
+      status: "Initializing",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell',
+      value: "ExecutionPolicy",
+      type: REG_SZ,
+      data: "Bypass",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging',
+      value: "EnableScriptBlockLogging",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging',
+      value: "EnableScriptBlockInvocationLogging",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging',
+      value: "EnableModuleLogging",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription',
+      value: "EnableTranscripting",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # Prevent annoying notifications during deployment
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance',
+      value: "Enabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # PHASE 2: SYSTEM PREPARATION
+  # ============================================
+
+  - !status: {
+      status: "Optimizing PowerShell",
+    }
+  - !powerShell:
+    weight: 200
+    runas: currentUserElevated
+    wait: true
+    exeDir: true
+    command: '.\\Scripts\\Performance\\NGEN.PS1'
+
+  # ============================================
+  # PHASE 3: FILE DEPLOYMENT
+  # ============================================
+
+  - !status: {
+      status: "Copying Lexboost OS files",
+    }
+  - !powerShell:
+    command: '.\\Scripts\\Setup\\COPY_LEXBOOSTOS.PS1'
+    runas: currentUserElevated
+    exeDir: true
+    ignoreErrors: true
+    wait: true
+    weight: 200
+
+  - !status: {
+      status: "Copying LexBoosT Theme",
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\THEME_DEPLOY.PS1 -Action CopyThemeFile',
+      exeDir: true,
+      wait: true,
+      weight: 50,
+      ignoreErrors: true,
+      option: "configure-theme",
+      runas: currentUserElevated,
+    }
+
+  # ============================================
+  # PHASE 4: SECURITY EXCLUSIONS
+  # ============================================
+
+  - !status: {
+      status: "Configuring Installation",
+    }
+  - !powerShell:
+    weight: 200
+    runas: currentUserElevated
+    wait: true
+    exeDir: true
+    command: '.\\Scripts\\Security\\AVEXCLUDE.PS1'
+
+  # ============================================
+  # PHASE 5: READY FOR DEPLOYMENT
+  # ============================================
+
+  - !status: {
+      status: "Starting Deployment",
+    }
+  - !run:
+    exeDir: true
+    exe: ".\\Scripts\\PAUSE.CMD"
+    runas: currentUserElevated
+    wait: true
+    weight: 300
+
+  - !status: {
+      status: "Let's Go!",
+    }
+  - !run:
+    exeDir: true
+    exe: ".\\Scripts\\PAUSE.CMD"
+    runas: currentUserElevated
+    wait: true
+    weight: 200

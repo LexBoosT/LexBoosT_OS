@@ -1,0 +1,237 @@
+---
+title: advanced-system-optimization
+description: Advanced CPU, memory and storage optimizations
+privilege: TrustedInstaller
+actions:
+
+  # ============================================
+  # CPU & PROCESS OPTIMIZATIONS
+  # ============================================
+
+  # PerfOptions - Enable performance flags for system processes
+  # This key must exist for individual process options to work
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options',
+      value: "PerfOptions",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # MEMORY MANAGEMENT - ADDITIONAL TWEAKS
+  # ============================================
+  # Note: ClearPageFileAtShutdown and DisablePagingExecutive already configured in memory-management-optimization.yml
+  # Note: DisablePageCombining is handled by FINALIZE4.CMD (Disable-MMAgent -PageCombining)
+
+  # ============================================
+  # NTFS FILESYSTEM OPTIMIZATIONS
+  # ============================================
+  # NOTE: DisableLastAccess, 8dot3NameCreation are handled by FINALIZE1.cmd (fsutil)
+  # which applies them at the filesystem driver level (more reliable than registry)
+
+  # ============================================
+  # CONTEXT SWITCH & QUANTUM OPTIMIZATION
+  # ============================================
+
+  # Win32PrioritySeparation - Already configured in win32ps.yml
+  # This file focuses on additional quantum settings
+
+  # Quantum - Prefer foreground applications (already set via multimedia)
+  # Additional tweak for process scheduling
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl',
+      value: "Quantum",
+      type: REG_DWORD,
+      data: "2",
+    }
+  # ============================================
+  # HARDWARE ABSTRACTION LAYER (HAL)
+  # ============================================
+
+  # UseHardwareErrorCorrection - Enable hardware error correction
+  # Improves system stability
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager',
+      value: "UseHardwareErrorCorrection",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # POWER & PERFORMANCE BALANCE
+  # ============================================
+
+  # CoalescingTimerInterval - Reduce timer coalescing
+  # Lower values = more responsive but higher power usage
+  # 0 = Minimum coalescing (best performance)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power',
+      value: "CoalescingTimerInterval",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ExitLatency - Reduce ACPI exit latency
+  # 0 = Minimum latency for power state transitions
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power',
+      value: "ExitLatency",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ExitLatencyCheck - Enable exit latency check
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power',
+      value: "ExitLatencyCheck",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # SESSION MANAGER OPTIMIZATIONS
+  # ============================================
+
+  # ProtectionMode - Enable additional process protection
+  # Improves security without performance impact
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager',
+      value: "ProtectionMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # SafeProcessSearchMode - Enable safe process search
+  # Prevents race conditions in process enumeration
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager',
+      value: "SafeProcessSearchMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # KERNEL ADDITIONAL TWEAKS
+  # ============================================
+
+  # AlwaysTrackIoBoosting - Disable IO boost tracking
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "AlwaysTrackIoBoosting",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ForceBugcheckForDpcWatchdog - Disable forced BSOD for DPC watchdog
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "ForceBugcheckForDpcWatchdog",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # EnableWerUserReporting - Disable WER user reporting
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "EnableWerUserReporting",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # SeLpacEnableWatsonReporting - Disable Watson telemetry
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "SeLpacEnableWatsonReporting",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # TimerCheckFlags - Disable timer check flags
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "TimerCheckFlags",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # InterruptSteeringFlags - Enable interrupt steering
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "InterruptSteeringFlags",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # CONFIGURATION MANAGER
+  # ============================================
+
+  # SelfHealingEnabled - Disable self-healing
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager',
+      value: "SelfHealingEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # VirtualizationEnabled - Disable config manager virtualization
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager',
+      value: "VirtualizationEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # FastBoot - Disable fast boot in config manager
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager',
+      value: "FastBoot",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # BugcheckRecoveryEnabled - Disable bugcheck recovery
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager',
+      value: "BugcheckRecoveryEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # I/O SYSTEM
+  # ============================================
+
+  # DisableDiskCounters - Disable disk performance counters
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System',
+      value: "DisableDiskCounters",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # IoAllowLoadCrashDumpDriver - Disable crash dump driver
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System',
+      value: "IoAllowLoadCrashDumpDriver",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # ============================================
+  # EXECUTIVE
+  # ============================================
+
+  # ForceEnableMutantAutoboost - Enable mutant auto-boost
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Executive',
+      value: "ForceEnableMutantAutoboost",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # ============================================
+  # WINDOWS NT ADVANCED OPTIMIZATIONS
+  # ============================================
+
+  # TimerCoalescing - Disable timer coalescing (REG_BINARY 64 bytes zeroed)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows',
+      value: "TimerCoalescing",
+      type: REG_BINARY,
+      data: "0000000000000000000000000000000000000000000000000000000000000000",
+    }
+  # ProcessDCEsInUseThreshold - Disable DCE threshold
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows',
+      value: "ProcessDCEsInUseThreshold",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # DesktopHeapLogging - Disable desktop heap logging
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows',
+      value: "DesktopHeapLogging",
+      type: REG_DWORD,
+      data: "0",
+    }

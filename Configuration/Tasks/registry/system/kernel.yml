@@ -1,0 +1,162 @@
+---
+title: configure-kernel
+description: configure-kernel
+privilege: TrustedInstaller
+actions:
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "DisableAutoBoost",
+      type: REG_DWORD,
+      data: "0",  # 0 = Permet le boost de priorité automatique
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "TimeSlip",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # === DisableExceptionChainValidation - STABLE
+  # ------> 0 = Garde la validation SEHOP (RECOMMANDÉ — stabilité, évite crashes Discord/apps SEH)
+  # ------> 1 = DÉSACTIVE la validation (risque de BSOD et erreurs apps — déconseillé)
+  # NOTE: la valeur précédente était 1 (bug de documentation inversée, corrigé)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "DisableExceptionChainValidation",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # === UnlimitDpcQueue - STABLE
+  # ------> 0 = Garde la limite par défaut (évite les hangs système)
+  # ------> 1 = Supprime la limite (risque de DPC storms)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "UnlimitDpcQueue",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # === ThreadDpcEnable - OPTIMISÉ
+  # ------> 1 = Active les DPC threadés (améliore réactivité sans risque)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "ThreadDpcEnable",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # PARAMÈTRES DPC TIMEOUT - ÉQUILIBRE STABLE
+  # =============================================
+  # Valeurs par défaut Windows : plus stables, évitent BSOD
+  # Timeout trop agressif (< 50ms) = risque de crashes drivers
+
+  # KeDpcTimeoutMs - Timeout principal DPC
+  # Recommandé: 50-100ms pour stabilité
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcTimeoutMs",
+      type: REG_DWORD,
+      data: "100",  # 0x64 = 100ms (stable)
+    }
+  # KeDpcSoftTimeoutMs - Timeout souple DPC
+  # Doit être >= KeDpcTimeoutMs
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcSoftTimeoutMs",
+      type: REG_DWORD,
+      data: "100",  # 0x64 = 100ms (stable)
+    }
+  # KeDpcCumulativeSoftTimeoutMs - Timeout cumulatif
+  # 2000ms est correct pour usage normal
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcCumulativeSoftTimeoutMs",
+      type: REG_DWORD,
+      data: "2000",  # 0x7D0 = 2000ms
+    }
+  # =============================================
+  # CONFIGURATION DU WATCHDOG DPC - STABLE
+  # =============================================
+
+  # KeDpcWatchdogPeriodMs - Période de surveillance
+  # 5000ms = valeur Windows par défaut (stable)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcWatchdogPeriodMs",
+      type: REG_DWORD,
+      data: "5000",  # 0x1388 = 5000ms (défaut Windows)
+    }
+  # KeDpcWatchdogProfileSingleDpcThresholdMs - Seuil DPC unique
+  # 50ms = tolérant pour les drivers lents
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcWatchdogProfileSingleDpcThresholdMs",
+      type: REG_DWORD,
+      data: "50",  # 0x32 = 50ms (stable)
+    }
+  # KeDpcWatchdogProfileCumulativeDpcThresholdMs - Seuil cumulatif
+  # 5000ms = valeur stable
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KeDpcWatchdogProfileCumulativeDpcThresholdMs",
+      type: REG_DWORD,
+      data: "5000",  # 0x1388 = 5000ms (stable)
+    }
+  # =============================================
+  # PARAMÈTRES SEH - SÉCURITÉ ACTIVÉE
+  # =============================================
+
+  # KernelSEHOPEnabled - Protection SEHOP
+  # 0 = Désactivé (risque de stabilité)
+  # 1 = Activé (recommandé pour stabilité)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "KernelSEHOPEnabled",
+      type: REG_DWORD,
+      data: "1",  # 1 = Active SEHOP (stabilité maximale)
+    }
+  # LargePageMinimum - OPTIMISÉ STABLE
+  # =============================================
+  #   - 4194304 (4MB) = Trop élevé, peut causer échecs allocation mémoire
+  #   - 0 = Windows gère automatiquement (RECOMMANDÉ)
+  #   - 2097152 (2MB) = Valeur alternative si besoin
+  #
+  # Les Large Pages sont utiles pour bases de données, mais:
+  #   - Peuvent fragmenter la mémoire
+  #   - Causent des échecs d'allocation pour certains drivers
+  #   - Inutiles pour gaming/usage normal
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "LargePageMinimum",
+      type: REG_DWORD,
+      data: "0",  # 0 = Gestion automatique Windows (stable)
+    }
+  # =============================================
+  # DISTRIBUTE TIMERS & DYNAMIC TICK
+  # =============================================
+
+  # === DistributeTimers — delete (prevents timer distribution across cores, reduces latency)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "DistributeTimers",
+      operation: delete,
+    }
+  # === DisableDynamicTick — prevents tick merging, reduces latency
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "DisableDynamicTick",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # === Dynamic Tick Duration — prevents tick merging (1000 decimal = 0x3e8)
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "MaxDynamicTickDuration",
+      type: REG_DWORD,
+      data: "1000",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel',
+      value: "MinDynamicTickDuration",
+      type: REG_DWORD,
+      data: "1000",
+    }

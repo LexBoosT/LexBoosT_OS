@@ -1,0 +1,10 @@
+---
+title: Opera GX Installation
+description: Installs Opera GX browser
+actions:
+  - !run:
+      runas: currentUserElevated
+      exeDir: true
+      wait: true
+      exe: "powershell"
+      args: '-EP Bypass -C ".\\Scripts\\Setup\\SOFTWARE.PS1 -Software Install-OperaGX"'

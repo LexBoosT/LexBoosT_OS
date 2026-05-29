@@ -1,0 +1,17 @@
+---
+title: Configure System -> Logon
+description: Configure logon settings
+privilege: TrustedInstaller
+actions:
+  # =============
+  # === Logon ===
+  # =============
+
+  # === Show first sign-in animation - Disabled
+  # AUDIT: valeur était 1 (Active l'animation) — corrigé à 0 pour correspondre à l'intention du commentaire
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System',
+      value: "EnableFirstLogonAnimation",
+      type: REG_DWORD,
+      data: "0",
+    }

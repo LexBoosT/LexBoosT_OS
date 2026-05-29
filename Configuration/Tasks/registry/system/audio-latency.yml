@@ -1,0 +1,81 @@
+---
+title: Configure Audio Latency
+description: Configure audio latency
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # Paramètres Audio (Latence ultra-faible)
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio',
+      value: "Affinity",
+      type: REG_DWORD,
+      data: "0",  # Utilise tous les cœurs CPU (0 = pas d'affinité forcée)
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio',
+      value: "GPU Priority",
+      type: REG_DWORD,
+      data: "8",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio',
+      value: "SFIO Priority",
+      type: REG_SZ,
+      data: "High",  # Priorité maximale pour les E/S stockage
+    }
+  # =============================================
+  # STARTUP SOUND — enable (HKLM)
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation',
+      value: "DisableStartupSound",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\EditionOverrides',
+      value: "UserSetting_DisableStartupSound",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # VOICE ACTIVATION — "Hey Cortana" (HKLM)
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings',
+      value: "AgentActivationEnabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings',
+      value: "AgentActivationLastUsed",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # HKCU: NARRATOR AUDIO DUCKING — enable
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\SOFTWARE\Microsoft\Narrator\NoRoam',
+      value: "DuckAudio",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # HKCU: ACCESSIBILITY SOUNDS
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Accessibility',
+      value: "Sound on Activation",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Accessibility',
+      value: "Warning Sounds",
+      type: REG_DWORD,
+      data: "1",
+    }

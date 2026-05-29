@@ -1,0 +1,235 @@
+---
+title: USB Optimization
+description: USB controller, audio, queue depth, and low-latency tuning.
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # USB XHCI — low latency mode
+  # =============================================
+
+  # === LowLatencyMode — reduces USB buffering latency
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters',
+      value: "LowLatencyMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # === ForceFullSpeed — prevent speed negotiation delays
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters',
+      value: "ForceFullSpeed",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # === IdleEnabled — disable USB XHCI idle
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters',
+      value: "IdleEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # === InterruptThreshold — minimize interrupt coalescing
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Services\USBXHCI\Parameters\Device',
+      value: "InterruptThreshold",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # USB HUB3 — low latency + force full speed
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBHUB3\Parameters',
+      value: "EnhancedPowerManagementEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBHUB3\Parameters',
+      value: "ForceFullSpeed",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBHUB3\Parameters',
+      value: "LowLatencyMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # === InterruptThreshold — HUB3
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\ControlSet001\Services\USBHUB3\Parameters\Device',
+      value: "InterruptThreshold",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # USB HUB — power down + aggressive suspend
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBHUB\Hub',
+      value: "DisablePowerDown",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbhub\Parameters',
+      value: "DisableOnSoftRemove",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbhub\Parameters',
+      value: "EnableAggressiveSuspend",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbhub\Parameters',
+      value: "SelectiveSuspendTimeout",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # USB AUDIO — always on + isochronous + low latency
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbaudio\Parameters',
+      value: "AudioAlwaysOn",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbaudio\Parameters',
+      value: "IsochronousTransferMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbaudio\Parameters',
+      value: "Latency",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # USB SERVICE — global parameters
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB',
+      value: "DisablePowerDown",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB',
+      value: "DisableSelectiveSuspend",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB',
+      value: "EnIdleEndpointSupport",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB\Parameters',
+      value: "DisableSelectiveSuspend",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB\Parameters',
+      value: "DisableSelectiveSuspendTimeout",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB\Parameters',
+      value: "ForceFullSpeed",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USB\Parameters',
+      value: "ForceHCResetOnResume",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # HID USB — disable idle
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\HidUsb',
+      value: "IdleEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # USBSTOR — polling interval
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\usbstor',
+      value: "PollingInterval",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # USBFLAGS — ignore HW serial number
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\usbflags',
+      value: "IgnoreHWSerNum",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # USB I/O QUEUE — work item tuning
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\xusb22\Parameters',
+      value: "IoQueueWorkItem",
+      type: REG_DWORD,
+      data: "10",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters',
+      value: "IoQueueWorkItem",
+      type: REG_DWORD,
+      data: "10",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Services\usbhub\Parameters',
+      value: "IoQueueWorkItem",
+      type: REG_DWORD,
+      data: "10",
+    }
+  # =============================================
+  # STORPORT — disable log control
+  # =============================================
+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\StorPort',
+      value: "LogControlEnable",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # DEVICE WAKE — disable HID wake (powercfg equivalent)
+  # =============================================
+  - !powerShell:
+    command: '.\\Scripts\\Devices\\DISABLE-HIDDEVICEWAKE.PS1'
+    exeDir: true
+    runas: currentUserElevated
+    weight: 20
+    ignoreErrors: true
+    wait: true

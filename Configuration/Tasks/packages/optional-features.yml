@@ -1,0 +1,15 @@
+---
+title: Optional Features
+description: Configures Windows optional features
+privilege: TrustedInstaller
+onUpgrade: false
+actions:
+  - !status: {
+      status: "Config features",
+      onUpgrade: false,
+    }
+  - !powerShell:
+    exeDir: true
+    errorAction: Ignore
+    weight: 100
+    command: '.\\Scripts\\Cleanup\\DISM-FEATURES.PS1'

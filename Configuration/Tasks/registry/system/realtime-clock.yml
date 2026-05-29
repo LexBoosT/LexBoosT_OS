@@ -1,0 +1,16 @@
+---
+title: Real-Time Clock (UTC)
+description: Sets hardware clock to UTC for dual-boot compatibility with Linux
+privilege: TrustedInstaller
+actions:
+  - !status: {
+      status: 'Fix dual-boot clock (Linux)',
+      option: "dual-boot-time",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation',
+      value: "RealTimeIsUniversal",
+      type: REG_DWORD,
+      data: "1",
+      option: "dual-boot-time",
+    }

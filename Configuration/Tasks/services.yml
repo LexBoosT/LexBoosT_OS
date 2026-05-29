@@ -1,0 +1,1318 @@
+---
+title: Services
+description: Removal and configuration of Windows services
+privilege: TrustedInstaller
+actions:
+  - !status: {
+      status: "Config Services",
+    }
+
+  # ============================================
+  # TELEMETRY & DIAGNOSTICS
+  # ============================================
+  # -- Automatic --
+  # Diagnostic Policy Service
+  - !service: {
+      name: "DPS",
+      operation: change,
+      startup: 2,
+    }
+  # -- Manual --
+  # Device Setup Manager
+  - !service: {
+      name: "DsmSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Diagnostic Service Host
+  - !service: {
+      name: "WdiServiceHost",
+      operation: change,
+      startup: 3,
+    }
+  # Diagnostic System Host
+  - !service: {
+      name: "WdiSystemHost",
+      operation: change,
+      startup: 3,
+    }
+  # -- Disabled --
+  # Connected User Experiences and Telemetry
+  - !service: {
+      name: "DiagTrack",
+      operation: change,
+      startup: 4,
+    }
+  # Diagnostic Execution Service
+  - !service: {
+      name: "diagsvc",
+      operation: change,
+      startup: 4,
+    }
+  # NVIDIA Telemetry Container
+  - !service: {
+      name: "NvTelemetryContainer",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Telemetry (DiagTrack alias)
+  - !service: {
+      name: "Telemetry",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Event Collector
+  - !service: {
+      name: "Wecsvc",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Error Reporting Service
+  - !service: {
+      name: "WerSvc",
+      operation: change,
+      startup: 4,
+    }
+  # Device Management WAP Push (telemetry/data collection for mobile devices)
+  - !service: {
+      name: "dmwappushservice",
+      operation: change,
+      startup: 4,
+    }
+
+  # ============================================
+  # TROUBLESHOOTING & COMPATIBILITY
+  # ============================================
+  # -- Disabled --
+  # Application Management (group policy install)
+  - !service: {
+      name: "AppMgmt",
+      operation: change,
+      startup: 4,
+    }
+  # Program Compatibility Assistant
+  - !service: {
+      name: "PcaSvc",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Troubleshooting
+  - !service: {
+      name: "TroubleshootingSvc",
+      operation: change,
+      startup: 4,
+    }
+  # Update Health Service
+  - !service: {
+      name: "uhssvc",
+      operation: change,
+      startup: 4,
+    }
+
+  # ============================================
+  # XBOX & GAMING
+  # ============================================
+  # -- Manual --
+  # Xbox Live Auth Manager
+  - !service: {
+      name: "XblAuthManager",
+      operation: change,
+      startup: 3,
+    }
+  # Xbox Live Game Save
+  - !service: {
+      name: "XblGameSave",
+      operation: change,
+      startup: 3,
+    }
+  # Xbox Accessory Management
+  - !service: {
+      name: "XboxGipSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Xbox Live Networking Service
+  - !service: {
+      name: "XboxNetApiSvc",
+      operation: change,
+      startup: 3,
+    }
+
+  # ============================================
+  # NETWORK & CONNECTIVITY
+  # ============================================
+  # -- Manual --
+  # Delivery Optimization (Windows Update P2P)
+  - !service: {
+      name: "DoSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Internet Connection Sharing (Mobile Hotspot)
+  - !service: {
+      name: "icssvc",
+      operation: change,
+      startup: 3,
+    }
+  # Server (SMB/File Sharing)
+  - !service: {
+      name: "LanmanServer",
+      operation: change,
+      startup: 3,
+    }
+  # NetBIOS over TCP/IP
+  - !service: {
+      name: "NetBT",
+      operation: change,
+      startup: 3,
+    }
+  # Shell Hardware Detection (AutoPlay)
+  - !service: {
+      name: "ShellHWDetection",
+      operation: change,
+      startup: 3,
+    }
+  # -- Disabled --
+  # AllJoyn Router Service
+  - !service: {
+      name: "AJRouter",
+      operation: change,
+      startup: 4,
+    }
+  # Application Layer Gateway
+  - !service: {
+      name: "ALG",
+      operation: change,
+      startup: 4,
+    }
+  # Fax
+  - !service: {
+      name: "Fax",
+      operation: change,
+      startup: 4,
+    }
+  # Downloaded Maps Manager
+  - !service: {
+      name: "MapsBroker",
+      operation: change,
+      startup: 4,
+    }
+  # Distributed Transaction Coordinator
+  - !service: {
+      name: "MSDTC",
+      operation: change,
+      startup: 4,
+    }
+  # Routing and Remote Access
+  - !service: {
+      name: "RemoteAccess",
+      operation: change,
+      startup: 4,
+    }
+  # Remote Registry
+  - !service: {
+      name: "RemoteRegistry",
+      operation: change,
+      startup: 4,
+    }
+  # Payments and NFC / SE Manager
+  - !service: {
+      name: "SEMgrSvc",
+      operation: change,
+      startup: 4,
+    }
+  # SSDP Discovery (DLNA/UPnP)
+  - !service: {
+      name: "SSDPSRV",
+      operation: change,
+      startup: 4,
+    }
+  # Distributed Link Tracking Client
+  - !service: {
+      name: "TrkWks",
+      operation: change,
+      startup: 4,
+    }
+  # Wallet Service
+  - !service: {
+      name: "WalletService",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Media Player Network Sharing
+  - !service: {
+      name: "WMPNetworkSvc",
+      operation: change,
+      startup: 4,
+    }
+
+  # ============================================
+  # DEVICES & PERIPHERALS
+  # ============================================
+  # -- Manual --
+  # Bluetooth Support Service
+  - !service: {
+      name: "BluetoothSupportService",
+      operation: change,
+      startup: 3,
+    }
+  # Bluetooth Audio/Hands-Free
+  - !service: {
+      name: "bthserv",
+      operation: change,
+      startup: 3,
+    }
+  # Device Association Service
+  - !service: {
+      name: "DeviceAssociationService",
+      operation: change,
+      startup: 3,
+    }
+  # Device Install Service
+  - !service: {
+      name: "DeviceInstall",
+      operation: change,
+      startup: 3,
+    }
+  # Device Management Enrollment
+  - !service: {
+      name: "DmEnrollmentSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Geolocation Service
+  - !service: {
+      name: "lfsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Print Spooler
+  - !service: {
+      name: "Spooler",
+      operation: change,
+      startup: 3,
+    }
+
+  # ============================================
+  # SEARCH & INDEXING
+  # ============================================
+  # -- Manual --
+  # Windows Font Cache Service
+  - !service: {
+      name: "FontCache",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Search
+  - !service: {
+      name: "WSearch",
+      operation: change,
+      startup: 3,
+    }
+
+  # ============================================
+  # SYSTEM & PERFORMANCE
+  # ============================================
+  # -- Manual --
+  # Background Intelligent Transfer Service
+  - !service: {
+      name: "BITS",
+      operation: change,
+      startup: 3,
+    }
+  # Connected Devices Platform Service
+  - !service: {
+      name: "CDPSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Connected Devices Platform User Service
+  - !service: {
+      name: "CDPUserSvc",
+      operation: change,
+      startup: 3,
+    }
+  # GPU Energy Driver (required for HAGS on Win11)
+  - !service: {
+      name: "GpuEnergyDrv",
+      operation: change,
+      startup: 3,
+    }
+  # SysMain (Superfetch/Prefetch)
+  - !service: {
+      name: "SysMain",
+      operation: change,
+      startup: 3,
+    }
+  - !run: {
+      exe: "net",
+      args: "stop SysMain",
+      ignoreErrors: true,
+    }
+  # Volumetric Audio Compositor
+  - !service: {
+      name: "VacSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Volume Shadow Copy
+  - !service: {
+      name: "VSS",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Push Notifications Service
+  - !service: {
+      name: "WpnService",
+      operation: change,
+      startup: 3,
+    }
+
+  # ============================================
+  # OTHER SERVICES
+  # ============================================
+  # -- Automatic --
+  # Clipboard User Service (Win+V history)
+  - !service: {
+      name: "cbdhsvc",
+      operation: change,
+      startup: 2,
+    }
+  # Client License Service (Microsoft Store)
+  - !service: {
+      name: "ClipSVC",
+      operation: change,
+      startup: 2,
+    }
+  # Storage Service Management
+  - !service: {
+      name: "smphost",
+      operation: change,
+      startup: 2,
+    }
+  # State Repository (UWP/Shell dependency)
+  - !service: {
+      name: "StateRepository",
+      operation: change,
+      startup: 2,
+    }
+  # Storage Service
+  - !service: {
+      name: "StorSvc",
+      operation: change,
+      startup: 2,
+    }
+  # Touch/Text Input Management
+  - !service: {
+      name: "TextInputManagementService",
+      operation: change,
+      startup: 2,
+    }
+  # Web Account Manager
+  - !service: {
+      name: "TokenBroker",
+      operation: change,
+      startup: 2,
+    }
+  # User Data Service (contact/sync cbdhsvc)
+  - !service: {
+      name: "UserDataSvc",
+      operation: change,
+      startup: 2,
+    }
+  # Virtual Disk Service (required for Disk Mgmt)
+  - !service: {
+      name: "vds",
+      operation: change,
+      startup: 2,
+    }
+  # Microsoft Defender Web Threat Defense (keep Automatic while Defender is active)
+  - !service: {
+      name: "webthreatdefsvc",
+      operation: change,
+      startup: 2,
+    }
+  # Microsoft Account Sign-in Assistant
+  - !service: {
+      name: "wlidsvc",
+      operation: change,
+      startup: 2,
+    }
+  # -- Manual --
+  # Application Identity (AppLocker)
+  - !service: {
+      name: "AppIDSvc",
+      operation: change,
+      startup: 3,
+    }
+  # App Readiness (UWP app preload)
+  - !service: {
+      name: "AppReadiness",
+      operation: change,
+      startup: 3,
+    }
+  # AppX Deployment Service (UWP installs)
+  - !service: {
+      name: "AppXSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Application Information (RunAs elevation)
+  - !service: {
+      name: "Appinfo",
+      operation: change,
+      startup: 3,
+    }
+  # Cellular Time
+  - !service: {
+      name: "autotimesvc",
+      operation: change,
+      startup: 3,
+    }
+  # ActiveX Installer
+  - !service: {
+      name: "AxInstSV",
+      operation: change,
+      startup: 3,
+    }
+  # BitLocker Drive Encryption Service
+  - !service: {
+      name: "BDESVC",
+      operation: change,
+      startup: 3,
+    }
+  # GameDVR and Broadcast
+  - !service: {
+      name: "BcastDVRUserService",
+      operation: change,
+      startup: 3,
+    }
+  # Bluetooth User Support Service
+  - !service: {
+      name: "BluetoothUserService",
+      operation: change,
+      startup: 3,
+    }
+  # Bluetooth Audio Gateway Service
+  - !service: {
+      name: "BTAGService",
+      operation: change,
+      startup: 3,
+    }
+  # Capability Access Manager (App Permissions)
+  - !service: {
+      name: "camsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Capture Service (Snipping Tool/Screenshot)
+  - !service: {
+      name: "CaptureService",
+      operation: change,
+      startup: 3,
+    }
+  # CD/DVD File System Driver
+  - !service: {
+      name: "cdrom",
+      operation: change,
+      startup: 3,
+    }
+  # Certificate Propagation (smart card)
+  - !service: {
+      name: "CertPropSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Office Click-to-Run
+  - !service: {
+      name: "ClickToRunSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Cloud Identity Service
+  - !service: {
+      name: "cloudidsvc",
+      operation: change,
+      startup: 3,
+    }
+  # COM+ System Application
+  - !service: {
+      name: "COMSysApp",
+      operation: change,
+      startup: 3,
+    }
+  # Consent UX (UAC dialog)
+  - !service: {
+      name: "ConsentUxUserSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Offline Files
+  - !service: {
+      name: "CscService",
+      operation: change,
+      startup: 3,
+    }
+  # Declared Configuration Service
+  - !service: {
+      name: "dcsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Optimize Drives (Disk Defragmenter)
+  - !service: {
+      name: "defragsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Device Picker
+  - !service: {
+      name: "DevicePickerUserSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Devices Flow
+  - !service: {
+      name: "DevicesFlowUserSvc",
+      operation: change,
+      startup: 3,
+    }
+  # DevQuery Background Discovery
+  - !service: {
+      name: "DevQueryBroker",
+      operation: change,
+      startup: 3,
+    }
+  # Display Enhancement (HDR/brightness)
+  - !service: {
+      name: "DisplayEnhancementService",
+      operation: change,
+      startup: 3,
+    }
+  # Device Management WAP Push
+  - !service: {
+      name: "dmwappushservice",
+      operation: change,
+      startup: 3,
+    }
+  # Wired AutoConfig (802.1X)
+  - !service: {
+      name: "dot3svc",
+      operation: change,
+      startup: 3,
+    }
+  # Data Sharing Service
+  - !service: {
+      name: "DsSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Extensible Authentication Protocol
+  - !service: {
+      name: "EapHost",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Edge Update Service
+  - !service: {
+      name: "edgeupdate",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Edge Update Service (user)
+  - !service: {
+      name: "edgeupdatem",
+      operation: change,
+      startup: 3,
+    }
+  # Encrypting File System
+  - !service: {
+      name: "EFS",
+      operation: change,
+      startup: 3,
+    }
+  # Embedded Mode (kiosk/tablet)
+  - !service: {
+      name: "embeddedmode",
+      operation: change,
+      startup: 3,
+    }
+  # Enterprise App Management
+  - !service: {
+      name: "EntAppSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Function Discovery Resource Publication
+  - !service: {
+      name: "FDResPub",
+      operation: change,
+      startup: 3,
+    }
+  # Function Discovery Provider Host
+  - !service: {
+      name: "fdPHost",
+      operation: change,
+      startup: 3,
+    }
+  # File History Service
+  - !service: {
+      name: "fhsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Camera Frame Server
+  - !service: {
+      name: "FrameServer",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Camera Frame Server Monitor
+  - !service: {
+      name: "FrameServerMonitor",
+      operation: change,
+      startup: 3,
+    }
+  # Graphics Performance Monitor
+  - !service: {
+      name: "GraphicsPerfSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Human Interface Device (HID) Service
+  - !service: {
+      name: "hidserv",
+      operation: change,
+      startup: 3,
+    }
+  # HV Host Service (Hyper-V)
+  - !service: {
+      name: "HvHost",
+      operation: change,
+      startup: 3,
+    }
+  # Internet Explorer ETW Collector
+  - !service: {
+      name: "IEEtwCollectorService",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Store Install Service
+  - !service: {
+      name: "InstallService",
+      operation: change,
+      startup: 3,
+    }
+  # Device Inventory Service
+  - !service: {
+      name: "InventorySvc",
+      operation: change,
+      startup: 3,
+    }
+  # IP Translation Configuration (NAT64/DNS64)
+  - !service: {
+      name: "IpxlatCfgSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Kernel Transaction Manager (DTC)
+  - !service: {
+      name: "KtmRm",
+      operation: change,
+      startup: 3,
+    }
+  # Windows License Manager
+  - !service: {
+      name: "LicenseManager",
+      operation: change,
+      startup: 3,
+    }
+  # Link-Layer Topology Discovery Mapper
+  - !service: {
+      name: "lltdsvc",
+      operation: change,
+      startup: 3,
+    }
+  # TCP/IP NetBIOS Helper
+  - !service: {
+      name: "lmhosts",
+      operation: change,
+      startup: 3,
+    }
+  # Language Experience Service
+  - !service: {
+      name: "LxpSvc",
+      operation: change,
+      startup: 3,
+    }
+  # MCP Management Service
+  - !service: {
+      name: "McpManagementService",
+      operation: change,
+      startup: 3,
+    }
+  # Messaging (SMS/MMS)
+  - !service: {
+      name: "MessagingService",
+      operation: change,
+      startup: 3,
+    }
+  # Edge Elevation Service
+  - !service: {
+      name: "MicrosoftEdgeElevationService",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Installer
+  - !service: {
+      name: "msiserver",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Keyboard Filter
+  - !service: {
+      name: "MsKeyboardFilter",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft iSCSI Initiator Service
+  - !service: {
+      name: "MSiSCSI",
+      operation: change,
+      startup: 3,
+    }
+  # Natural Authentication
+  - !service: {
+      name: "NaturalAuthentication",
+      operation: change,
+      startup: 3,
+    }
+  # Network Connectivity Assistant
+  - !service: {
+      name: "NcaSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Network Connection Broker
+  - !service: {
+      name: "NcbService",
+      operation: change,
+      startup: 3,
+    }
+  # Network Connected Devices Auto-Setup
+  - !service: {
+      name: "NcdAutoSetup",
+      operation: change,
+      startup: 3,
+    }
+  # Network Connections
+  - !service: {
+      name: "Netman",
+      operation: change,
+      startup: 3,
+    }
+  # Network List Service
+  - !service: {
+      name: "netprofm",
+      operation: change,
+      startup: 3,
+    }
+  # Network Setup Service
+  - !service: {
+      name: "NetSetupSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Passport Container (Windows Hello)
+  - !service: {
+      name: "NgcCtnrSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Passport (Windows Hello PIN/Bio)
+  - !service: {
+      name: "NgcSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Network Location Awareness
+  - !service: {
+      name: "NlaSvc",
+      operation: change,
+      startup: 3,
+    }
+  # NPSM Service
+  - !service: {
+      name: "NPSMSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Peer Networking Identity Manager
+  - !service: {
+      name: "p2pimsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Peer Networking Grouping
+  - !service: {
+      name: "p2psvc",
+      operation: change,
+      startup: 3,
+    }
+  # WSL Plan 9 File Sharing
+  - !service: {
+      name: "P9RdrService",
+      operation: change,
+      startup: 3,
+    }
+  # BranchCache
+  - !service: {
+      name: "PeerDistSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Perception Simulation (HoloLens/VR dev)
+  - !service: {
+      name: "perceptionsimulation",
+      operation: change,
+      startup: 3,
+    }
+  # Phone Service
+  - !service: {
+      name: "PhoneSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Contact Data (People app)
+  - !service: {
+      name: "PimIndexMaintenanceSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Performance Logs & Alerts
+  - !service: {
+      name: "pla",
+      operation: change,
+      startup: 3,
+    }
+  # Plug and Play (critical boot-start, must stay Automatic)
+  - !service: {
+      name: "PlugPlay",
+      operation: change,
+      startup: 2,
+    }
+  # PNRP Machine Name Publication
+  - !service: {
+      name: "PNRPAutoReg",
+      operation: change,
+      startup: 3,
+    }
+  # Peer Name Resolution Protocol
+  - !service: {
+      name: "PNRPsvc",
+      operation: change,
+      startup: 3,
+    }
+  # IPsec Policy Agent
+  - !service: {
+      name: "PolicyAgent",
+      operation: change,
+      startup: 3,
+    }
+  # Printer Extensions and Notifications
+  - !service: {
+      name: "PrintNotify",
+      operation: change,
+      startup: 3,
+    }
+  # Windows PushToInstall
+  - !service: {
+      name: "PushToInstall",
+      operation: change,
+      startup: 3,
+    }
+  # Quality Windows Audio Video Experience
+  - !service: {
+      name: "QWAVE",
+      operation: change,
+      startup: 3,
+    }
+  # Remote Access Auto Connection Manager
+  - !service: {
+      name: "RasAuto",
+      operation: change,
+      startup: 3,
+    }
+  # Remote Access Connection Manager (VPN)
+  - !service: {
+      name: "RasMan",
+      operation: change,
+      startup: 3,
+    }
+  # Retail Demo Service
+  - !service: {
+      name: "RetailDemo",
+      operation: change,
+      startup: 3,
+    }
+  # Radio Management Service (Airplane mode)
+  - !service: {
+      name: "RmSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Remote Procedure Call Locator
+  - !service: {
+      name: "RpcLocator",
+      operation: change,
+      startup: 3,
+    }
+  # Smart Card
+  - !service: {
+      name: "SCardSvr",
+      operation: change,
+      startup: 3,
+    }
+  # Smart Card Device Enumeration
+  - !service: {
+      name: "ScDeviceEnum",
+      operation: change,
+      startup: 3,
+    }
+  # Smart Card Removal Policy
+  - !service: {
+      name: "SCPolicySvc",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Backup
+  - !service: {
+      name: "SDRSVC",
+      operation: change,
+      startup: 3,
+    }
+  # Secondary Logon
+  - !service: {
+      name: "seclogon",
+      operation: change,
+      startup: 3,
+    }
+  # Sensor Data Service
+  - !service: {
+      name: "SensorDataService",
+      operation: change,
+      startup: 3,
+    }
+  # Sensor Service
+  - !service: {
+      name: "SensorService",
+      operation: change,
+      startup: 3,
+    }
+  # Sensor Monitoring Service
+  - !service: {
+      name: "SensrSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Remote Desktop Configuration
+  - !service: {
+      name: "SessionEnv",
+      operation: change,
+      startup: 3,
+    }
+  # Internet Connection Sharing
+  - !service: {
+      name: "SharedAccess",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Windows SMS Router
+  - !service: {
+      name: "SmsRouter",
+      operation: change,
+      startup: 3,
+    }
+  # Secure Socket Tunneling Protocol (SSTP VPN)
+  - !service: {
+      name: "SstpSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Image Acquisition (WIA/Scanner)
+  - !service: {
+      name: "StiSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Spot Verifier (file integrity)
+  - !service: {
+      name: "svsvc",
+      operation: change,
+      startup: 3,
+    }
+  # Microsoft Software Shadow Copy Provider
+  - !service: {
+      name: "swprv",
+      operation: change,
+      startup: 3,
+    }
+  # Telephony
+  - !service: {
+      name: "TapiSrv",
+      operation: change,
+      startup: 3,
+    }
+  # Storage Tiers Management
+  - !service: {
+      name: "TieringEngineService",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Modules Installer (Manual=default, trigger-start via WU/DISM)
+  - !service: {
+      name: "TrustedInstaller",
+      operation: change,
+      startup: 3,
+    }
+  # Universal Device Kit User Service
+  - !service: {
+      name: "UdkUserSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Remote Desktop Port Redirector
+  - !service: {
+      name: "UmRdpService",
+      operation: change,
+      startup: 3,
+    }
+  # User Data Storage
+  - !service: {
+      name: "UnistoreSvc",
+      operation: change,
+      startup: 3,
+    }
+  # UPnP Device Host
+  - !service: {
+      name: "upnphost",
+      operation: change,
+      startup: 3,
+    }
+  # Update Orchestrator Service
+  - !service: {
+      name: "UsoSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Guest Interface
+  - !service: {
+      name: "vmicguestinterface",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Heartbeat
+  - !service: {
+      name: "vmicheartbeat",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Data Exchange
+  - !service: {
+      name: "vmickvpexchange",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Remote Desktop Virtualization
+  - !service: {
+      name: "vmicrdv",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Guest Shutdown
+  - !service: {
+      name: "vmicshutdown",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Time Synchronization
+  - !service: {
+      name: "vmictimesync",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V PowerShell Direct
+  - !service: {
+      name: "vmicvmsession",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Volume Shadow Copy
+  - !service: {
+      name: "vmicvss",
+      operation: change,
+      startup: 3,
+    }
+  # Hyper-V Guest Volume Shadow Copy
+  - !service: {
+      name: "vmvss",
+      operation: change,
+      startup: 3,
+    }
+  # Warp JIT Service
+  - !service: {
+      name: "WarpJITSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Block Level Backup Engine
+  - !service: {
+      name: "wbengine",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Connect Now (Wi-Fi setup)
+  - !service: {
+      name: "wcncsvc",
+      operation: change,
+      startup: 3,
+    }
+  # WebClient (WebDAV)
+  - !service: {
+      name: "WebClient",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Encryption Provider Host
+  - !service: {
+      name: "WEPHOSTSVC",
+      operation: change,
+      startup: 3,
+    }
+  # Problem Reports Control Panel Support
+  - !service: {
+      name: "wercplsupport",
+      operation: change,
+      startup: 3,
+    }
+  # Wi-Fi Direct Services Connection Manager
+  - !service: {
+      name: "WFDSConMgrSvc",
+      operation: change,
+      startup: 3,
+    }
+  # WIA RPC Service
+  - !service: {
+      name: "WiaRpc",
+      operation: change,
+      startup: 3,
+    }
+  # WinHTTP Web Proxy Auto-Discovery
+  - !service: {
+      name: "WinHttpAutoProxySvc",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Remote Management
+  - !service: {
+      name: "WinRM",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Insider Service
+  - !service: {
+      name: "wisvc",
+      operation: change,
+      startup: 3,
+    }
+  # Local Profile Assistant Service
+  - !service: {
+      name: "wlpasvc",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Management Service
+  - !service: {
+      name: "WManSvc",
+      operation: change,
+      startup: 3,
+    }
+  # WMI Performance Adapter
+  - !service: {
+      name: "wmiApSrv",
+      operation: change,
+      startup: 3,
+    }
+  # Work Folders
+  - !service: {
+      name: "workfolderssvc",
+      operation: change,
+      startup: 3,
+    }
+  # Parental Controls
+  - !service: {
+      name: "WpcMonSvc",
+      operation: change,
+      startup: 3,
+    }
+  # Portable Device Enumerator (MTP)
+  - !service: {
+      name: "WPDBusEnum",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Update
+  - !service: {
+      name: "wuauserv",
+      operation: change,
+      startup: 3,
+    }
+  # Windows Driver Foundation (UMDF)
+  - !service: {
+      name: "wudfsvc",
+      operation: change,
+      startup: 3,
+    }
+  # WWAN AutoConfig (cellular)
+  - !service: {
+      name: "WwanSvc",
+      operation: change,
+      startup: 3,
+    }
+  # -- Disabled --
+  # Microsoft App-V Client
+  - !service: {
+      name: "AppVClient",
+      operation: change,
+      startup: 4,
+    }
+  # Assigned Access (Kiosk mode)
+  - !service: {
+      name: "AssignedAccessManagerSvc",
+      operation: change,
+      startup: 4,
+    }
+  # Net.Tcp Port Sharing Service
+  - !service: {
+      name: "NetTcpPortSharing",
+      operation: change,
+      startup: 4,
+    }
+  # Shared PC Account Manager
+  - !service: {
+      name: "shpamsvc",
+      operation: change,
+      startup: 4,
+    }
+  # Auto Time Zone Updater
+  - !service: {
+      name: "tzautoupdate",
+      operation: change,
+      startup: 4,
+    }
+  # Windows Subsystem for Android
+  - !service: {
+      name: "WSAIFabricSvc",
+      operation: change,
+      startup: 4,
+    }

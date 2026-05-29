@@ -1,0 +1,14 @@
+---
+title: Storage Device Security
+description: Enables TCG security activation for enhanced storage devices
+privilege: TrustedInstaller
+actions:
+  - !status: {
+      status: 'Enabling storage device security',
+    }
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\EnhancedStorageDevices',
+      value: "TCGSecurityActivationDisabled",
+      type: REG_DWORD,
+      data: "0",
+    }

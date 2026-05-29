@@ -1,0 +1,378 @@
+---
+title: Gaming optimizations (MMCSS / Game Mode / FPS)
+description: Gaming registry tweaks — MMCSS, Game Mode, FPS, memory compression
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # MMCSS SYSTEM PROFILE — GLOBAL
+  # =============================================
+  # NetworkThrottlingIndex: disable throttling for max network performance
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "NetworkThrottlingIndex",
+      type: REG_DWORD,
+      data: "4294967295",
+    }
+  # SystemResponsiveness: 14% reserved for background (safe minimum for audio)
+  # Lower values (0-10) risk audio crackling on DAC/USB devices
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "SystemResponsiveness",
+      type: REG_DWORD,
+      data: "14",
+    }
+  # Priority: high scheduling for multimedia tasks
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "Priority",
+      type: REG_DWORD,
+      data: "6",
+    }
+  # SchedulingCategory: high for multimedia tasks
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "Scheduling Category",
+      type: REG_SZ,
+      data: "High",
+    }
+  # AlwaysOn: keep SystemProfile always active
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "AlwaysOn",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # EnableMMCSS: enable Multimedia Class Scheduler Service
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "EnableMMCSS",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # AllowTearing: enable tearing for lowest latency (V-Sync off)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "AllowTearing",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # NoLazyMode: force MMCSS to stay active (never revert to lazy scheduling)
+  # Complements AlwaysOn — AlwaysOn keeps the profile loaded, NoLazyMode prevents
+  # the scheduler from falling back to non-multimedia scheduling when idle
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile',
+      value: "NoLazyMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # MMCSS SYSTEM PROFILE — GAMES TASK
+  # =============================================
+  # Affinity: use all CPU cores (0 = no restriction)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Affinity",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # Background Only: treat game as foreground process
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Background Only",
+      type: REG_SZ,
+      data: "False",
+    }
+  # BackgroundPriority: normal priority even in background
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "BackgroundPriority",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # Clock Rate: 10kHz task refresh rate
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Clock Rate",
+      type: REG_DWORD,
+      data: "10000",
+    }
+  # GPU Priority: 8 (max on 1-8 scale)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "GPU Priority",
+      type: REG_DWORD,
+      data: "8",
+    }
+  # Priority: 6 (real-time level)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Priority",
+      type: REG_DWORD,
+      data: "6",
+    }
+  # Scheduling Category: high
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Scheduling Category",
+      type: REG_SZ,
+      data: "High",
+    }
+  # SFIO Priority: high for disk I/O
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "SFIO Priority",
+      type: REG_SZ,
+      data: "High",
+    }
+  # Latency Sensitive: enable latency optimizations
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games',
+      value: "Latency Sensitive",
+      type: REG_SZ,
+      data: "True",
+    }
+  # =============================================
+  # MMCSS SYSTEM PROFILE — WINDOW MANAGER TASK
+  # =============================================
+  # ------> Controls dwm.exe CPU/GPU scheduling via MMCSS
+  # Clock Rate: 2000 (balanced — default ~1000, avoids CPU overhead of 10000)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Window Manager',
+      value: "Clock Rate",
+      type: REG_DWORD,
+      data: "2000",
+    }
+  # GPU Priority: 6 (high but below Games=8, balanced for DWM responsiveness)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Window Manager',
+      value: "GPU Priority",
+      type: REG_DWORD,
+      data: "6",
+    }
+  # Priority: 5 (above normal)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Window Manager',
+      value: "Priority",
+      type: REG_DWORD,
+      data: "5",
+    }
+  # Scheduling Category: High
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Window Manager',
+      value: "Scheduling Category",
+      type: REG_SZ,
+      data: "High",
+    }
+  # =============================================
+  # GAME MODE — ENABLED
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\GameBar',
+      value: "AllowAutoGameMode",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\GameBar',
+      value: "AutoGameModeEnabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # MICROSOFT GAMES — FPS & FLUIDITY
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Games',
+      value: "FpsStatusGamesAll",
+      type: REG_DWORD,
+      data: "4",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Games',
+      value: "FpsStatusGames",
+      type: REG_DWORD,
+      data: "10",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Games',
+      value: "FpsAll",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Games',
+      value: "GameFluidity",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # =============================================
+  # DISABLE WEBVIEW2 IN SEARCH
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260',
+      value: "EnabledState",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260',
+      value: "EnabledStateOptions",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260',
+      value: "Variant",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260',
+      value: "VariantPayload",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260',
+      value: "VariantPayloadKind",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # HARDWARE-ACCELERATED GPU SCHEDULING
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers',
+      value: "HwSchMode",
+      type: REG_DWORD,
+      data: "2",
+    }
+  # =============================================
+  # DIRECTSTORAGE 1.2+ OPTIMIZATIONS
+  # =============================================
+  # Enables DirectStorage optimizations for faster game loading on NVMe Gen4+
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage',
+      value: "EnableDirectStorage",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage',
+      value: "EnableOptimizations",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # VRR FOR WINDOWED APPS (Windows 11 25H2+)
+  # =============================================
+  # Enables Variable Refresh Rate for windowed/borderless applications
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "VRRForWindowedApps",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # AUTO HDR ENHANCEMENTS (Windows 11 25H2+)
+  # =============================================
+  # Improves automatic HDR quality and intensity
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "AutoHDREnabled",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "AutoHDRIntensity",
+      type: REG_DWORD,
+      data: "2",
+    }
+  # =============================================
+  # NVIDIA LEGACY SHARPENING — disable on newer drivers
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS',
+      value: "EnableGR535",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # =============================================
+  # SERVICES PIPE TIMEOUT — faster boot
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control',
+      value: "ServicesPipeTimeout",
+      type: REG_DWORD,
+      data: "30000",
+    }
+  # =============================================
+  # DISABLE CO-INSTALLERS — WARNING: breaks Realtek/Creative audio drivers
+  # and other specialty hardware that requires co-installers for proper operation.
+  # Only enable if you are certain your hardware does not use driver co-installers.
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Installer',
+      value: "DisableCoInstallers",
+      type: REG_DWORD,
+      data: "1",
+    }
+  # =============================================
+  # HKCU: SEARCH — disable whole file system search
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Search\Preferences',
+      value: "WholeFileSystem",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # HKCU: WALLPAPER JPEG QUALITY — max
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Desktop',
+      value: "JPEGImportQuality",
+      type: REG_DWORD,
+      data: "100",
+    }
+  # =============================================
+  # HKCU: ALT+TAB — show windows only (no Edge tabs)
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "MultiTaskingAltTabFilter",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # HKCU: DIRECTX GPU PREFERENCES — flip model, VRR, AutoHDR
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences',
+      value: "DirectXUserGlobalSettings",
+      type: REG_SZ,
+      data: "1",
+    }
+  # =============================================
+  # HKCU: INPUT — disable input preload
+  # =============================================
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\input',
+      value: "IsInputAppPreloadEnabled",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # MEMORY COMPRESSION — conditional 16 GB+
+  # =============================================
+  # Disabling memory compression reduces CPU overhead but increases pagefile usage.
+  # Only applied when RAM >= 16 GB to avoid degradation on low-memory systems.
+  - !powerShell: {
+      command: '.\\Scripts\\Performance\\GAMING_MEMORY_COMPRESSION.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+    }

@@ -1,0 +1,110 @@
+---
+title: Configure Explorer View
+description: Configure Explorer View
+privilege: TrustedInstaller
+actions:
+  # ============================================================
+  # RÉACTIVITÉ UI — Délais Win32 (sources : SuperUser, MakeUseOf, XDA, TweakTown 2024-2026)
+  # ============================================================
+
+  # === MenuShowDelay = 0 — Délai avant apparition des sous-menus Win32
+  # Valeur par défaut : 400ms — Présent depuis Windows 95, toujours actif sur Win11.
+  # Affecte : menu contextuel "Afficher plus d'options", sous-menus, Panneau de configuration.
+  # N'affecte PAS le Start Menu (WinUI/XAML). Impact perceptuel immédiat.
+  # Sources multiples convergent sur 0ms comme valeur optimale pour un usage productivité/gaming.
+  - !registryValue: {
+      path: 'HKCU\Control Panel\Desktop',
+      value: "MenuShowDelay",
+      type: REG_SZ,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Control Panel\Desktop',
+      value: "MenuShowDelay",
+      type: REG_SZ,
+      data: "0",
+    }
+
+  # === StartupDelayInMSec
+  # Windows impose par défaut un délai aléatoire (jusqu'à 10s) pour lisser la charge au boot.
+  # Source : kubaam/Windows-11-Fix-Tweaks, XDA, multiple forums 2024-2025.
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize',
+      value: "StartupDelayInMSec",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize',
+      value: "StartupDelayInMSec",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # WaitForIdleState=1 : attend l'état idle avant lancement (nécessaire pour les icônes de notification)
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize',
+      value: "WaitForIdleState",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # ============
+  # === View ===
+  # ============
+  # === Display the full path in title bar
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState',
+      value: "FullPath",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState',
+      value: "FullPath",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Hide extensions for known file types
+  # ------> Disabled for Security reasons
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "HideFileExt",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "HideFileExt",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # === Show hidden folders/files
+  # ------> Disabled for Security reasons
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "Hidden",
+      type: REG_DWORD,
+      data: "1",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "Hidden",
+      type: REG_DWORD,
+      data: "1",
+    }
+
+  # === Show sync provider notifications (ads)
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowSyncProviderNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
+      value: "ShowSyncProviderNotifications",
+      type: REG_DWORD,
+      data: "0",
+    }

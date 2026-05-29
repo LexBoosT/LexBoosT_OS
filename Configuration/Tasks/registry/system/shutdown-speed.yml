@@ -1,0 +1,20 @@
+---
+title: Shutdown Speed
+description: Reduces shutdown time with HungAppTimeout and AutoEndTasks at system level
+privilege: TrustedInstaller
+actions:
+  - !status: {
+      status: 'Optimizing shutdown speed',
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control',
+      value: "HungAppTimeout",
+      type: REG_SZ,
+      data: "2000",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control',
+      value: "AutoEndTasks",
+      type: REG_SZ,
+      data: "1",
+    }

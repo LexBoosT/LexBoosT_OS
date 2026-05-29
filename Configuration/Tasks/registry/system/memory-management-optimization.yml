@@ -1,0 +1,151 @@
+---
+title: configure-memory-management
+description: configure-memory-management
+privilege: TrustedInstaller
+actions:
+
+  # =============================================
+  # Paramètres principaux de gestion mémoire
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "ClearPageFileAtShutdown",
+      type: REG_DWORD,
+      data: "0",  # Ne pas effacer le fichier d'échange au shutdown (améliore les temps d'arrêt)
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "DisablePagingExecutive",
+      type: REG_DWORD,
+      data: "1",  # Garde le noyau en mémoire physique (réduit la latence)
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "NonPagedPoolQuota",
+      type: REG_DWORD,
+      operation: delete,  # Supprime la valeur pour revenir au défaut Windows
+    }
+  # NOTE: HugePagesEnabled retiré — nécessite le privilège SeLockMemoryPrivilege
+  # ("Lock pages in memory" dans la GPO locale) pour avoir le moindre effet.
+  # Sans ce droit explicitement assigné, cette clé est totalement inopérante.
+  # Pour les jeux/desktop, les Large Pages n'apportent pas de gain mesurable.
+  # Si tu veux l'activer : secpol.msc → Local Policies → User Rights Assignment
+  # → "Lock pages in memory" → ajouter ton compte utilisateur + redémarrer.
+
+  # =============================================
+  # Configuration des pools mémoire - STABLE
+  # =============================================
+  # PagedPoolSize:
+  #   - 0 = Windows gère automatiquement (RECOMMANDÉ)
+  #   - Valeur fixe (ex: 192) = risque de pénurie mémoire si trop bas
+  #   - Windows 10/11 gère mieux que valeurs manuelles
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "PagedPoolSize",
+      type: REG_DWORD,
+      data: "0",  # 0 = Gestion automatique Windows (stable)
+    }
+  # SystemPages:
+  #   - 0xFFFFFFFF = Maximum, mais peut causer instabilité
+  #   - 0 = Windows calcule optimal selon RAM (RECOMMANDÉ)
+  #   - Valeurs typiques: 32000-45000 pour 16GB+ RAM
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "SystemPages",
+      type: REG_DWORD,
+      data: "0",  # 0 = Windows calcule automatiquement (stable)
+    }
+  # =============================================
+  # Optimisations avancées - STABLE
+  # =============================================
+
+  # PhysicalAddressExtension (PAE):
+  #   ⚠️ PAE n'a d'effet que sur Windows 32-bit.
+  #   Sur Windows 11 64-bit, cette clé est totalement ignorée par le noyau.
+  #   Supprimée car code mort sur Win11 x64.
+
+  # PoolUsageMaximum:
+  #   - 96% = Seuil d'utilisation du pool (correct)
+  #   - Valeur par défaut Windows = suffisant
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "PoolUsageMaximum",
+      type: REG_DWORD,
+      data: "96",  # 0x60 = 96% (correct)
+    }
+  # EnableCfg (Control Flow Guard):
+  #   - 0 = Désactivé (risque sécurité et stabilité)
+  #   - 1 = Activé (RECOMMANDÉ - protège contre corruption mémoire)
+  #   ⚠️ CFG est une protection importante Windows 10/11
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "EnableCfg",
+      type: REG_DWORD,
+      data: "1",  # 1 = Active CFG (sécurité et stabilité)
+    }
+  # =============================================
+  # Paramètres Prefetch/Superfetch
+  # =============================================
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "EnablePrefetcher",
+      type: REG_DWORD,
+      data: "3",  # 0x3 = Prefetch activé pour apps + boot
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "MaxNumActiveTraces",
+      type: REG_DWORD,
+      data: "8",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "EnableSuperfetch",
+      type: REG_DWORD,
+      data: "0",  # 0x0 = Désactive Superfetch
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "EnableBoottrace",
+      type: REG_DWORD,
+      data: "0",  # 0x0 = Désactive le traçage au boot
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "SfTracingState",
+      type: REG_DWORD,
+      data: "0",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters',
+      value: "KernelExecutesPagedCodes",
+      type: REG_DWORD,
+      data: "0",
+    }
+  # =============================================
+  # SPECTRE / MELTDOWN MITIGATIONS — DISABLED
+  # =============================================
+  # FeatureSettingsOverride + FeatureSettingsOverrideMask = 3
+  # Désactive les mitigations Spectre V2 (Branch Target Injection) et Meltdown (Rogue Data Cache Load)
+  #
+  # Gain CPU mesuré : +5% à +15% en single-thread sur Intel 6e-11e gen (Skylake à Rocket Lake)
+  # Impact quasi nul sur AMD Zen 2+ et Intel 12e+ gen (mitigations hardware)
+  #
+  # ⚠️ SÉCURITÉ : Ces mitigations protègent contre des attaques par canal auxiliaire.
+  #   Sur une machine gaming pure sans données sensibles, le gain perf prime.
+  #   Sur une machine mixte (bureautique/bancaire), garder les mitigations activées (valeur 0).
+  #
+  #   0 = Mitigations activées (défaut Windows)
+  #   3 = Mitigations Spectre V2 + Meltdown désactivées
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "FeatureSettingsOverride",
+      type: REG_DWORD,
+      data: "3",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management',
+      value: "FeatureSettingsOverrideMask",
+      type: REG_DWORD,
+      data: "3",
+    }

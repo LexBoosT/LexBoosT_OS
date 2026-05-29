@@ -1,0 +1,515 @@
+---
+title: Configuration
+description: Applies LexBoosT OS™ final configurations
+privilege: TrustedInstaller
+actions:
+  # ============================================
+  # PHASE 1: TIME & SYSTEM CONFIGURATION
+  # ============================================
+  - !powerShell: {
+    command: '.\\Scripts\\Finalize\\TIME_NTP.PS1',
+    exeDir: true,
+    runas: currentUserElevated,
+    wait: true,
+  }
+
+  # Disable Windows Update Auto Registration
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Services\Pending\7971f918-a847-4430-9279-4a52d1efe18d',
+      value: "RegisterWithAU",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # Network Performance (Disable Link-Local Multicast Name Resolution (LLMNR) protocol as it is vulnerable and has been replaced by DNS)
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient',
+      value: "EnableMulticast",
+      type: REG_DWORD,
+      data: "0",
+    }
+
+  # ============================================
+  # PHASE 2: POWER SCHEME CONFIGURATION
+  # ============================================
+  - !registryValue: {
+      path: 'HKCR\powerscheme\DefaultIcon',
+      value: "",
+      type: REG_SZ,
+      data: "%windir%\\System32\\powercpl.dll,1",
+      onUpgrade: false,
+    }
+  - !registryValue: {
+      path: 'HKCR\powerscheme\Shell\open\command',
+      value: "",
+      type: REG_SZ,
+      data: 'powercfg /import "%1"',
+      onUpgrade: false,
+    }
+  - !registryValue: {
+      path: 'HKCR\.pow',
+      value: "",
+      type: REG_SZ,
+      data: "powerscheme",
+      onUpgrade: false,
+    }
+  - !registryValue: {
+      path: 'HKCR\.pow',
+      value: "FriendlyTypeName",
+      type: REG_SZ,
+      data: "Power Scheme",
+      onUpgrade: false,
+    }
+
+  # ============================================
+  # PHASE 3: TELEMETRY OPT-OUT
+  # ============================================
+  - !powerShell: {
+    command: '.\Scripts\Finalize\TELEMETRY_OPTOUT.PS1',
+    exeDir: true,
+    runas: currentUserElevated,
+    wait: true,
+  }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\POWERSHELL_NOLOGO.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+    }
+
+  # ============================================
+  # PHASE 4: DESKTOP & START MENU
+  # ============================================
+  - !status: {
+      status: "Config Start Menu",
+      option: "wipe-startmenu",
+    }
+
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\WIPE_STARTMENU.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+      option: "wipe-startmenu",
+    }
+  - !status: {
+      status: "Config Office Tasks",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Cleanup\\DISABLE_OFFICE_TASKS.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 50,
+    }
+
+  # ============================================
+  # PHASE 5: THEME & VISUALS (Optional)
+  # ============================================
+  - !status: {
+      status: "Copying Wallpapers",
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\THEME_DEPLOY.PS1 -Action CopyWallpapers',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 100,
+      ignoreErrors: true,
+      option: "configure-theme",
+    }
+  - !status: {
+      status: "Config Theme",
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\WALLPAPER.PS1 -Mode Desktop -ImagePath $env:systemroot\Web\Wallpaper\LexBoosTOS\v3\desktop.jpg',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 45,
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\WALLPAPER.PS1 -Mode LockScreen -ImagePath $env:systemroot\Web\Wallpaper\LexBoosTOS\v3\lockscreen.jpg',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 45,
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\THEME_DEPLOY.PS1 -Action SetDefaultTile',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 45,
+      option: "configure-theme",
+    }
+  - !cmd: {
+      command: 'copy /y "Themes" "%windir%\Resources\Themes" > nul',
+      runas: currentUserElevated,
+      wait: true,
+      weight: 10,
+      exeDir: true,
+      option: "configure-theme",
+    }
+  - !status: {
+      status: "Modifying User Avatar",
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\PFP.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\TERMINAL.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      option: "configure-theme",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\WINVER.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+    }
+
+  # ============================================
+  # PHASE 6: LEXBOOST TOOLS (Optional)
+  # ============================================
+  - !status: {
+      status: "Copying Launcher Files",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Setup\\COPY_LAUNCHER_FILES.PS1',
+      exeDir: true,
+      wait: true,
+      weight: 200,
+      ignoreErrors: true,
+    }
+  - !status: {
+      status: "Applying Visual Effects",
+      option: "lex-visual",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\VISUAL.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 400,
+      option: "lex-visual",
+      onUpgrade: false,
+    }
+  - !status: {
+      status: "Config CPU Cache",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Performance\\L2L3.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+      onUpgrade: false,
+    }
+
+  # ============================================
+  # PHASE 7: FILE ASSOCIATIONS & CONTEXT MENU
+  # ============================================
+  - !powerShell: {
+    command: '.\Scripts\Finalize\FILE_ASSOCIATIONS.PS1',
+    exeDir: true,
+    runas: currentUserElevated,
+    wait: true,
+  }
+
+  # Rollback context menu on desktop background
+  - !registryValue: {
+      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      value: "MUIVerb",
+      type: REG_SZ,
+      data: "Restore LexBoosT OS Backup",
+      option: "backup",
+    }
+  - !registryValue: {
+      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      value: "Icon",
+      type: REG_SZ,
+      data: "rstrui.exe",
+      option: "backup",
+    }
+  - !registryValue: {
+      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      value: "Position",
+      type: REG_SZ,
+      data: "Bottom",
+      option: "backup",
+    }
+  - !registryValue: {
+      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback\command',
+      value: "",
+      type: REG_SZ,
+      data: 'powershell.EXE -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -Verb RunAs -FilePath powershell.EXE -ArgumentList ',
+      option: "backup",
+    }
+
+  # ============================================
+  # PHASE 8: MISCELLANEOUS CONFIGURATION
+  # ============================================
+  - !status: {
+      status: "Config Explorer",
+    }
+  - !registryValue: {
+      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager',
+      value: "EnthusiastMode",
+      type: REG_DWORD,
+      data: "1",
+      onUpgrade: false,
+      weight: 300,
+    }
+  - !status: {
+      status: "Disabling Remote Assistance",
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance',
+      value: "fAllowFullControl",
+      type: REG_DWORD,
+      data: "0",
+      onUpgrade: false,
+    }
+  - !registryValue: {
+      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance',
+      value: "fAllowToGetHelp",
+      type: REG_DWORD,
+      data: "0",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Cleanup\\DISABLE_REMOTE_ASSIST_FIREWALL.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      ignoreErrors: true,
+    }
+
+  # ============================================
+  # PHASE 9: FINALIZE OPTIMIZATIONS
+  # ============================================
+  - !status: {
+      status: "LexBoosT™ Optimizations 1/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE1.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "1/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "LexBoosT™ Optimizations 2/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE2.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "2/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "LexBoosT™ Optimizations 3/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE3.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "3/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "LexBoosT™ Optimizations 4/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE4.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "4/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "LexBoosT™ Optimizations 5/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE5.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "5/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "LexBoosT™ Optimizations 6/6",
+    }
+  - !run: {
+      exe: ".\\Scripts\\Finalize\\FINALIZE6.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "6/6 Success!",
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !run: {
+      exe: ".\\Scripts\\PAUSE.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "Desktop Preparation",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\UI\\ICONS_DESK.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+  - !status: {
+      status: "Enable Low Latency Profile",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Performance\\LOW-LATENCY-PROFILE.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }
+
+  # ============================================
+  # PHASE 10: CLEANUP
+  # ============================================
+  - !status: {
+      status: "Cleaning Active Setup Stubs",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Cleanup\\CLEANUP-ACTIVE-SETUP.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 100,
+      onUpgrade: false,
+    }
+  - !status: {
+      status: "Cleaning Up Folders",
+      onUpgrade: false,
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\Cleanup\\DEL_WINOLD_INETPUB.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+      onUpgrade: false,
+    }
+
+  # Clear AppX caches
+  - !appx: {
+      name: "*Client.CBS*",
+      operation: clearCache,
+    }
+  - !appx: {
+      name: "*StartMenuExperienceHost*",
+      operation: clearCache,
+    }
+  - !appx: {
+      name: "*Windows.Search*",
+      operation: clearCache,
+    }
+  - !appx: {
+      name: "*TCUI*",
+      operation: clearCache,
+    }
+
+  # Reactivate widgets after Windows update
+  - !powerShell: {
+      command: '.\\Scripts\\Cleanup\\RESET_WEBEXPERIENCE.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+    }
+
+  - !powerShell: {
+    command: '.\\Scripts\\Finalize\\FINAL_POST.PS1',
+    exeDir: true,
+    runas: currentUserElevated,
+    wait: true,
+  }
