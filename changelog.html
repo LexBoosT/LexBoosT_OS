@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexBoosT OS™ v26.06 — Changelog</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --bg-card: #0a0b10;
+            --border: #1a1b2a;
+            --text: #c8c8d4;
+            --text-dim: #6b6b80;
+            --accent: #8b5cf6;
+            --accent2: #f97316;
+            --green: #10b981;
+            --gradient-hero: linear-gradient(135deg, #8b5cf6 0%, #a855f7 30%, #f97316 70%, #ef4444 100%);
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.06), transparent),
+                radial-gradient(ellipse 60% 40% at 90% 80%, rgba(249, 115, 22, 0.04), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+        nav .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
+        nav .logo {
+            font-weight: 800;
+            font-size: 1.15rem;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+        nav a.back {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a.back:hover { color: var(--accent); }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 24px 64px;
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .changelog-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .changelog-list li {
+            padding: 14px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .changelog-list li:hover { border-color: rgba(139, 92, 246, 0.3); }
+        .changelog-list li .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-right: 8px;
+            letter-spacing: 0.3px;
+        }
+        .tag-fix { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .tag-feat { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .tag-new { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .tag-break { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        code {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        a { color: var(--accent); }
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        .stat strong { color: var(--text); }
+        footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a href="./" class="logo">LexBoosT OS™</a>
+        <a href="./" class="back">← <span data-fr>Retour</span><span data-en>Back</span></a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>LexBoosT OS™ V26.06</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>121</strong> changements</div>
+        <div class="stat">🪛 <strong>42</strong> fixes</div>
+        <div class="stat">✨ <strong>58</strong> improvements</div>
+        <div class="stat">🆕 <strong>16</strong> new features</div>
+        <div class="stat">💥 <strong>5</strong> breaking changes</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES.PS1 Set-DrivesConfiguration hang fixed: replaced Get-PhysicalDisk -SerialNumber (can hang on some NVMe/SSD) with DeviceId-based lookup. Playbook no longer freezes at "Configuring Drive Optimizations".</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> HKCU registry propagation fixed: replaced all <code>HKEY_CURRENT_USER\</code> with <code>HKCU\</code> in mouse-keyboard.yml (2 occurrences) and explorer.yml (1 occurrence). APPLYDUHIVE.PS1 pattern-matches <code>HKCU*</code> — the long form was silently skipped, causing mouse/keyboard settings to be missing from the registry after installation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> APPLYDUHIVE.PS1 Get-UserProfilesOffline bug fixed: replaced <code>return</code> with <code>continue</code> inside ForEach-Object pipeline. <code>return</code> was terminating the entire pipeline at the first built-in profile (Default/Public), preventing all subsequent user profiles from being discovered and processed.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> APPLYDUHIVE.PS1 now scans .CMD and .PS1 scripts for HKCU paths: previously only YAML files were scanned, causing ~45 HKCU values from FINALIZE1-3.CMD (notifications, accessibility, DeviceAccess, ContentDeliveryManager, etc.) and ~10 from VISUAL.PS1/OPTIMIZE-MOUSESMOOTHINGCURVES.PS1/ICONS_DESK.PS1 to be missing from Default User hive. Regex-based extraction covers both <code>HKCU\</code> and <code>HKEY_CURRENT_USER\</code> formats.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> IFEO priority conflicts fixed: aligned ifeo.yml with system-process-performance-optimization.yml — sihost.exe CpuPriority 1→2 (Normal, fixes Win11 taskbar lag), IoPriority 0→2 (Normal), ctfmon.exe CpuPriority 5→2 (Normal), csrss.exe CpuPriority 3→4 (Above Normal).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> NVIDIA EnableGR535 duplicate removed from gaming.yml: already handled by GPUTweaks (FTS Tweaks). GPUTweaks is now the single source of truth for all GPU driver tweaks (NVIDIA/AMD/Intel).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Privacy Location conflict fixed: ConsentStore location set to Allow (was Deny→Allow→Deny due to duplicate entries). Apps requiring location access now work correctly.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> InkWorkspace conflict fixed: AllowWindowsInkWorkspace set to 1 in FINALIZE3.CMD (was 0, conflicting with explorer.yml). Preserves stylus/pen compatibility.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> BCD x2apicpolicy enable: added to DEVICES.PS1 Set-BcdOptimizations. Improves interrupt routing on modern CPUs (Intel 12th+, AMD Zen 3+).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> BCD useplatformtick yes (AMD): added to DEVICES.PS1 Set-BcdOptimizations. Forces TSC as tick source on AMD CPUs for better timer precision.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LSO/RSC alignment: DEVICES.PS1 network settings aligned with YAML — *LsoV1IPv4, *LsoV2IPv4, *LsoV2IPv6 set to 0 (disabled), *RscIPv4, *RscIPv6, *UdpRsc, ForceRscEnabled set to 0 (disabled), ReceiveSegmentCoalescing set to Disabled. Consistent low-latency network configuration across all sources.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Dead code removed: crash-control.yml deleted (FINALIZE3.CMD covers same values), DisablePageCombining removed from advanced-system-optimization.yml (FINALIZE4.CMD covers via Disable-MMAgent), ExcludeWUDriversInQualityUpdate duplicate removed from updates.yml (already in drivers.yml), Crash Control/NoDriveTypeAutoRun/NoAutorun duplicates removed from FINALIZE3.CMD (already in YAML).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DirectStorage 1.2+ optimizations: EnableDirectStorage=1, EnableOptimizations=1 in gaming.yml. Faster game loading on NVMe Gen4+ drives.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> VRR for windowed apps: VRRForWindowedApps=1 in gaming.yml. Enables Variable Refresh Rate for borderless/windowed games (Windows 11 25H2+).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Auto HDR enhancements: AutoHDREnabled=1, AutoHDRIntensity=2 in gaming.yml. Improved automatic HDR quality (Windows 11 25H2+).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES.PS1 HiberbootEnabled duplicate removed: HiberbootEnabled=0 removed from additional-performance-optimization.yml (DEVICES.PS1 Set-HibernationSettings covers it). Policies delete and SleepStudyEnabled kept (not in DEVICES.PS1).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES.PS1 USB Selective Suspend bug fixed: powercfg value corrected from 1 (enabled) to 0 (disabled) for USB Selective Suspend Setting (GUID 48e6b7a6-50f5-4782-a5d4-53bb8f07e226).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 core parking refactored: new Set-CoreParkingDisabled helper function replaces 3 identical code blocks (Intel/AMD X3D single-CCD/AMD). ~24 lines of duplicated code eliminated.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 system detection cached: new Get-CachedLaptopStatus and Get-CachedVMStatus functions cache WMI/CIM results. 9 Test-Laptop calls and 1 Test-VM call replaced — reduces redundant hardware queries.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Pre-Installation Backup: System snapshot created before any modifications (system restore point, targeted registry export from YAML configs, service state, AppX snapshot, BCD export). Backup saved to %ProgramData%\LexBoosTOS\Backup with timestamped manifest.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Rollback System: ROLLBACK.ps1 restores BCD, targeted registry keys, and service startup types from pre-installation backup. "Restore LexBoosT OS Backup" context menu added to desktop.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Custom OS Detection: 24 custom Windows builds (AtlasOS, ReviOS, Tiny11, Ghost Spectre, etc.) detected via ProductName, EditionID, OEM info, folder paths, and registry keys. Installation aborted with error message if detected — prevents catastrophic playbook conflicts.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> AppX Snapshot Before/After: APPX-REMOVER.ps1 now saves pre-removal package list, post-removal list, and generates a diff report of removed packages in C:\Windows\LexBoosTOS\Logs.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> System Configuration Log: Writes Windows version, architecture, CPU, RAM, and user info to C:\Windows\LexBoosTOS\Logs\lexboost-system-config.txt for support/debug.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Active Setup Stubs Cleanup: CLEANUP-ACTIVE-SETUP.ps1 clears StubPath entries and Run keys for browsers (Brave, Chrome, Edge, Firefox, Opera, Vivaldi, Zen) and OneDrive — prevents first-logon popups.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> ConsentStore Full Lockdown: 32 capabilities set to Deny (activity, appointments, bluetooth, calendar, callHistory, cellularData, chat, contacts, email, eyeTracker, gazeInput, generativeAI, humanPresence, humanInterfaceDevice, location, motion, notifications, passkeys, phoneCall, phoneCallHistory, radios, spatialPerception, backgroundSpatialPerception, tasks, trustedDevices, userAccountInformation, userDataTasks, userNotificationListener, voiceActivation, wifiData, wifiDirect). Applied to HKLM, HKCU\.DEFAULT, and all live user SIDs via PowerShell. Webcam and microphone remain Allow.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Offline NTUSER.DAT Processing: APPLYDUHIVE.ps1 now scans all C:\Users\ profiles, loads each NTUSER.DAT, applies HKCU settings, and unloads — previously only processed Default user.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Disable Windows Transparency: New option in AME — "Disable Windows Transparency" under Visual options. Sets EnableTransparency=0 (HKCU\Themes\Personalize) to remove acrylic/blur effects on taskbar, Start menu, and window borders for a clean opaque look.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Windows Update Granular Policies: AUPowerManagement=0 (no wake for updates), DeferFeatureUpdates=1 + 365 days, AUOptions=2 (notify before download), ExcludeWUDriversInQualityUpdate=1, TargetReleaseVersion=1.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Optimization centralized: 60 registry keys consolidated from 5 files into 1 (registry\system\dwm-optimization.yml), sourced from verified community tweaks. Gain: unified DWM tuning, zero redundancy.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Categories: Reorganized from A→K to sequential A→I. New Category B (Buffer & Sync) added; Schedule (E), Flip Model (F), MPO (G), Visual (H), MMCSS (I) renumbered accordingly.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Rendering Pipeline: disabled legacy rendering modes (DisallowNonDrawListRendering), caching (DisableDrawListCaching, EnableEffectCaching), and image processing (EnableImageProcessing). Enabled copy-on-present, scanout caching, virtual surface flattening, surface discard on minimize, and Advanced Direct Flip. Gain: lighter desktop compositing, ~1-3ms faster frame delivery.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Buffer & Sync: buffer age set to 1 frame (DWM_MAX_BUFFER_AGE/DWM_MAXIMUM_BUFFER_AGE), triple buffering enabled (DWM_TRIPLE_BUFFER). Gain: tear-free desktop on all display types.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Telemetry Disabled: all DWM diagnostic, debug, and animation tracking turned off (5 telemetry keys). Gain: zero DWM background logging, ~10-30% lighter dwm.exe CPU usage.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Advanced Composition: disabled primitive reordering, resample overrides, front buffer render checks, overlay auto-qualification, and extended composition filters. Enabled common supersets, dirty expression optimization, and resize optimization. Gain: consistent frame pacing, no micro-stutters from partial updates.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Schedule & Frame Control: frame timing offsets minimized, schedule intervals zeroed. Gain: no background interruptions, tighter frame timing.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Flip Model & Present: Independent Flip fully enabled (HKLM + HKCU), MaxQueuedPresentBuffers set to 2, FrameLatency set to 1 frame. Gain: maximum flip model coverage, lower input lag (16ms at 60Hz vs 33ms).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM MPO/Overlays: overlay test mode deleted, OverlayMinFPS set to 0 for dynamic overlay switching. Gain: fix MPO flickering/stuttering in games.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DWM Visual & Animations: thumbnail hibernation turned off (AlwaysHibernateThumbnails=0). Gain: saved GPU memory.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DWM Corrections: License activation popups (DisableSpecificPopups, DisableExpirationPopups, HideBalloonNotification, DontAskAgain, LicenseInterval) removed from DWM config — these are license-related, not DWM. HighColor set to 1 (30-bit 10bpc HDR preserved). EnableDesktopOverlays set to 1 (Discord/Steam/VLC overlays functional). MegaRects (EnableMegaRects, MegaRectSize, MegaRectSearchCount) removed — Windows manages partial redraw by default.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> MMCSS Scheduling consolidated into gaming.yml: SystemProfile root, Games task, and Window Manager task all in one file. Window Manager GPU Priority lowered from 8 to 6 (avoids conflict with Games=8). Window Manager Clock Rate lowered from 10000 to 2000 (avoids CPU overhead). dwm-optimization.yml MMCSS section removed.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> AllowTelemetry consolidated: 5 paths → 1 (HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection only). MaxTelemetryAllowed duplicates removed.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Paint AI keys consolidated: nonstandard CurrentVersion\Policies\Paint removed, only GP path Policies\Microsoft\Paint kept.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> AllowUseDirectFlip removed from gaming.yml (redundant with DisableIndependentFlip in dwm-optimization.yml).</li>
+        <li><span class="tag tag-new">🆕 NEW</span> IFEO (Image File Execution Options): Added CPU priority tuning for 4 processes — MoUsoCoreWorker.exe (High), spoolsv.exe (High), RuntimeBroker.exe (Idle), backgroundTaskHost.exe (Idle). Reduces background CPU contention from Windows Update scan worker and UWP broker during gaming.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Taskbar: Emoji/Touch Keyboard button now visible in notification area (TipbandDesiredVisibility=1). Quick access to emoji panel without Win+. shortcut.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Timer Precision: TimeBroker forced to highest resolution (13 keys — hardware timer, clock steering, force precision, disable sleep idle). Task Scheduler optimized (17 keys — real-time scheduling, prevent throttling, disable background tasks during gaming, minimum quantum size). Packet Scheduler timer resolution forced. Explorer resource-aware timers disabled. TSC sync policy set to enhanced. Gain: system-wide microsecond timer accuracy, fewer timer-induced micro-stutters, ~1-5ms reduced scheduling jitter.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Dynamic Tick fully disabled: bcdedit + registry kernel + tick duration limits (max/min = 1000). DISABLE_DYNAMIC_TICK environment variable removed (redundant with kernel key). Gain: no tick merging, consistent timer interrupt rate, lower DPC/ISR latency variance.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> MaxDynamicTickDurationSize removed (0xFFFFFFFF = 4 billion was an absurd value for a kernel parameter).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DistributeTimers removed: prevents timer distribution across cores. Gain: reduced cross-core timer migration overhead.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> USB Low Latency: XHCI and HUB3 controllers set to LowLatencyMode + ForceFullSpeed. USB audio always-on + isochronous transfer + minimum latency. USB hubs: aggressive suspend disabled, power down prevented. HID USB idle disabled. Gain: lower USB peripheral latency, stable audio on USB DACs/headsets, faster mouse/keyboard response. (DisableLegacyUSBSupport and DisableZeroLengthControlTransfers skipped to preserve Xbox Wireless Adapter / USB 2.0 dongle compatibility.)</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> USB I/O Queue Tuning: IoQueueWorkItem set to 0xa on xusb22, USBXHCI, and usbhub drivers. Gain: optimized work item queue depth for gaming peripherals.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable ESP padding (potentially reduces latency on some UEFI systems).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Defender Optimization: scheduled scans disabled, catch-up scans disabled, scan only when idle, restore point before scan disabled, IOAV download scanning disabled, scan-on-realtime-enable skipped, signature updates reduced to every 24h, common paths/extensions/processes excluded (exe/dll/sys/log/game formats). Gain: less msmpeng.exe CPU/disk I/O during gaming, fewer hard pagefaults from real-time scanning.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable WMI AutoLoggers: 27 additional ETW trace sessions (DefenderApi/Audit, ReadyBoot, Tpm, FaceTel, Holographic, TCPIP, Spooler, WiFiDriver×4, WMI_Traces, Setup, OOBE, FilterMgr, etc.) — 41 total autologgers disabled. Gain: further CPU/disk I/O reduction from stopped kernel trace sessions.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> WMI Autologger ControlSet001 → CurrentControlSet: all 14 entries in telemetry.yml and 2 in disable-AI-programs.yml now use CurrentControlSet (survives boot from alternate control set).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Adjust CPU/I/O priorities: fontdrvhost.exe/lsass.exe/sihost.exe/sppsvc.exe → Idle, csrss.exe → Normal/High I/O, ctfmon.exe/SearchIndexer.exe → High — reduces CPU contention from background services.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable CrossDeviceResume.exe via debugger trick (auto-kill on launch) — prevents cross-device resume overhead.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Scheduled Tasks: Disable 54 additional background tasks (SysMain, WaaSMedic, Kernel, ReFS, USB notifications, Flighting, Containers, AppData, Input sync×4, Chkdsk, PerformanceTrace, UpdateOrchestrator×4, Feedback×2, ExploitGuard, BitLocker×2, CloudRestore, SettingSync×2, WinINet, InstallService×3, etc.) + delete 5 (EdgeUpdate, MARE, USO_UxBroker, DeviceDirectoryClient). Gain: fewer background CPU/disk wake-ups, leaner task scheduler.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Security & Convenience: LowRiskFileTypes (no SmartScreen for common formats), disable Open File security warning (Zones\3), disable File History, hide disconnected/hidden audio devices. Gain: fewer prompts, cleaner audio panel.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Tips & Nags: Additional AllowOnlineTips disables (PolicyManager + System), disable App Archiving, disable background disk layout optimization (EnableAutoLayout). Gain: zero suggestions, no disk activity from auto-layout.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> File Explorer: Remove Gallery/Home/Network namespace pinned folders, disable BAM window hinting throttling, disable account notifications in Start. Gain: cleaner Explorer, fewer background Graph calls.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Kernel & Power: Disable timer coalescing (REG_BINARY), device power management on all Enum bus devices, StorPort NVMe idle power, USB LPM, power telemetry/watchdogs (FxAccounting, DeepIoCoalescing, MSDisabled, PowerWatchdog×5, Sleepstudy, EnergyEstimation, ThermalTelemetry, StandbyConnectivity, HibernateDefault, CS compliance, PEP constraints). Gain: lower DPC/ISR latency, higher sustained clocks.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Session Manager: Disable kernel telemetry (WerUserReporting, WatsonReporting, IoBoosting tracking), disable Config Manager self-healing/virtualization/fast-boot/bugcheck-recovery, disable I/O counters & crash dump driver, enable mutant auto-boost & interrupt steering. Gain: leaner kernel path, fewer deferred calls.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> NDIS: Boost receive worker thread priority to 31, disable watchdog/re-enumeration BSOD, disable NBL tracking & debug logging, disable NIC power saver & NAPs (desktop only). Gain: lower network stack latency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Input: Disable touch palm rejection delay zones, disable raw mouse throttling timers. Gain: reduced input latency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Desktop-only guard: All power management disables (USB LPM, NVMe idle, NDIS suspend, kernel parking/serialization) skipped on laptops via chassis/battery detection. Gain: preserves battery life on portables.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Improved LexBoosT OS Wallpaper.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Reativate GameBar\GameDVR. (On Ryzen 9 X3D CPUs (7950X3D/9950X3D), Game Bar is required for proper core parking. It helps Windows direct games to the 3D V-Cache cores. Disabling it can cause a 5-10% performance loss in games.)</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> CPU-aware core parking: core unparking (CPMINCORES, registry visibility, ValueMax) now applied only on Intel, AMD single-CCD X3D, and AMD non-X3D. Skipped on AMD dual-CCD X3D (Ryzen 9 7950X3D/9950X3D) where Game Bar manages parking for the 3D V-Cache CCD. Prevents performance loss on high-end X3D CPUs.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> AMD 3D V-Cache detection enhanced: now matches known models (5800X3D, 7800X3D, 7900X3D, 7950X3D, 9800X3D, 9900X3D, 9950X3D) in addition to "X3D" pattern match.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Intel hybrid detection expanded: now matches Core Ultra 200+ (Arrow Lake) and Core Ultra 100+ (Meteor Lake, Lunar Lake) in addition to 12th-14th gen.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> TSX detection hardened: Intel Haswell/Broadwell/Skylake CPUs correctly identified as vulnerable to CVE-2019-11135 (TSX Async Abort). DisableTsx=1 applied on vulnerable CPUs, DisableTsx=0 only on fixed CPUs.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> CPU-aware C-States: enabled only on AMD dual-CCD X3D (required for core parking), disabled on all other CPUs to eliminate idle state transition latency. Deep C-States visibility in Power Options follows the same rule.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Intel-only tweaks consolidated with CPU detection: TSX enable, Intel hybrid scheduling GUID visibility, HeteroMultiClassParkingEnabled, Intel chipset update. Non-Intel CPUs skip these entirely.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Dynamic tick (bcdedit disabledynamictick) applied on all CPUs except AMD dual-CCD X3D, where dynamic tick must remain active for proper core scheduling.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> BCD x2apicpolicy enable removed (can prevent boot on systems without BIOS x2APIC support — requires CMOS reset to recover).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> BCD pciexpress forcedisable removed (disables ASPM globally — causes data corruption on some NVMe drives and battery drain on laptops).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> BCD useplatformclock no now applied only on Intel CPUs (AMD requires HPET for TSC calibration — avoids stutters/audio crackling on Ryzen).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES.cmd: critical devices (System Timer, System CMOS/real time clock, Motherboard resources, ACPI Processor Aggregator) removed from auto-disable list — prevents BSOD/boot failures.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Core parking and hybrid scheduling tweaks with per-CPU logic.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Per-CPU clock tick scheduling and forced parking request now skipped on AMD dual-CCD X3D — preserves Windows CCD coordination for 3D V-Cache scheduling.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Auto detect AMD chipsets and install drivers (detects laptop/desktop chipsets, downloads and installs latest version). (Option in Installation)</li>
+        <li><span class="tag tag-new">🆕 NEW</span> UTC hardware clock option for Linux dual-boot (Option in Installation).</li>
+        <li><span class="tag tag-new">🆕 NEW</span> New Program: LexBoosT Hyper-V Manager.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Packages Manager — Search with multi-word queries now properly quoted (e.g., "visual studio" is treated as a single phrase instead of being split into separate search terms for Winget/Chocolatey).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> LexBoosT Packages Manager — Silent mode checkbox added to the update selection dialog (checked by default). Updates can now be installed silently like regular package installations.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> LexBoosT Tools Launcher: Better accessibility. Cleaner Launcher.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span> Removing the return of the old Windows 25h2 Start Menu (no longer works).</li>
+        <li><span class="tag tag-new">🆕 NEW</span> File Explorer: remove "Previous Versions" tab from file, folder, and drive property sheets. Cleaner properties dialog.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Privacy: disable lock screen camera access (NoLockScreenCamera). Prevents camera activation from the lock screen.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Improved LexBoosT Devices Cleanup. Now use DevManView for better accurency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Scheduled Tasks: Added 21 missing tasks to FINALIZE5.cmd (Disabled instead of Deleted, safer approach).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Services: Reorganized services.yml — sorted alphabetically within each category, grouped by startup type (Automatic/Manual/Disabled), and all services now have descriptive comments aligned to a uniform column for readability.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> PlugPlay service corrected: changed from Manual (3) back to Automatic (2) — critical boot-start service for hardware enumeration.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> ClipSVC duplicate entry removed (was listed twice: change + start, now single change entry).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> TrustedInstaller comment clarified: Manual (3) is the Windows default (trigger-start via WU/DISM), correctly preserved.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> webthreatdefsvc comment clarified: keep Automatic while Defender is active.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Easy Move User Folders — AppData folder movement was broken (checkbox display name "⚠ AppData" didn't match the dictionary key "AppData"). Fixed by storing the real folder name in CheckBox.Tag. Fixed Documents folder junction point creation by safely deleting only empty subdirectories. Added same-path protection to prevent data loss when source and destination are identical.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> BCD Optimizations refactored: all bcdedit commands consolidated into Set-BcdOptimizations function in DEVICES.ps1 with per-CPU conditional logic. Core optimizations (5-level paging off, firstmegabytepolicy UseAll, stale entry cleanup) applied unconditionally. Timer/scheduling optimizations (disabledynamictick yes, useplatformclock/USEplatformtick no on Intel only, tscsyncpolicy enhanced) skipped on AMD 3D V-Cache dual-CCD (>8 cores) to preserve Windows CCD coordination for proper core scheduling.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> APPX-REMOVER.ps1: TokenManipulator kernel handle leak fixed (Marshal.FreeHGlobal → CloseHandle). 32-bit WOW6432Node registry paths added for AppX cleanup. $removedCount now verified before increment.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> APPX-REMOVER.ps1: wildcard path protection added — package cleanup skipped if $packageFamilyName is empty/null. SystemApps path check now rejects junction/symlink targets.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Set-RegistryValue in DEVICES.ps1: all registry types (DWORD, String, QWORD, MultiString, ExpandString, Binary) now explicitly handled; MultiString values properly cast to [string[]].</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> RUNTIMES.ps1: VC++ detection refactored — uses registry view (x64→native, x86→WOW6432Node) instead of fragile DisplayName string matching. Winget install now verified via Test-CommandAvailable. DirectX detection expanded to 6 DLLs, logic relaxed (any DLL found = installed).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> EDGE.ps1: $env:windir="" now wrapped in try/finally — windir restored on all code paths (previously commented out restoration line, left windir empty on early returns).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DisableCoInstallers warning added: documents that it breaks Realtek/Creative audio drivers and specialty hardware.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> SystemResponsiveness raised from 10 to 14 (safe minimum for audio — prevents crackling on DAC/USB devices).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DWM FrameLatency lowered from 2 to 1 (reduces input lag from 33ms to 16ms at 60Hz).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Games task Clock Rate kept at 10000 (gaming benefits), Window Manager Clock Rate lowered to 2000 (avoids CPU overhead).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable Find My Device (Disable location-based device tracking by Microsoft).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable WAP Push Service (Disable WAP Push Message routing service used for telemetry).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> WPAD — disable auto-proxy discovery (prevents MITM attacks)</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> The OneDrive uninstall script now finds and deletes all scheduled tasks whose name starts with OneDrive.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Skip the installation of VCredist if they are already installed on the system.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES-TWEAKER-AUTO.PS1 — xHCI IMOD was skipped because USB controllers don't have the "Interrupt Management" registry key by default, so they never entered $Devices. C# ApplyImod now called unconditionally (does its own SetupDi detection).</li>
+        <li><span class="tag tag-break">💥 BREAKING</span> Delete Disable Devices in AME. Now you use LexBoosT Devices Cleanup for Enable/Disable devices. (Program updated for this case)</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Intel & Realtek Network Settings: perf keywords (*InterruptModeration, *RSS, *FlowControl, *PacketCoalescing, etc.) now applied on laptops too (were desktop-only). Removed duplicate keys between perf/power blocks. Added missing *PacketCoalescing=0. Fixed *ReceiveBuffers conflict (1024 vs 512), *ModernStandbyWoLMagicPacket prefix, invalid *SSIdleTimeout=0. Settings split: common perf / vendor-specific perf (always) / power management (desktop only).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Update nvidiaProfileInspector to 3.0.1.13</li>
+    </ul>
+</div>
+
+<footer>
+    <div class="container" style="padding:0;">
+        <p>LexBoosT OS™ v26.06 — <a href="./">← Back to site</a></p>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1024 @@
+# LexBoosT OS™ V26.06
+
+- 🪛 DEVICES.PS1 Set-DrivesConfiguration hang fixed: replaced Get-PhysicalDisk -SerialNumber (can hang on some NVMe/SSD) with DeviceId-based lookup. Playbook no longer freezes at "Configuring Drive Optimizations".
+- 🪛 HKCU registry propagation fixed: replaced all `HKEY_CURRENT_USER\` with `HKCU\` in mouse-keyboard.yml (2 occurrences) and explorer.yml (1 occurrence). APPLYDUHIVE.PS1 pattern-matches `HKCU*` — the long form was silently skipped, causing mouse/keyboard settings to be missing from the registry after installation.
+- 🪛 APPLYDUHIVE.PS1 Get-UserProfilesOffline bug fixed: replaced `return` with `continue` inside ForEach-Object pipeline. `return` was terminating the entire pipeline at the first built-in profile (Default/Public), preventing all subsequent user profiles from being discovered and processed.
+- ✨ APPLYDUHIVE.PS1 now scans .CMD and .PS1 scripts for HKCU paths: previously only YAML files were scanned, causing ~45 HKCU values from FINALIZE1-3.CMD (notifications, accessibility, DeviceAccess, ContentDeliveryManager, etc.) and ~10 from VISUAL.PS1/OPTIMIZE-MOUSESMOOTHINGCURVES.PS1/ICONS_DESK.PS1 to be missing from Default User hive. Regex-based extraction covers both `HKCU\` and `HKEY_CURRENT_USER\` formats.
+- 🪛 IFEO priority conflicts fixed: aligned ifeo.yml with system-process-performance-optimization.yml — sihost.exe CpuPriority 1→2 (Normal, fixes Win11 taskbar lag), IoPriority 0→2 (Normal), ctfmon.exe CpuPriority 5→2 (Normal), csrss.exe CpuPriority 3→4 (Above Normal).
+- 🪛 NVIDIA EnableGR535 duplicate removed from gaming.yml: already handled by GPUTweaks (FTS Tweaks). GPUTweaks is now the single source of truth for all GPU driver tweaks (NVIDIA/AMD/Intel).
+- 🪛 Privacy Location conflict fixed: ConsentStore location set to Allow (was Deny→Allow→Deny due to duplicate entries). Apps requiring location access now work correctly.
+- 🪛 InkWorkspace conflict fixed: AllowWindowsInkWorkspace set to 1 in FINALIZE3.CMD (was 0, conflicting with explorer.yml). Preserves stylus/pen compatibility.
+- ✨ BCD x2apicpolicy enable: added to DEVICES.PS1 Set-BcdOptimizations. Improves interrupt routing on modern CPUs (Intel 12th+, AMD Zen 3+).
+- ✨ BCD useplatformtick yes (AMD): added to DEVICES.PS1 Set-BcdOptimizations. Forces TSC as tick source on AMD CPUs for better timer precision.
+- 🪛 LSO/RSC alignment: DEVICES.PS1 network settings aligned with YAML — *LsoV1IPv4, *LsoV2IPv4, *LsoV2IPv6 set to 0 (disabled), *RscIPv4, *RscIPv6, *UdpRsc, ForceRscEnabled set to 0 (disabled), ReceiveSegmentCoalescing set to Disabled. Consistent low-latency network configuration across all sources.
+- 🪛 Dead code removed: crash-control.yml deleted (FINALIZE3.CMD covers same values), DisablePageCombining removed from advanced-system-optimization.yml (FINALIZE4.CMD covers via Disable-MMAgent), ExcludeWUDriversInQualityUpdate duplicate removed from updates.yml (already in drivers.yml), Crash Control/NoDriveTypeAutoRun/NoAutorun duplicates removed from FINALIZE3.CMD (already in YAML).
+- ✨ DirectStorage 1.2+ optimizations: EnableDirectStorage=1, EnableOptimizations=1 in gaming.yml. Faster game loading on NVMe Gen4+ drives.
+- ✨ VRR for windowed apps: VRRForWindowedApps=1 in gaming.yml. Enables Variable Refresh Rate for borderless/windowed games (Windows 11 25H2+).
+- ✨ Auto HDR enhancements: AutoHDREnabled=1, AutoHDRIntensity=2 in gaming.yml. Improved automatic HDR quality (Windows 11 25H2+).
+- 🪛 DEVICES.PS1 HiberbootEnabled duplicate removed: HiberbootEnabled=0 removed from additional-performance-optimization.yml (DEVICES.PS1 Set-HibernationSettings covers it). Policies delete and SleepStudyEnabled kept (not in DEVICES.PS1).
+- 🪛 DEVICES.PS1 USB Selective Suspend bug fixed: powercfg value corrected from 1 (enabled) to 0 (disabled) for USB Selective Suspend Setting (GUID 48e6b7a6-50f5-4782-a5d4-53bb8f07e226).
+- ✨ DEVICES.PS1 core parking refactored: new Set-CoreParkingDisabled helper function replaces 3 identical code blocks (Intel/AMD X3D single-CCD/AMD). ~24 lines of duplicated code eliminated.
+- ✨ DEVICES.PS1 system detection cached: new Get-CachedLaptopStatus and Get-CachedVMStatus functions cache WMI/CIM results. 9 Test-Laptop calls and 1 Test-VM call replaced — reduces redundant hardware queries.
+- 🆕 Pre-Installation Backup: System snapshot created before any modifications (system restore point, targeted registry export from YAML configs, service state, AppX snapshot, BCD export). Backup saved to %ProgramData%\LexBoosTOS\Backup with timestamped manifest.
+- 🆕 Rollback System: ROLLBACK.ps1 restores BCD, targeted registry keys, and service startup types from pre-installation backup. "Restore LexBoosT OS Backup" context menu added to desktop.
+- 🆕 Custom OS Detection: 24 custom Windows builds (AtlasOS, ReviOS, Tiny11, Ghost Spectre, etc.) detected via ProductName, EditionID, OEM info, folder paths, and registry keys. Installation aborted with error message if detected — prevents catastrophic playbook conflicts.
+- 🆕 AppX Snapshot Before/After: APPX-REMOVER.ps1 now saves pre-removal package list, post-removal list, and generates a diff report of removed packages in C:\Windows\LexBoosTOS\Logs.
+- 🆕 System Configuration Log: Writes Windows version, architecture, CPU, RAM, and user info to C:\Windows\LexBoosTOS\Logs\lexboost-system-config.txt for support/debug.
+- 🆕 Active Setup Stubs Cleanup: CLEANUP-ACTIVE-SETUP.ps1 clears StubPath entries and Run keys for browsers (Brave, Chrome, Edge, Firefox, Opera, Vivaldi, Zen) and OneDrive — prevents first-logon popups.
+- 🆕 ConsentStore Full Lockdown: 32 capabilities set to Deny (activity, appointments, bluetooth, calendar, callHistory, cellularData, chat, contacts, email, eyeTracker, gazeInput, generativeAI, humanPresence, humanInterfaceDevice, location, motion, notifications, passkeys, phoneCall, phoneCallHistory, radios, spatialPerception, backgroundSpatialPerception, tasks, trustedDevices, userAccountInformation, userDataTasks, userNotificationListener, voiceActivation, wifiData, wifiDirect). Applied to HKLM, HKCU\.DEFAULT, and all live user SIDs via PowerShell. Webcam and microphone remain Allow.
+- 🆕 Offline NTUSER.DAT Processing: APPLYDUHIVE.ps1 now scans all C:\Users\ profiles, loads each NTUSER.DAT, applies HKCU settings, and unloads — previously only processed Default user.
+- 🆕 Disable Windows Transparency: New option in AME — "Disable Windows Transparency" under Visual options. Sets EnableTransparency=0 (HKCU\Themes\Personalize) to remove acrylic/blur effects on taskbar, Start menu, and window borders for a clean opaque look.
+- 🆕 Windows Update Granular Policies: AUPowerManagement=0 (no wake for updates), DeferFeatureUpdates=1 + 365 days, AUOptions=2 (notify before download), ExcludeWUDriversInQualityUpdate=1, TargetReleaseVersion=1.
+- ✨ DWM Optimization centralized: 60 registry keys consolidated from 5 files into 1 (registry\system\dwm-optimization.yml), sourced from verified community tweaks. Gain: unified DWM tuning, zero redundancy.
+- ✨ DWM Categories: Reorganized from A→K to sequential A→I. New Category B (Buffer & Sync) added; Schedule (E), Flip Model (F), MPO (G), Visual (H), MMCSS (I) renumbered accordingly.
+- ✨ DWM Rendering Pipeline: disabled legacy rendering modes (DisallowNonDrawListRendering), caching (DisableDrawListCaching, EnableEffectCaching), and image processing (EnableImageProcessing). Enabled copy-on-present, scanout caching, virtual surface flattening, surface discard on minimize, and Advanced Direct Flip. Gain: lighter desktop compositing, ~1-3ms faster frame delivery.
+- ✨ DWM Buffer & Sync: buffer age set to 1 frame (DWM_MAX_BUFFER_AGE/DWM_MAXIMUM_BUFFER_AGE), triple buffering enabled (DWM_TRIPLE_BUFFER). Gain: tear-free desktop on all display types.
+- ✨ DWM Telemetry Disabled: all DWM diagnostic, debug, and animation tracking turned off (5 telemetry keys). Gain: zero DWM background logging, ~10-30% lighter dwm.exe CPU usage.
+- ✨ DWM Advanced Composition: disabled primitive reordering, resample overrides, front buffer render checks, overlay auto-qualification, and extended composition filters. Enabled common supersets, dirty expression optimization, and resize optimization. Gain: consistent frame pacing, no micro-stutters from partial updates.
+- ✨ DWM Schedule & Frame Control: frame timing offsets minimized, schedule intervals zeroed. Gain: no background interruptions, tighter frame timing.
+- ✨ DWM Flip Model & Present: Independent Flip fully enabled (HKLM + HKCU), MaxQueuedPresentBuffers set to 2, FrameLatency set to 1 frame. Gain: maximum flip model coverage, lower input lag (16ms at 60Hz vs 33ms).
+- ✨ DWM MPO/Overlays: overlay test mode deleted, OverlayMinFPS set to 0 for dynamic overlay switching. Gain: fix MPO flickering/stuttering in games.
+- ✨ DWM Visual & Animations: thumbnail hibernation turned off (AlwaysHibernateThumbnails=0). Gain: saved GPU memory.
+- 🪛 DWM Corrections: License activation popups (DisableSpecificPopups, DisableExpirationPopups, HideBalloonNotification, DontAskAgain, LicenseInterval) removed from DWM config — these are license-related, not DWM. HighColor set to 1 (30-bit 10bpc HDR preserved). EnableDesktopOverlays set to 1 (Discord/Steam/VLC overlays functional). MegaRects (EnableMegaRects, MegaRectSize, MegaRectSearchCount) removed — Windows manages partial redraw by default.
+- ✨ MMCSS Scheduling consolidated into gaming.yml: SystemProfile root, Games task, and Window Manager task all in one file. Window Manager GPU Priority lowered from 8 to 6 (avoids conflict with Games=8). Window Manager Clock Rate lowered from 10000 to 2000 (avoids CPU overhead). dwm-optimization.yml MMCSS section removed.
+- 🪛 AllowTelemetry consolidated: 5 paths → 1 (HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection only). MaxTelemetryAllowed duplicates removed.
+- 🪛 Paint AI keys consolidated: nonstandard CurrentVersion\Policies\Paint removed, only GP path Policies\Microsoft\Paint kept.
+- 🪛 AllowUseDirectFlip removed from gaming.yml (redundant with DisableIndependentFlip in dwm-optimization.yml).
+- 🆕 IFEO (Image File Execution Options): Added CPU priority tuning for 4 processes — MoUsoCoreWorker.exe (High), spoolsv.exe (High), RuntimeBroker.exe (Idle), backgroundTaskHost.exe (Idle). Reduces background CPU contention from Windows Update scan worker and UWP broker during gaming.
+- 🆕 Taskbar: Emoji/Touch Keyboard button now visible in notification area (TipbandDesiredVisibility=1). Quick access to emoji panel without Win+. shortcut.
+- ✨ Timer Precision: TimeBroker forced to highest resolution (13 keys — hardware timer, clock steering, force precision, disable sleep idle). Task Scheduler optimized (17 keys — real-time scheduling, prevent throttling, disable background tasks during gaming, minimum quantum size). Packet Scheduler timer resolution forced. Explorer resource-aware timers disabled. TSC sync policy set to enhanced. Gain: system-wide microsecond timer accuracy, fewer timer-induced micro-stutters, ~1-5ms reduced scheduling jitter.
+- ✨ Dynamic Tick fully disabled: bcdedit + registry kernel + tick duration limits (max/min = 1000). DISABLE_DYNAMIC_TICK environment variable removed (redundant with kernel key). Gain: no tick merging, consistent timer interrupt rate, lower DPC/ISR latency variance.
+- 🪛 MaxDynamicTickDurationSize removed (0xFFFFFFFF = 4 billion was an absurd value for a kernel parameter).
+- ✨ DistributeTimers removed: prevents timer distribution across cores. Gain: reduced cross-core timer migration overhead.
+- ✨ USB Low Latency: XHCI and HUB3 controllers set to LowLatencyMode + ForceFullSpeed. USB audio always-on + isochronous transfer + minimum latency. USB hubs: aggressive suspend disabled, power down prevented. HID USB idle disabled. Gain: lower USB peripheral latency, stable audio on USB DACs/headsets, faster mouse/keyboard response. (DisableLegacyUSBSupport and DisableZeroLengthControlTransfers skipped to preserve Xbox Wireless Adapter / USB 2.0 dongle compatibility.)
+- ✨ USB I/O Queue Tuning: IoQueueWorkItem set to 0xa on xusb22, USBXHCI, and usbhub drivers. Gain: optimized work item queue depth for gaming peripherals.
+- ✨ Disable ESP padding (potentially reduces latency on some UEFI systems).
+- ✨ Defender Optimization: scheduled scans disabled, catch-up scans disabled, scan only when idle, restore point before scan disabled, IOAV download scanning disabled, scan-on-realtime-enable skipped, signature updates reduced to every 24h, common paths/extensions/processes excluded (exe/dll/sys/log/game formats). Gain: less msmpeng.exe CPU/disk I/O during gaming, fewer hard pagefaults from real-time scanning.
+- ✨ Disable WMI AutoLoggers: 27 additional ETW trace sessions (DefenderApi/Audit, ReadyBoot, Tpm, FaceTel, Holographic, TCPIP, Spooler, WiFiDriver×4, WMI_Traces, Setup, OOBE, FilterMgr, etc.) — 41 total autologgers disabled. Gain: further CPU/disk I/O reduction from stopped kernel trace sessions.
+- 🪛 WMI Autologger ControlSet001 → CurrentControlSet: all 14 entries in telemetry.yml and 2 in disable-AI-programs.yml now use CurrentControlSet (survives boot from alternate control set).
+- ✨ Adjust CPU/I/O priorities: fontdrvhost.exe/lsass.exe/sihost.exe/sppsvc.exe → Idle, csrss.exe → Normal/High I/O, ctfmon.exe/SearchIndexer.exe → High — reduces CPU contention from background services.
+- ✨ Disable CrossDeviceResume.exe via debugger trick (auto-kill on launch) — prevents cross-device resume overhead.
+- ✨ Scheduled Tasks: Disable 54 additional background tasks (SysMain, WaaSMedic, Kernel, ReFS, USB notifications, Flighting, Containers, AppData, Input sync×4, Chkdsk, PerformanceTrace, UpdateOrchestrator×4, Feedback×2, ExploitGuard, BitLocker×2, CloudRestore, SettingSync×2, WinINet, InstallService×3, etc.) + delete 5 (EdgeUpdate, MARE, USO_UxBroker, DeviceDirectoryClient). Gain: fewer background CPU/disk wake-ups, leaner task scheduler.
+- ✨ Security & Convenience: LowRiskFileTypes (no SmartScreen for common formats), disable Open File security warning (Zones\3), disable File History, hide disconnected/hidden audio devices. Gain: fewer prompts, cleaner audio panel.
+- ✨ Tips & Nags: Additional AllowOnlineTips disables (PolicyManager + System), disable App Archiving, disable background disk layout optimization (EnableAutoLayout). Gain: zero suggestions, no disk activity from auto-layout.
+- ✨ File Explorer: Remove Gallery/Home/Network namespace pinned folders, disable BAM window hinting throttling, disable account notifications in Start. Gain: cleaner Explorer, fewer background Graph calls.
+- ✨ Kernel & Power: Disable timer coalescing (REG_BINARY), device power management on all Enum bus devices, StorPort NVMe idle power, USB LPM, power telemetry/watchdogs (FxAccounting, DeepIoCoalescing, MSDisabled, PowerWatchdog×5, Sleepstudy, EnergyEstimation, ThermalTelemetry, StandbyConnectivity, HibernateDefault, CS compliance, PEP constraints). Gain: lower DPC/ISR latency, higher sustained clocks.
+- ✨ Session Manager: Disable kernel telemetry (WerUserReporting, WatsonReporting, IoBoosting tracking), disable Config Manager self-healing/virtualization/fast-boot/bugcheck-recovery, disable I/O counters & crash dump driver, enable mutant auto-boost & interrupt steering. Gain: leaner kernel path, fewer deferred calls.
+- ✨ NDIS: Boost receive worker thread priority to 31, disable watchdog/re-enumeration BSOD, disable NBL tracking & debug logging, disable NIC power saver & NAPs (desktop only). Gain: lower network stack latency.
+- ✨ Input: Disable touch palm rejection delay zones, disable raw mouse throttling timers. Gain: reduced input latency.
+- ✨ Desktop-only guard: All power management disables (USB LPM, NVMe idle, NDIS suspend, kernel parking/serialization) skipped on laptops via chassis/battery detection. Gain: preserves battery life on portables.
+- ✨ Improved LexBoosT OS Wallpaper.
+- ✨ Reativate GameBar\GameDVR. (On Ryzen 9 X3D CPUs (7950X3D/9950X3D), Game Bar is required for proper core parking. It helps Windows direct games to the 3D V-Cache cores. Disabling it can cause a 5-10% performance loss in games.) (Source: https://community.amd.com/t5/pc-processors/ryzen-9-7950-x3d-uses-all-cores-while-gaming/m-p/645288#M56807)
+- ✨ CPU-aware core parking: core unparking (CPMINCORES, registry visibility, ValueMax) now applied only on Intel, AMD single-CCD X3D, and AMD non-X3D. Skipped on AMD dual-CCD X3D (Ryzen 9 7950X3D/9950X3D) where Game Bar manages parking for the 3D V-Cache CCD. Prevents performance loss on high-end X3D CPUs.
+- 🪛 AMD 3D V-Cache detection enhanced: now matches known models (5800X3D, 7800X3D, 7900X3D, 7950X3D, 9800X3D, 9900X3D, 9950X3D) in addition to "X3D" pattern match.
+- 🪛 Intel hybrid detection expanded: now matches Core Ultra 200+ (Arrow Lake) and Core Ultra 100+ (Meteor Lake, Lunar Lake) in addition to 12th-14th gen.
+- 🪛 TSX detection hardened: Intel Haswell/Broadwell/Skylake CPUs correctly identified as vulnerable to CVE-2019-11135 (TSX Async Abort). DisableTsx=1 applied on vulnerable CPUs, DisableTsx=0 only on fixed CPUs.
+- ✨ CPU-aware C-States: enabled only on AMD dual-CCD X3D (required for core parking), disabled on all other CPUs to eliminate idle state transition latency. Deep C-States visibility in Power Options follows the same rule.
+- ✨ Intel-only tweaks consolidated with CPU detection: TSX enable, Intel hybrid scheduling GUID visibility, HeteroMultiClassParkingEnabled, Intel chipset update. Non-Intel CPUs skip these entirely.
+- ✨ Dynamic tick (bcdedit disabledynamictick) applied on all CPUs except AMD dual-CCD X3D, where dynamic tick must remain active for proper core scheduling.
+- 🪛 BCD x2apicpolicy enable removed (can prevent boot on systems without BIOS x2APIC support — requires CMOS reset to recover).
+- 🪛 BCD pciexpress forcedisable removed (disables ASPM globally — causes data corruption on some NVMe drives and battery drain on laptops).
+- 🪛 BCD useplatformclock no now applied only on Intel CPUs (AMD requires HPET for TSC calibration — avoids stutters/audio crackling on Ryzen).
+- 🪛 DEVICES.cmd: critical devices (System Timer, System CMOS/real time clock, Motherboard resources, ACPI Processor Aggregator) removed from auto-disable list — prevents BSOD/boot failures.
+- 🆕 Core parking and hybrid scheduling tweaks with per-CPU logic.
+- ✨ Per-CPU clock tick scheduling and forced parking request now skipped on AMD dual-CCD X3D — preserves Windows CCD coordination for 3D V-Cache scheduling.
+- 🆕 Auto detect AMD chipsets and install drivers (detects laptop/desktop chipsets, downloads and installs latest version). (Option in Installation)
+- 🆕 UTC hardware clock option for Linux dual-boot (Option in Installation).
+- 🆕 New Program: LexBoosT Hyper-V Manager.
+- 🪛 FIX: LexBoosT Packages Manager — Search with multi-word queries now properly quoted (e.g., "visual studio" is treated as a single phrase instead of being split into separate search terms for Winget/Chocolatey).
+- ✨ LexBoosT Packages Manager — Silent mode checkbox added to the update selection dialog (checked by default). Updates can now be installed silently like regular package installations.
+- ✨ LexBoosT Tools Launcher: Better accessibility. Cleaner Launcher.
+- 💥 Removing the return of the old Windows 25h2 Start Menu (no longer works).
+- 🆕 File Explorer: remove "Previous Versions" tab from file, folder, and drive property sheets. Cleaner properties dialog.
+- 🆕 Privacy: disable lock screen camera access (NoLockScreenCamera). Prevents camera activation from the lock screen.
+- ✨ Improved LexBoosT Devices Cleanup. Now use DevManView for better accurency.
+- ✨ Scheduled Tasks: Added 21 missing tasks to FINALIZE5.cmd (Disabled instead of Deleted, safer approach).
+- ✨ Services: Reorganized services.yml — sorted alphabetically within each category, grouped by startup type (Automatic/Manual/Disabled), and all services now have descriptive comments aligned to a uniform column for readability.
+- 🪛 PlugPlay service corrected: changed from Manual (3) back to Automatic (2) — critical boot-start service for hardware enumeration.
+- 🪛 ClipSVC duplicate entry removed (was listed twice: change + start, now single change entry).
+- 🪛 TrustedInstaller comment clarified: Manual (3) is the Windows default (trigger-start via WU/DISM), correctly preserved.
+- 🪛 webthreatdefsvc comment clarified: keep Automatic while Defender is active.
+- 🪛 FIX: LexBoosT Easy Move User Folders — AppData folder movement was broken (checkbox display name "⚠ AppData" didn't match the dictionary key "AppData"). Fixed by storing the real folder name in CheckBox.Tag. Fixed Documents folder junction point creation by safely deleting only empty subdirectories. Added same-path protection to prevent data loss when source and destination are identical.
+- ✨ BCD Optimizations refactored: all bcdedit commands consolidated into Set-BcdOptimizations function in DEVICES.ps1 with per-CPU conditional logic. Core optimizations (5-level paging off, firstmegabytepolicy UseAll, stale entry cleanup) applied unconditionally. Timer/scheduling optimizations (disabledynamictick yes, useplatformclock/USEplatformtick no on Intel only, tscsyncpolicy enhanced) skipped on AMD 3D V-Cache dual-CCD (>8 cores) to preserve Windows CCD coordination for proper core scheduling.
+- 🪛 APPX-REMOVER.ps1: TokenManipulator kernel handle leak fixed (Marshal.FreeHGlobal → CloseHandle). 32-bit WOW6432Node registry paths added for AppX cleanup. $removedCount now verified before increment.
+- 🪛 APPX-REMOVER.ps1: wildcard path protection added — package cleanup skipped if $packageFamilyName is empty/null. SystemApps path check now rejects junction/symlink targets.
+- 🪛 Set-RegistryValue in DEVICES.ps1: all registry types (DWORD, String, QWORD, MultiString, ExpandString, Binary) now explicitly handled; MultiString values properly cast to [string[]].
+- 🪛 RUNTIMES.ps1: VC++ detection refactored — uses registry view (x64→native, x86→WOW6432Node) instead of fragile DisplayName string matching. Winget install now verified via Test-CommandAvailable. DirectX detection expanded to 6 DLLs, logic relaxed (any DLL found = installed).
+- 🪛 EDGE.ps1: $env:windir="" now wrapped in try/finally — windir restored on all code paths (previously commented out restoration line, left windir empty on early returns).
+- 🪛 DisableCoInstallers warning added: documents that it breaks Realtek/Creative audio drivers and specialty hardware.
+- 🪛 SystemResponsiveness raised from 10 to 14 (safe minimum for audio — prevents crackling on DAC/USB devices).
+- 🪛 DWM FrameLatency lowered from 2 to 1 (reduces input lag from 33ms to 16ms at 60Hz).
+- 🪛 Games task Clock Rate kept at 10000 (gaming benefits), Window Manager Clock Rate lowered to 2000 (avoids CPU overhead).
+- ✨ Disable Find My Device (Disable location-based device tracking by Microsoft).
+- ✨ Disable WAP Push Service (Disable WAP Push Message routing service used for telemetry).
+- ✨ WPAD — disable auto-proxy discovery (prevents MITM attacks)
+- 🪛 The OneDrive uninstall script now finds and deletes all scheduled tasks whose name starts with OneDrive.
+- ✨ Skip the installation of VCredist if they are already installed on the system.
+- 🪛 Fix: DEVICES-TWEAKER-AUTO.PS1 — xHCI IMOD was skipped because USB controllers don't have the "Interrupt Management" registry key by default, so they never entered $Devices. C# ApplyImod now called unconditionally (does its own SetupDi detection).
+- 💥 Delete Disable Devices in AME. Now you use LexBoosT Devices Cleanup for Enable/Disable devices. (Program updated for this case)
+- 🪛 Intel & Realtek Network Settings: perf keywords (*InterruptModeration, *RSS, *FlowControl, *PacketCoalescing, etc.) now applied on laptops too (were desktop-only). Removed duplicate keys between perf/power blocks. Added missing *PacketCoalescing=0. Fixed *ReceiveBuffers conflict (1024 vs 512), *ModernStandbyWoLMagicPacket prefix, invalid *SSIdleTimeout=0. Settings split: common perf / vendor-specific perf (always) / power management (desktop only).
+- ✨ Update nvidiaProfileInspector to 3.0.1.13
+
+# LexBoosT OS™ V26.06
+
+- 🆕 Auto detect Intel chipsets and install drivers. (Option in Installation)
+- 🪛 LexBoosT Network Optimizer: Added BBR2 loopback large MTU fix (netsh int ipv4/ipv6 set global loopbacklargemtu=disable) to prevent local TCP connection breakage on Windows 11 23H2+, with automatic restore when switching away from BBR2. (Thanks wind999 for the info)
+- ✨ Mitigations Spectre V2 + Meltdown disabled. (gain ~ +5 @ +15% CPU on Intel 6e-11e gen on single-thread, Zero impact on AMD Zen 2+ and Intel 12e+ gen (hardware mitigations)).
+- ✨ Update ReadMe: https://mdeditor.net/docs/22d47c09d9d6e9a57974a77146b549c2
+- ✨ Code Cleanup.
+
+# LexBoosT OS™ V26.05.4
+
+- ✨ The playbook was blocking Microsoft account sign-in because TokenBroker/wlidsvc services were set to Manual instead of Automatic and registry settings like EnableCdp=0/userAccountInformation=Deny/MSAOptional (commented out) were preventing the auth stack from functioning,
+so all four files were patched to restore connectivity - users can now sign in to a Microsoft account both before and after installation.
+- ✨ Improvements of winver.
+- 🆕 Install Terminal with theme when you use LexBoosT Theme option in AME.
+- ✨ LexBoosT Browser Cleaner: Added Zen Browser.
+- ✨ It is no longer necessary to have Windows activated to install the playbook now.
+- ✨ LexBoosT Drive\Folder Compactor now has cmd windows open to view progress.
+- ✨ Privacy & Security: WorkplaceJoin block, Remote Assistance disable, GenerativeAI/SystemAIModels deny, Advertising ID disable, OneDrive folder backup block, PowerShell ExecutionPolicy Bypass, UAC consent prompt disable. Gain: improved privacy, reduced background telemetry, fewer background processes.
+- ✨ AI/Copilot/Edge/Office: 6 WindowsAI policy keys, 12 Edge Copilot policies, Office Copilot disable (Word/Excel/OneNote), Copilot Shell/BingChat disable, ShowCopilotNudges=0. Gain: reduced CPU/RAM usage, privacy protection against AI data collection.
+- ✨ Explorer & UI: Visual effects animation bits, accessibility keys, nav pane preferences, Dynamic Lighting disable. Gain: faster UI responsiveness, consistent desktop experience.
+- ✨ Notifications: Defender notification enable (HKLM+HKCU), toast/lock screen notification control, location prompts disable. Gain: cleaner notification experience without missing security alerts.
+- ✨ Updates: ContinuousInnovation opt-in, expedited updates disable, NoAutoRebootWithLoggedOnUsers, metered network download disable. Gain: more control over Windows Update behavior, no unexpected reboots.
+- ✨ New Wallpaper.
+
+# LexBoosT OS™ V26.05.3
+
+- ✨ Improved Default User Hive.
+- 🪛 Fix Start menu which is cleared even if you do not check the corresponding box in AME. (Thanks Calopsy for report)
+- ✨ Creating the BSOD dump that does not require a pagefile.
+- ✨ Installing the runtimes will no longer interfere with the playbook installation.
+- ✨ I modified the NileSoftShell software to eliminate the intrusive menu.
+- 🪛 Cleaning up old DisallowRun keys (which caused "restrictions" pop-ups at startup).
+- 🪛 I forgot to reintegrate the script after my refactoring. (Thanks win999 for report).
+- 🪛 Fixed GPU/WiFi/SysMain regressions: Intel GPUs now detected for Write-Combining, and SysMain service properly stopped after being set to Manual.
+- ✨ Disable NTFS Encryption (EFS). (Disables the Encrypting File System overhead)
+- ✨ Disable NTFS Compression. (Prevents the kernel from loading compression routines)
+- 💥 GPU tweaks delegated to GPUTweaks: removed graphic-drivers.yml, directx.yml, and GPU sections from gaming.yml, FINALIZE*.cmd, DEVICES.ps1, and privacy.yml.
+- 💥 Removed references to deleted GPU tasks from registry.yml playbook.
+- ✨ GPUTweaks: added missing tweaks (NVIDIA Shader Cache, NVIDIA context menu, AMD LargePages, AMD Power Containment, DXGKrnl thread priority).
+- 🪛 GPUTweaks: fixed nvlddmkm Partial state caused by uint.MaxValue overflow on DWORD writes.
+- 🪛 GPUTweaks: fixed Performance Tweaks / Dynamic PStates conflict on shared RMClkSlowDown key.
+- ✨ GPUTweaks: added diagnostic feedback showing failed keys on Partial state (tooltip + status detail).
+
+# LexBoosT OS™ V26.05.2
+
+- ✨ Automatically optimizes CPU interrupt affinity per device (dedicated GPU 1 CCX, USB/NET/AUDIO dispatched on P-cores/E-cores), forces MSI on all devices, and applies hardware IMOD xHCI; potential gain: ~5-15% reduction in DPC latency + ~3-8% of 1% in-game lows (variable depending on CPU config).
+- 💥 Automatic backup of registry settings.
+- ✨ Ensures APPX Packages and certain custom settings are only made on the first installation, so as not to break your personal configuration after an update.
+- ✨ Don't touch Start Menu and Taskbar when you upgrade LexBoosT OS.
+- 🆕 Activates the two features LowLatencyProfile and LowLatencyProfileForApplicationLaunch via IDs 60716524 and 61391826 (ViVeTool command). (https://x.com/zacbowden/status/2052367669081284984).
+- ✨ Deactivate selective suspend Bluetooth (avoids micro-lags/controller disconnections).
+- ✨ NoLazyMode=1 in MMCSS SystemProfile — forces multimedia scheduler to never fall back to lazy mode; potential gain: more consistent frame pacing, ~1-3% reduction in frame time variance during gaming.
+- ✨ C-States dynamically configured per device type: disabled (0) on desktop to eliminate core sleep/wake latency, enabled (1) on laptop for battery preservation; potential gain (desktop): ~2-5% reduction in DPC/ISR latency, fewer micro-stutters in CPU-bound scenarios.
+- ✨ DNS cache optimized: MaxCacheTtl=86400 (24h positive caching), MaxNegativeCacheTtl=5s (fast retry on failed lookups), NegativeSOACacheTime=0 (instant SOA refresh); potential gain: faster repeated DNS resolution, ~10-50ms saved per cached lookup.
+- ✨ Direct3D Flip Queue minimized: FlipQueueSize=1 (1 pre-rendered frame max), ForceFlipInterval=0 (no forced sync delay), applied to both 64-bit and 32-bit (Wow6432Node) games; potential gain: ~1-3ms input latency reduction in GPU-bound DX9/DX11 titles.
+- ✨ TCP pool enlarged for high concurrency: MaxFreeTcbs=65536, MaxHashTableSize=65536, GlobalMaxTcpWindowSize=65535; potential gain: supports more simultaneous TCP connections, reduced contention in P2P/online games and heavy browsing sessions.
+- ✨ I have reactivated the icssvc service to share PC’s internet connection with other devices as a mobile hotspot.
+
+# LexBoosT OS™ V26.05.1
+
+- ✨ IRQ Affinity: pins GPU interrupts to P-Core 1 and offloads NVMe/network IRQs to E-Cores on Intel hybrid CPUs to reduce frame latency.
+- ✨ MMIO Write-Combine: enables USWC write-combining on GPU PCIe BAR via registry to batch CPU-to-VRAM writes and cut 0.1% low stutters.
+- ✨ NDIS Optimizer: dynamically computes P/E-core topology and routes RSS receive processing to E-Cores on Intel hybrid CPUs to free P-Cores for latency-sensitive tasks.
+- 🪛 Fix Revert Script.
+- ✨ Rebuild Performance Counters at the end of the playbook installation.
+- ✨ Remove EFI Drive letter.
+- ✨ Refactoring the Playbook for better log.
+
+
+# LexBoosT OS™ V26.05
+
+- 🆕 In view of the changes that have been made to the build, it is advisable to start again with a clean installation of Windows. However you can update from build 7.3 to 26.05 without any problem.
+- ✨ LexBoosT UUP Dump ISO Downloader V1.6.1 (Automatically launch the program as administrator if not already running with elevated privileges, to ensure all features work correctly without manual restart.)
+- ✨ Update nvidiaProfileInspector to v3.0.1.12.
+- 🪛 Allow enumeration before user login (fix USB4 Host Router Code 55).
+- 🪛 Force V-Sync when Gsync Profile is installed.
+- 💥 Delete SSD Optimization in playbook install, cause too long install if you have much SSD.
+- ✨ Reactivating clipboard history.
+- 🪛 Fix SaveZoneInformation (value 2): allows third-party software (e.g. Lenovo Legion Toolkit) to run without being blocked by the downloaded file restriction policy.
+- 🪛 LexBoosT Packages Manager: Fixed winget installation: replaced non-functional RegisterByFamilyName command with full dependency chain (VCLibs + UI.Xaml) + dual fallback (aka.ms/getwinget → GitHub latest release) + PATH refresh without restart.
+- 🪛 LexBosT Defender Manager : Certificate EKU validation (1.3.6.1.4.1.311.10.3.6) now blocks installation on invalid cert instead of silently continuing, and ARM64 detection now checks both environment variable and WMI Win32_ComputerSystem.
+- 🪛 Fix agressive DWM Tweaks (when moving the desktop icons, tended to be upside down).
+- 🪛 Disables the desktop in a separate process (tended to move your icons if a file\shortcut appeared).
+- 🪛 Fix Win+V Clipboard shortcut (Thanks Alcopsy).
+
+- 🆕 Added "Disable VBS" option on AME Wizard.
+- ✨ Hystart left enabled (default) — disabling it causes congestion on shared networks and increases packet loss. The latency benefit is negligible on modern connections.
+- ✨ Pacing left enabled (default) — disabling it increases jitter on most networks, especially WiFi and shared connections. No measurable input latency benefit.
+- ✨ NetBT service set to Manual: required for LAN gaming (older titles) and NetBIOS name resolution.
+- ✨ LanmanServer service set to Manual: required for file sharing (mods, LAN parties).
+- ✨ ShellHWDetection service set to Manual: required for auto-detection of controllers/peripherals.
+- 🆕 Uninstall Copilot packages.
+- 🆕 Disable PlatformAoAcOverride (forces S3 on supported hardware).
+- 🆕 DirectStorage: GPU decompression (DirectX 1.2+ games) Requires DX12 Ultimate GPU + NVMe SSD + native DirectStorage game.
+- 🆕 Disabling memory compression reduces CPU overhead but increases pagefile usage. Only applied when RAM >= 16 GB to avoid degradation on low-memory systems.
+- 💥 DisableTaskOffload removed — this key is deprecated on Windows 11 (management by adapter). On modern hardware (1Gbit+), it increases the CPU load without measurable latency gain.
+- 🪛 CpuPriorityClass: Normal CPU Priority (Above Normal removed — risk of micro-stutters in play) (Set to Normal now).
+- 🪛 SIHOST.EXE (Shell Infrastructure Host): Idle (1) would make Taskbar and Action Center slow on Windows 11. sihost manages notifications, the taskbar, the action center. Normal (2) is required.
+- 🪛 Set IoPriority to Normal (Idle removed — breaks Win11 taskbar).
+- ✨ Code cleanup.
+- 🪛 Fix Widget Manager problem when you enable widgets.
+- ✨ On LexBoost Package Manager you can now press "Enter" to start the search. A “Silent” box is present to install programs in silent mode if you wish.
+- ✨ In "Make Restore Point" you can now choose the name of your restore point as well as its type.
+
+- ✨ Modification of the shadow copy detection method for "VSS Manager".
+- 🪛 Fix automatic startup with Windows of "LexBoosT Todo List Manager" when UAC is activated.
+- 🪛 Fix automatic startup with Windows of "LexBoosT Desktop Icons Toggle" when UAC is activated.
+- ✨ LAPTOP: The power profile is available in Windows Power Manager, but the user's current plan is not affected.
+- ✨ Install Notepad++ and PowerShell.
+- 🪛 "LexBoosT Timer Resolution Manager": Fix the "Inactive" Sheduled Task in Timer Control program.
+- 🪛 "LexBoosT GPU Tweaks": Now detects all graphics chipsets and activates the corresponding buttons.
+- ✨ Enables the Microsoft vulnerable drivers blocklist.
+- ✨ Enables TCG security for storage.
+- ✨ Disables JS, enables Protected Mode/View for Adobe Reader DC+XI.
+- 🪛 Fix UTC clock for dual-boot Linux
+- ✨ The Nvidia Profiles will be installed depending on whether you have a Laptop or a desktop PC.
+- ✨ Disable search indexing on non-system drives (reduces I/O micro-stutters during gaming).
+- 🆕 Automatic backup of registry settings before the first installation of the playbook, this restoration is effective at each upgrade and applies the new tweaks.
+- ✨ LexBoost Easy Move User Folders: Added moving the AppData folder.
+- ✨ Rework completly "LexBoosT Defender Manager" with 0 Risk to Break Windows.
+- ✨ Pro Audio Format — 24bit/48kHz (studio standard for gaming)
+- ✨ Disable TOUCH SCREEN Advanced Stuff (only if no touch device detected)
+- ✨ Thanks to Alcospy for its help and numerous tests.
+
+# LexBoosT OS™ V7.3
+
+- ✨ Update Lex Snake to V3.0.0 (Added Paint Mode, Relook the game menu, fix some little bugs)
+- ✨ Update VSS Manager. Now possible to delete restore points.
+- ✨ LexBoosT RAM Cleaner Pro now cleans all RAM memory (Standby List + Modified Page List + Working Sets) via native Windows APIs, while automatically protecting essential system processes.
+- 🆕 LexBoosT Desktop Icons Toggle. Small software that allows you to hide/show desktop icons using a mouse key or keyboard shortcut.
+- 🪛 LexBoosT UUP Dump: Fixed build deduplication to show all variants (Windows 11, CPC OS, etc.) with sorting by priority so that standard Windows 11 appears first in results and notifications.
+
+# LexBoosT OS™ V7.2
+
+- ✨ Update "LexBoosT Remove Windoas AI":
+	- ✨ Mica effect enabled
+	- ✨ **Backup Mode**: Full backup for complete reversion
+	- ✨ **Classic Apps Installation**:
+			- Windows Photo Viewer
+			- Classic Paint (mspaint)
+			- Classic Snipping Tool
+			- Classic Notepad
+			- Photos Legacy
+	- ✨ **Enhanced Registry Keys**:
+			- Copilot, Edge, Office, Paint AI
+			- Voice Access, Input Insights
+			- Settings Search AI, AI Actions
+	- ✨ **Complete AI Package Removal** with protected package handling
+	- ✨ **Enhanced File Cleanup** (registry + cache + system files)
+- 🪛 Fix Defender Manager which does not disable defender. (Thanks FengXi for report)
+- 🪛 Windows will automatically reconnect the user after a reboot, avoiding login blocking for those using Microsoft accounts without a password/PIN.
+
+# LexBoosT OS™ V7.1
+
+- ✨ Disable Cross Device Resume completly.
+- ✨ Lex Snake V2.1.0:
+	- ✨ Added 2 Players Mode. (P1: Arrows, P2: WASD).
+	- ✨ Improvements of gameplay (Now "Walls" spawn).
+	- ✨ Increased playing area from 15x15 to 25x25.
+	- 🪛 Fixed an issue where commands could teleport you to the menu or leaderboard and cause you to no longer be able to move in-game.
+	- 🪛 Your leaderboard is saved when updating LexBoosT OS.
+- ✨ Lex Snake V2.2.0:
+	- 🪛 Bloom persist after snake death — Dead snake segments no longer render on bloom in Normal mode.
+	- 🪛 P1 head inversion in 2P smooth mode — Separate rotation transforms per player instead of one shared one.
+	- 🪛 Walls disappearing — Race condition fixed; walls now spawn without conflicting with snake positions.
+	- 🪛 Wall blink lag — Replaced async Task.Delay with game-tick-based updates, eliminating lag when snakes pass through blinking targets.
+	- ✨ Food no longer spawns adjacent to walls.
+	- ✨ Walls no longer spawn on or near snakes.
+	- ✨ Wall spawns auto-relocate if a snake blocks them.
+- ✨ Lex Snake V2.3.0:
+	- 🪛 Leaderboard UI not refreshing.
+	- ✨ Reset Leaderboard button.
+	- ✨ Hover effect on Mute and Reset Leaderboard buttons.
+	- ✨ 3-state Mute cycling: The Mute button now cycles through: 🔊 Mute → 🔇 Unmute (all muted) → 🎵 Mute Music → 🔊 Mute SFX.
+	- ✨ Separate 2-player leaderboard — The service maintains two independent leaderboards (Single Player and 2 Players), saved in the same JSON file. A label under “LEADERBOARD” shows the active mode.
+	- ✨ "2 Players" and "Retro Mode" checkboxs is now disabled during gameplay.
+	- ✨ Instant score panel update — Checking/unchecking “2 Players” immediately updates the “P2: 0” display and the leaderboard label without starting a game.
+	- ✨ Replace "PRESS ANY KEY TO START" by "PRESS ENTER TO START".
+	- 🪛 Adjusts "QUIT GAME" overlay position. They all cover exactly the game area.
+
+- ✨ Disable Store results in Search (25H2).
+- ✨ Prevent WebView2 spawning from SearchHost.
+- ✨ CrossResume is only disable if you Remove "Your Phone" in AME.
+- ✨ Disable ValueBanners in Windows 11 Settings.
+- ✨ Prevent Gaming Copilot dll file(s) from loading.
+- 🪛 Fix Winget telemetry opt-out for new users in the Default profile.
+- 🪛 Fix 'Allow downloads from other PCs'.
+- 🪛 LexBoosT Image Compressor & Crop: Fixed image previews in the Image Files drop zone, tripled the thumbnail sizes, and adjusted the Crop Settings zone height and preview scaling to fit properly.
+
+# LexBoosT OS™ V7.0
+
+- 🆕 Added ReTrim SSD/NVME. Automatically optimizes all your SSD and NVMe drives to keep them fast and extend their lifespan, during playbook installation.
+- ✨ Complete rewrite of "LexBoosT Secure Password Generator" with possibility to make a backup of your  password.json file and your encryption key provided by Windows which is used to describe your password. Use if you have just reformatted and want to recover your saved password or make usable on second PC.
+- ✨ Complete rewrite of "LexBoosT Ram Cleaner Pro".
+- ✨ Complete rewrite of "LexBoosT Create System Image".
+- ✨ Complete rewrite of "LexBoosT VSS Manager".
+- ✨ Complete rewrite of "LexBoosT New Start Menu Manager".
+- ✨ Complete rewrite of "LexBoosT Easy Move User Folders".
+- ✨ Complete rewrite of "LexBoosT Drive/Folder Compactor".
+- ✨ Update LexBoosT UUP Dump ISO Downloader to V1.5. (Better Search).
+- ✨ Complete rewrite of "LexBoosT DWM Effect Manager".
+- ✨ Complete rewrite of "LexBoosT PageFile Manager".
+- ✨ Complete rewrite of "LexBoosT Recommended Seection Manager".
+- ✨ Complete rewrite of "LexBoosT LangBar Shortcut" and rename "LexBoosT Language Bar Manager.
+- ✨ Complete rewrite of "LexBoosT Timer Control" and rename "LexBoosT Timer Resolution Manager".
+- 🆕 First LexBoosT OS™ Game: Lex Snake!
+- ✨ Update DLSS 310.6.0 and Streamline.
+- 🆕 New Program: "LexBoosT GPU Tweaks". Allows you to tweak Nvidia/AMD and Intel settings. Replaces (Nvidia Tweaks in LexBoosT OS folder).
+- ✨ Clean Icons Caches is now in LexBoosT Toolbox in context menu.
+- 💥 Deleting the LexBoosT OS™ folder on the Desktop because it is no longer useful.
+- 🆕 New Program: "LexBoosT Cursor Installer". A program to install the cursors that were in the LexBoosT OS™ folder.
+- ✨ New icons for "Support Me" and "LexBoosT™ Tools Launcher".
+- ✨ Update nvidiaProfileInspector to v3.0.1.10.
+- ✨ Complete rewrite of "LexBoosT Todo List Manager Pro".
+- ✨ Complete rewrite of "LexBoosT USB Sleep Mode Manager" and "LexBoosT USB Idle Manager" are one, the program is renamed "LexBoosT USB Sleep\Idle Mode Manager".
+- ✨ Complete rewrite of "LexBoosT Defender Manager"
+- 🆕 New Program: "LexBoosT Icon Converter". (Drag&Drop work with\without UAC).
+- ✨ Addition of categories in "LexBoosT™ Tools Launcher" with sorting of them.
+- ✨ Complete rewrite of "LexBoosT SuperFetch Manager" and rename "LexBoosT Prefetch\SuperFetch Manager".
+- ✨ Complete rewrite of "LexBoosT Lockscreen and Windows Hello".
+- ✨ Complete rewrite of "LexBoosT Toolbox" and add GodMode.
+- ✨ Complete rewrite of "LexBoosT ISO Compressor" and rename to "LexBoosT ISO Compressor WIM<>ESD.
+- 🆕 New Program: "LexBoosT Images Compressor & Crop. (Drag&Drop work with\without UAC).
+- 💥 Deleting the LexBoosT Toolbox in Installation on AME Wizard, now it's only in "LexBoosT™ Tools Launcher".
+
+
+# LexBoosT OS™ Lite V1.2
+
+- 🆕 New Program: Notepad++ VSCode Theme Installer.
+- 🆕 New Program: LexBoosT Folder Color Picker.
+- ✨ Update nvidiaProfileInspector to v3.0.1.8.
+- ✨ Added Tooltips in LexBoosT™ Tools Launcher.
+- ✨ Update LexBoosT UUP Dump Iso Downloader.
+- ✨ Complete rewrite of "LexBoost Ultimate Toolbox" and renamed to "LexBoosT Packages Manager".
+- 💥 Delete LexBoosT GPU Cleaner Pro. (No use. The drivers do the job very well.)
+
+# LexBoosT OS™ V6.9
+
+- ✨ For Windows Debloater I added: WindowsCommunicationsApps, BingNews, BingWeather, WebMediaExtensions, RawImageExtension, HEIFImageExtension, HEVCVideoExtension, VP9VideoExtensions, AV1VideoExtension, AVCEncoderVideoExtension, MPEG2VideoExtension, WebpImageExtension, WindowsFeedbackHub, Windows.Client.AIX (Recall).
+- 🪛 The cleanup option in LexToolBox now launches as administrator.
+- 🆕 New Program: Notepad++ VSCode Theme Installer.
+- 🆕 Show seconds on taskbar clock.
+- 🆕 Adds a "Install this update" option to the context menu for .cab files, which runs the DISM command to install the update.
+- 🆕 Adds an "Open PowerShell here as administrator" option to the context menu in Explorer for directories, drives, and library backgrounds, which runs a PowerShell command to open an elevated PowerShell window in the selected location.
+- 🆕 Hide Home page in Settings.
+- ✨ Update nvidiaProfileInspector to v3.0.1.8.
+- 🆕 New Program: LexBoosT Folder Color Picker.
+- ✨ Complete rewrite of "LexBoost Ultimate Toolbox" and renamed to "LexBoosT Packages Manager".
+- 🪛 Converted the Nvidia_DLSS_GOM download script from Unix (LF) to Windows (CRLF) line endings.
+- 💥 Delete LexBoosT GPU Cleaner Pro. (No use. The drivers do the job very well.)
+- ✨ Added Tooltips in LexBoosT™ Tools Launcher.
+- ✨ Update LexBoosT UUP Dump Iso Downloader.
+
+# LexBoosT OS™ V6.8 Out!
+https://ko-fi.com/post/LexBoosT-OS-V6-8-A0A11W8S86
+
+### Network Stack Optimizations
+- **Complete network stack configuration** (RSS, ECN, TCP Fast Open, VoIP QoS, adapter reset)
+  - **Type:** Improvement
+  - **Gains:** Better throughput, reduced latency, VoIP connection stability, improved congestion management
+
+### Feature Management
+- **FeatureManagement overrides activation** for system feature control
+  - **Type:** Improvement
+  - **Gains:** Granular control over system features, prevention of unwanted activations
+
+### System Performance
+- **Advanced CPU, memory and storage optimizations** (NTFS, HAL, power management, Game Mode)
+  - **Type:** Improvement
+  - **Gains:** Reduced CPU usage, better responsiveness, optimized power consumption, improved gaming performance
+
+### Stability Fixes
+- **DisableExceptionChainValidation configuration** for system stability
+  - **Type:** Fix
+  - **Gains:** Prevention of crashes related to exception chain validation
+
+- **KernelExecutesPagedCodes disabled** in prefetch parameters
+  - **Type:** Fix/Security
+  - **Gains:** Increased system stability, prevention of kernel memory errors
+
+### Network Performance
+- **Advanced network optimizations** (QoS, TCP/IP, DNS cache, EEE disabled, SMB)
+  - **Type:** Improvement
+  - **Gains:** Reduced latency, faster DNS resolution, optimized file transfers, energy saving disabled for max performance
+
+### Real-time Performance
+- **Real-time latency optimizations** for gaming/audio (MMCSS, DirectFlip, input latency, memory compression)
+  - **Type:** Improvement
+  - **Gains:** Reduced audio/video latency, minimized input lag, smoother gaming and audio production experiences
+
+### Input/IME Performance
+- **CPU priority configuration for ctfmon.exe** (text/IME process)
+  - **Type:** Improvement
+  - **Gains:** More responsive text input, better experience for input methods (IME)
+
+# LexBoosT OS™ V6.7
+
+- LexBoosT Ultimate Toolbox: Uncheck checkbox after package installation.
+- LexBoosT Tools Launcher: Add Search Zone and Combobox with Categories.
+- Update LexBoosT UUP Dump Iso Downloader and now it is possible to download the update files and install them. Many Options, Include autounattend!
+- Debloat Windows and delete OneDrive, Phone etc in AME is only for first install of playbook.
+- Disable Nearby.
+- Disable deep C-states (idle states).
+- Change Win32PrioritySeparation 28 to 2A.
+
+# LexBoosT OS™ Lite V1.1
+
+- Improve winget upgrade in LexBoosT Ultimate Toolbox:
+	- Added --include-unknown flag to winget upgrade command to include packages requiring explicit targeting
+	- Removed dependency on inSection flag that was skipping packages before the first header
+	- Fixed version parsing to handle < character as a separate token
+	- Improved package ID detection for multi-word package names
+
+- New Program "LexBoosT Remove AI":
+	- Mode “Remove AI”:
+		- Disables Copilot and Recall via registry.
+		- Removes Appx/CBS packages related to AI.
+		- Deletes AI files from System32.
+		- Disables Copilot policies.
+		- Removes Recall scheduled tasks.
+		- Hides AI components in Settings.
+		- Disables Rewrite AI in Notepad.
+		- Creates post-update cleanup scheduled task.
+	- Mode “Revert Changes”:
+		- Undoes all modifications above.
+		- Reinstalls/reactivates AI features.
+
+- New Program "LexBoosT UUP Dump ISO Downloader".
+- Revert LexBoosT Ram Cleaner for now from v6.3.
+- Fix Typo on different button on LexBoosT Ultimate Toolbox.
+
+# LexBoosT OS™ V6.6 Out!
+https://ko-fi.com/post/LexBoosT-OS-V6-6-J3J31VT8CY
+
+- Improve winget upgrade in LexBoosT Ultimate Toolbox:
+	- Added --include-unknown flag to winget upgrade command to include packages requiring explicit targeting
+	- Removed dependency on inSection flag that was skipping packages before the first header
+	- Fixed version parsing to handle < character as a separate token
+	- Improved package ID detection for multi-word package names
+
+- New Program "LexBoosT Remove AI":
+	- Mode “Remove AI”:
+		- Disables Copilot and Recall via registry.
+		- Removes Appx/CBS packages related to AI.
+		- Deletes AI files from System32.
+		- Disables Copilot policies.
+		- Removes Recall scheduled tasks.
+		- Hides AI components in Settings.
+		- Disables Rewrite AI in Notepad.
+		- Creates post-update cleanup scheduled task.
+	- Mode “Revert Changes”:
+		- Undoes all modifications above.
+		- Reinstalls/reactivates AI features.
+
+- Kill the INACCESSIBLE BOOT DEVICE BSOD.
+- New Program "LexBoosT UUP Dump ISO Downloader".
+- Revert LexBoosT Ram Cleaner for now from v6.3.
+- Debloat Windows is now a option. (No possible revert if you debloat).
+- Unlock Background Polling Rate Cap.
+- Fix Typo on different button on LexBoosT Ultimate Toolbox.
+- Storage controllers excluded of MSI Mode. Only apply MSI to GPU and Audio devices, NOT storage controllers.
+- GPU Priority set to 8 (HIGH) instead of 31 (REALTIME) to avoid GPU driver conflicts.
+- Disable Aggressive NVMe Power States.
+- ASLR disabling REMOVED - can cause memory corruption and BSOD. ASLR is a critical stability feature that randomizes memory addresses.
+- DEP disabling REMOVED - critical for system stability. DEP (Data Execution Prevention) prevents code execution from non-executable memory regions.
+- Keep DMA protection disabled for compatibility but be aware of security implications.
+- csrss mitigations disabling REMOVED - critical for system stability.
+- Meltdown/Spectre patches disabling REMOVED - can cause instability on modern CPUs.
+- NTFS/ReFS mitigations disabling REMOVED - can cause file system instability.
+- Fix Winver don't launch.
+
+# LexBoosT OS™ V6.5.2
+
+- Fixed a potential problem for certain Nvme which encounters a BSOD INACCESSIBLE_BOOT_DEVICE.
+
+# LexBoosT OS™ V6.5.1
+
+- Re Added crash control for make a dump file for see crash problem.
+- Due to changes regarding memory management by Microsoft in recent versions of Windows, I decided to revert some aggressive memory tweaks to let Windows manage it dynamically to avoid crashes.
+
+
+# LexBoosT OS™ V6.5
+
+
+- LexBoosT Ultimate Toolbox is now a c# Application. More light, more speed.
+- Added Autoruns Sysinternals in LexBoosT Launcher.
+- Prevents DPC-related BSODs (timeout increased from 20ms to 100ms).
+- Restores SEHOP protection against memory corruption.
+- Prevents exception chain validation crashes.
+- Avoids DPC storm system hangs.
+- Uses Windows default watchdog thresholds for maximum stability.
+- Prevents large page memory allocation failures.
+- Windows automatically manages memory pools based on your hardware.
+- Prevents memory shortage errors (fixed 192MB → automatic).
+- Eliminates 64-bit PAE incompatibility BSODs.
+- Enables Control Flow Guard protection against memory corruption.
+- Prevents random system crashes from excessive SystemPages.
+- Native NVMe driver runs in stable compatible mode.
+- Prevents NVMe Gen4/Gen5 instability issues.
+- Keeps driver signature enforcement enabled (prevents unsigned driver BSODs).
+- ReadyBoost driver kept intact (avoids storage driver conflicts).
+- Removes risky FeatureManagement overrides.
+- NVMe power management handled by Windows (avoids sleep issues).
+- Storage devices remain stable during power state transitions.
+- Prevents NVMe drive from failing to wake from sleep.
+- ModernStandby sleep/wake functionality preserved.
+- Prevents network adapter wake failures.
+- System can enter and exit sleep without crashes.
+- Network connectivity maintained in standby modes.
+- 100% CPU for foreground apps (was 90/10 split). (Better FPS, smoother gameplay delivery, less stuttering).
+- Disabled lazy writer for better disk response. (Faster save/load times, better responsiveness).
+- Maximum file cache for faster loading. (Faster file access, reduced disk I/O).
+- High scheduling category. (Better resource allocation for multimedia).
+- Update Winaero Tweaker 1.65.
+- Update Folder Colorizer.
+
+# LexBoosT OS™ Lite V1.0
+
+- [Nvidia/AMD] (tweaks/drivers) only if you want, in LexBoosT OS Lite folder on desktop.
+- Full LexBoosT Tools Launcher.
+- No system tweaks, wallpapers, debloat... will be present in the Lite versions, ... Your system remains unchanged.
+- There will only be an update of the LexBoosT Tools Launcher programs.
+
+# LexBoosT OS™ V6.4 Out!
+
+https://ko-fi.com/post/LexBoosT-OS-V6-4-E1E71V5YFA
+
+- New Wallpaper.
+- Added new program: LexBoosT Password Generator.
+- Improved Ram Cleaning by clean workingset and standbylist.
+- Update Dlss 310.5.3.0.
+- Added new tweaks for nvidia:
+	- Disable Logging
+	- Disable ASPM
+	- Disable Event Tracer
+	- Disable Error Checks
+	- Disable Advanced Error Reporting
+	- Force Highest NVLink Link Power States
+	- Disable Noise Aware Pll
+	- Disable Optimal Power For Padlink Pll
+	- Disable Pex Power Savings features
+	- Disable CLKREQ and DEEP L1
+	- Disable 6 Power Savings
+- Fix Windows Start for LexBoosT Ram Cleaner and apply cleanup at program startup.
+- Refactoring playbook.
+- Native NVMe driver optimization and Boost Speed.
+- Add modules for Discord Debloat App:
+	- discord_hook-1
+	- discord_notifications-1
+	- discord_zlib-1
+	- discord_rpc-1
+	- discord_safety_check-1
+	- discord_voice_stub-1
+	- discord_emoji-1
+	- discord_gifts-1
+    - discord_relationships-1
+- Added option on Discord Debloat App for clear cache, Gpu cache.
+- Added option in AME for Clean WinSxS cache.
+
+# LexBoosT OS™ V6.3
+
+- Update DLLS .dll to v310.5.2.0
+- Update nvidiaProfileInspector to 2.4.0.34
+- Compatible .26300 Windows build.
+- Possible fix for Xbox users.
+- New Dark wallpaper.
+
+
+# LexBoosT OS™ V6.2.1
+
+- Fix Searching Bluetooth devices.
+
+
+
+# LexBoosT OS™ V6.2
+
+- Privacy: Prevent Gaming Copilot dll file(s) from loading.
+- Windows gives more CPU resources now to the dedicated GPU driver, which slightly reduces latency and improves responsiveness, especially in gaming.
+- Prevents certain programs from getting stuck on the iGPU.
+- New program: "LexBoosT Discord Fake Game Presence" for Discord Orbs Quests.
+- Default configuration for rBAR for Nvidia Tweaks.
+
+# LexBoosT OS™ V6.1
+
+- Scale LexBoosT™ Launcher
+- Add missing LexBoosT™ Widget Manager in launcher.
+- Reworking interface of LexBoosT Nvidia GPU Tweaks and add possibility to adjust Power Limit of the graphic card.
+- Deleted Custom Host File.
+- Improvements to optimizations of critical system processes (CSRSS, SVCHOST, EXPLORER...).
+- Optimizations of non-critical processes (reduced priority) (SEARCHINDEXER, CTFMON, FONTDRVHOST... ).
+- Optimize prefetch boot.
+
+
+# LexBoosT OS™ V6.0
+
+- Compatible 26H1 Build 28000
+- Disable Privacy Settings Experience at sign-in.
+- Disable GameDVR when Xbox Gamebar is disable.
+- Disable scheduled diagnosis.
+- Disable publishing/uploading of user activities.
+- Disable sign-in and lock last interactive user after a restart.
+- Turn off smart card plug and play service.
+- Disable notifications network usage.
+- Disable typing insights.
+- Disable app-v.
+- Disable superfecth's eventlog connection.
+- Restrict Anonymous Access.
+- Restrict Anonymous Enumeration of Shares.
+- Disable suggestions in the search box and in search home.
+- Block enumeration policy for external dma protected devices.
+- Disable device health attestation.
+- Disable font providers.
+- Disable system responsiveness diagnostics.
+- Disable windows boot performance diagnostics.
+- Disable memory leak diagnostics.
+- Disable shutdown performance diagnostics.
+- Disable troubleshooting.
+- Disable online troubleshooting.
+- Disable flip3d invokation.
+- Disable wmp media sharing.
+- New program: LexBoosT™ VSS Manager, LexBoosT™ Toolbox (Menu in context menu).
+- LexBoosT™ Ultimate Toolbox: Update Visual Studio Community and add .Net 10
+- Option in AME for Disable Volume Shadow Copy (VSS).
+- Drastically optimizes the opening of “LexBoosT™ Tools Launcher”
+- Enable optimizations for windowed games.
+- Enabling Loundness EQ For Eligible Devices.
+- Internet Optimizations:
+	- Disables Unicast Response Optimization. (Prevents Windows from responding to UDP broadcast packets with a unicast (reduces unnecessary network interruptions)).
+	- Disables Receive Segment Coalescing on UDP (RSC for UDP) (Prevents UDP packet merging, which adds latency (especially visible on CS2, Valorant, Quake-like)).
+	- Disables UDP checksum offload on the network card (sometimes useful) (Forces the CPU to calculate checksums → more stability on certain lousy drivers (Realtek/Killer especially)).
+	- Disable Gro (Generic Receive Offload) on UDP (Very effective on Intel i225/i226 cards and the new Killer which add 2-8 ms of latency with GRO activated).
+	- Force “low latency” mode of the UDP stack (Hidden option since Windows 11 24H2, reduces internal UDP buffering (1-4 ms gain on 240+ Hz games)).
+	- Completely disables UDP flow control (avoids unnecessary pauses).
+	- UDP optimizations (gaming latency).
+	- Optimize DNS Cache.
+- Targeted QoS Gaming – COMPETITIVE FPS 2025 Maximum priority (DSCP 46 + VLAN priority 7) for games:
+	- CS2, Valorant, Apex, Overwatch2, CallOfDuty, RainbowSix, Fortnite, Warzone, PUBG, ESCAPE_FROM_TARKOV, Battlefield2042, HellLetLoose, Squad, Insurgency, Arma3, DayZ, Rust, PALADINS, SPLITGATE, XDEFIANT, THEFINALS, DELTAFORCE, CROSSFIRE, ROBLOX, HAZE, MARVEL_RIVALS, DEADLOCK, CONCORD, HERO_BASE, Battlefield6.
+- Maximum priority for VoIP and communication tools (Discord, Teams, Zoom, etc.)
+- Disable notifications network usage.
+- Transforms LexBoosT™ Optimizations into multiple sections during installation.
+- Disable UAC by default. Reactivate it in LexBoosT™ UAC Manager if necessary. (If you activate it, after an update your settings will be preserved.)
+- Reduced computer shutdown time.
+- New Program: LexBoosT™ New Start Menu Manager, for enable/disable new start menu for 25H2 (26200.7019+).
+- Improved scaling of wolf head for user account image on the LexBoosT™ Theme.
+
+
+# LexBoosT OS™ V5.5
+
+- New Program: LexBoosT Clean GPU Ram, frees VRAM between sessions to boost gaming, streaming, content creation, AI/dev, overclocking, and system stability for intensive GPU users.
+- LexBoosT Ultimate Toolbox: ignored_packages.json is now not in desktop.
+- Disable Modern Standby Networking.
+- Disable AI features for Notepad.
+- Your visual effects configuration is now preserved after installing a playbook update.
+- The Welcome window no longer appears if you asked not to display it after updating the playbook
+- New wallpaper for this version.
+
+# LexBoosT OS™ V5.4
+
+- Tune NVMe Queue Depth & Timeout.
+- Optimize Polling Rate Stability.
+- Increase IRQ13 Priority.
+- Improve Mouse/Keyboard/USB thread priority.
+- Improve DPC Latency.
+- Disable File System Lazy Writing.
+- Improve Flip Queue + Timeout Tweaks.
+- New Program: LexBoosT™ Ram Cleaner Pro.
+- New wallpaper for this version.
+
+# LexBoosT OS™ V5.3
+
+- Fix Widget weather image disapears in taskbar.
+- Fix Bad popup Error in LexBoosT™ Create System Image.
+- Fix display of Recommendations, even though you have not checked it on AME.
+- Fix for LexBoosT™ Tools Launcher which would not start if it was closed incorrectly.
+- Enable UAC by default. Possible to Disable on LexBoosT™ Tools Launcher.
+- Fix MSI for hardwares.
+
+
+# LexBoosT OS™ V5.2
+
+- Cleaning deprecated registry keys.
+- Removed icons that are no longer needed.
+- Remove 2 folders in LexBoosT OS™ folder.
+- Added LexBoosT Captain/Colloid Cursors packs in "5. Cursors" folder in LexBoosT OS folder on desktop.
+- Default cursors for my theme is Colloid now.
+- LexBoosT ISO Compressor: Fix Hidden Start Convert button.
+
+# LexboosT OS™ V5.1
+
+- LexBoosT Netwok Optimizer: IPv4 and IPv6 addresses displayed on separate lines, and added reset winsock.
+- LexBoosT USB Sleep Mode Manager: Now Reset button restore default Windows values.
+- Install VC++ Runtimes during playbook installation.
+- If you Enable UAC in playbook options (uncheck), this also enable LUA.
+- Add choice of 4 Browsers in AME (Brave, Chrome, Vivaldi, Firefox) (not obligatory).
+- LexBoosT Todo List Manager Pro: Fix Show\ReOpen windows in notification area.
+- LexBoosT Tools Launcher: Now launched applications will only have one instance and all programs are run as Administrator.
+- Nvidia Tweaks: Now possible to Cap FPS.
+- Disable DWM Mica effect by default. If you want activate it, go LexBoosT Tools Launcher.
+- LexBoosT Activation Manager: Fix Office Activation.
+- New Program: LexBoosT UAC Manager.
+- Rework several scripts for better future management, with some small fixes and a more adequate order.
+- Better energy management for laptops to avoid heating while maintaining very good performance.
+- Rework Runtimes Installation during playbook installation.
+- Auto Configure Deep Interruptions and PowerThrottling with Laptop detection.
+- Added Winaero Tweaker on LexBoosT Launcher.
+- Enable Admin Filter by default.
+- Others little adjusments.
+
+
+# LexboosT OS™ V5.0
+
+- Rework the TSX script to make it more robust.
+- MSI mode for core devices. (GPU, Audio, Storage, USB) (High priority).
+- Enable TRIM support for SSDs.
+- Disable task related to HDD.
+- Optimize C:\.
+- Optimize Network Adpaters (Realtek and Intel) (with laptop management).
+- Disable hibernation (Only for desktop).
+- Optimizing LowerFilters for SSDs.
+- Now Interrupt policies for Nvidia GPUs with "2. Nvidia GPU Tweaks" is on High.
+- Removes speed limits on SMB file transfers to improve network performance.
+- Update LexBoosT Ultimate Toolbox. When you update your packages, you have the option to choose which ones to update.
+- In "2. Nvidia GPU Tweaks" you can now choose 2 profile, Standard or G-Sync.
+- Fix Restore point shortcut.
+- Improved Superfetch optimizations.
+- Unpack CPU by default. (No need Powersheme or softs)
+- Improved Win32PrioritySeparation  36 -> 38.
+- Improved NVMe Queue Depth.
+- New Wallpaper and change Purple accent colorization to Blue accent for my theme.
+- New Program for Activate Windows/Office based on MAS.
+- New Program for Make a System Image for Restore with WinRE. (clone system partition)
+- Improves the package search function in LexBoosT Ultimate Toolbox, and improve functions.
+- Delete GameBoosT.
+- Add New App on Desktop: LexBoosT Tools Launcher
+- I re-arranged the "LexBoosT OS" Folder on the desktop.
+- The "LexBoosT OS" folder icon and the "Support Me" icon have been modified.
+- The playbook is no longer detected as malicious in AME.
+- Add ignoreErrors flags to w32tm commands.
+- Possible to ignore Winget and Chocolatey packages in Update results and possible to manage ignored packages.
+- Welcome message after installing the playbook when restarting the computer.
+- Add New App : LexBoosT WIM/ESD Converter. To convert an ISO whose install is in .wim or .esd, and the possibility of creating a bootable ISO from an uncompressed ISO.
+- Turn-ON Show time in Notification Center. (Build 26100.5074+)
+- Added Shader cache for Directx and Vulkan.
+- LexBoosT Todo List Manager: Fixed a problem that could arise when creating new tasks which caused everything to be put on a single line.
+
+# LexboosT OS™ V4.4
+
+- Remove Disable Langbar Shortcut in AME and make a program for that in Tools folder.
+- Added a new program! LexBoosT Todo List Pro in Tools Folder (The progam run in notification area, possible to launch the program at startup).
+- Improved LexBoosT Ultimate Toolbox, you have the option to search winget and chocolatey packages and install them directly from the program.
+- Disable the autostarting of CrossDeviceResume.exe.
+- Added LexBoosT Start Menu Manager Program to disable Recommended section and backup\restore your Start Menu.
+- Fix langbar for IME.
+- Replacement of the powershell command for deactivating memory compression with a registry key.
+- Photos is no longer uninstalled.
+- Added Xbox App in Start Menu.
+- Now File explorer is Mica by default.
+- Context Menu is Mica by default for Nilsoft Shell.
+- Remove Recommended Section is option in AME.
+- Enable User folders in start menu by default.
+- Improved code for Enable TSX on Intel.
+- Disable Remote Assistance.
+- Standard MouseHover Time (too fast for some people).
+- Low Priority for Windows Defender.
+
+# LexboosT OS™ V4.3
+
+- Deleted BCD Tweaks cause problems on different hardware.
+- Microsoft Photo Legacy By defaut.
+- Re Enabled GPU Energy Driver.
+- Disable all pinned program for the first install, no for upgrade.
+- All my programs is now signed.
+
+# LexboosT OS™ V4.2
+
+- Fix TimerControl don't work on certain system. (Need reboot after applying "Enable Timer Resolution")
+- Delete Powershell 7 in AME.
+- Delete Verbose Message.
+- "Lexboost Ultimate Toolbox" reworked with the possibility of importing checked box configuration for faster installations.
+- "Lexboost Ultimate Toolbox" reworked aesthetics.
+- Added YoutubeMP3 and YoutubeVideo softwares in "LexBoosT Ultimate Toolbox".
+- Added option in AME for LexBoosT Visual Performance. (If you like speed, and disable windows animations).
+- Delete Pins programs in taskbar.
+- Update Windhawk Settings with better transparency.
+- Update Windows DWM transparency also.
+- Added MSI Mode High priority for Nvidia Card in Nvidia GPU Tweaks.
+- Re Enable DTT.
+- Add Disable UAC in AME.
+
+# LexboosT OS™ V4.1
+
+- Enable Numlock at startup.
+- Applications are now starting from Lockscreen and not from the desktop.
+- Fix of the Lexboost DWM Effect Manager application which does not unregister the DLL.
+- Fixed accidental deletion of Nvidia "container" when you deactivate tweaks.
+- Add whether or not to activate the Lexboost profile in 2. Nvidia GPU Tweaks.
+- Re enable the boot logo and animation.
+- Hide Most used apps in start menu.
+- Added on LexBoosT Ultimate Toolbox:
+	- Molotov.
+	- Spotify (Fixed).
+	- Battle State (Escape From Tarkov launcher).
+- Automatic detection for Xbox Gamepad Network Adapter (USB dongle) for enable Idle only for this USB hardware.
+- Unlock Nvidia Profile Inspector and update my profile. (VRR Enable, DLSS Override...).
+- Add Nvidia Profile inspector (Unlocked) in "2. Graphic Tweaks\Utilities" folder when Nvidia card is detected.
+- Add USB Idle ON/OFF in "15. USB Idle" folder in LexBoosT OS folder on desktop.
+- Rework Installation Menu and Add to Remove options for Music and Video.
+- Cleanup the Hosts file.
+- Iso Injection capability.
+- Enable/Disable Spotlight in option in AME Wizard.
+- MPO Enable now.
+- Toggle Defender to now a graphical interface.
+- New method for uninstall OneDrive.
+- Speed up boot time.
+- Rework script to application:
+	- Defender Toggle
+	- Enable/Disable Hibernation
+	- Enable/Disable Superfetch
+	- Enable/Disable USB Idle
+	- Enable/Disable Widgets
+	- Clean Browser caches.
+- Added Gaming QoS tweaks.
+- Improved GPU Optimisation for Nvidia and AMD.
+- Optimize Network for Gaming with QoS tweaks.
+- SSD Gaming Optimisations (Force Trim).
+- Improve USB for Gaming
+- Reativate Sleeping Tabs and Startup Boost for Edge.
+
+# LexboosT OS™ V4.0
+
+- Most installations are interactive in LexBoosT Ultimate Toolbox.
+- Make an option to remove Search on taskbar in AME Wizard.
+- Don't delete Pinned items from Start Menu on upgrade installation now.
+- Improved DWM tweaks for better smooth experience.
+- Disable Smart App Control. Cause slow app loading issues and sends data to Microsoft.
+- Fix typo on Defender Toggle script.
+- Fix of the command window which remains displayed when you launch an option in Lexboost Toolbox.
+- If the powerplan is on Lexboost Ultimate during installation, the Playbook Switch on the Performance profile before update the Lexboost Ultimate and the reactivated then.
+- During the installation of NVIDIA tweaks, a question is asked to install GSP firmwire tweak. Read the "important" section well before continuing.
+- New folder in LexBoosT OS folder in Desktop "0. Tools" with reworked Script with Gui:
+	- 1. Make Restore Point
+	- LexBoosT Deveices Cleanup
+	- LexBoosT Discord Debloater
+	- LexBoosT Drive-Folder Compactor
+	- LexBoosT DWM Effect Manager
+	- LexBoosT Easy Move User Folders
+	- LexBoosT Lockscreen and Windows Hello
+	- LexBoosT LexBoosT Network Optimizer
+	- LexBoosT Pagefile Manager
+	- LexBoosT LexBoosT Shell Manager
+	- LexBoosT LexBoosT Timer Control
+	- LexBoosT Ultimate Toolbox
+	- LexBoosT LexBoosT USB Sleep Mode Manager
+	- LexBoosT Shortcut Arrow Editor
+	- LexBoosT Clean Icons Caches
+- Fix of the shortcut on the desktop of the Lexboost OS folder for users who have moved the desktop on another disk.
+- The installation menu of AME is lightened to keep that the essentials.
+- Nanazip is by default now.
+- Disable Module CPU Intel Innovation Platform Framework service for best performance.
+- Fix Floorp winget ID in LexBoosT Ultimate Toolbox
+- Restore Home in Settings.
+- Add French language for LexBoosT Shell.
+- Rework some code and Playbook refactoring.
+
+# LexboosT OS™ V3.5
+
+- Delete Disk Cleanup during install.
+- Fix Download Link in LexBoosT Ultimate Toolbox for Logitech G-Hub, FileZilla.
+- Added LexBoosT Nvidia Driver Checker if Nvidia card is detected.
+- Rework the "1. Graphic Tweaks" folder.
+- Rework Chocolatey\Windget installation script.
+- Delete LexBoosT Tweak Tool Plus! in AME Wizard.
+
+# LexboosT OS™ V3.4
+
+- Avoid the use of uncontiguous portions of low-memory from the OS. Boosts memory performance and improves microstuttering at least 80% of the cases.
+- Disable DMA memory protection and cores isolation.
+- Show verbose status messages.
+- Added a script for Download Nvidia DLSS Gbobal Override Mode with full dlss .dll updated, If the Playbook detect that you had an NVIDIA graphics card.
+- Possibility to activate-deactivate the lockscreen with Windows Hello with my script in the folder "15. Lockscreen and Windows Hello" which is in the Lexboost OS folder on the desktop.
+- Disk cleaning in LexBoost Toolbox no longer deletes restore points.
+- Rework LexBoosT Powerplan.
+
+# LexboosT OS™ V3.3
+
+- Deleted Windows Defender in AME Wizard, now you have a script for EnableDisable Defender in LexBoosT OS Folder in Desktop.
+- Force explorer to use high performance GPU.
+- Rework Ultimate Disk Cleanup Script.
+- Replace Disk Cleanup in context menu by Ultimate Disk Cleanup Script.
+- Added "14. Folder Colorizer" folder in LexBoosT OS folder in desktop with Install script for automatically install program.
+- Added File Converter program in LexBoosT Ultimate Toolbox.
+- Added 1 tweak for Nvidia to disable frame queue.
+- Installation of DirectX during installation of Lexboost OS.
+- Added option in AME Wizard to disables non-essential system devices while protecting audio hardware to optimize performance and reduce latency.
+- Delete Audio Tweaks for better compatibility.
+- Apply 2 tweaks for Intel K series for max performance.
+- Fix lockscreen image for Windows enterprise edition.
+- Several small adjustments to increase the performance of the system without generating a stability problem.
+
+# LexboosT OS™ V3.2
+
+- Add in LexBoosT Ultimate Toolbox:
+    .Ray Browser
+    .Battle.Net
+    .Rockstar Launcher
+    .Amazon Games
+    .EasyFun
+    .Armoury Crate
+    .iCue 3
+    .Microsoft Sysinternals Autoruns
+    .JoyToKey
+    .K-Lite Mega Codec Pack
+    .Elgato Stream Deck
+    .AdGuard
+
+- Add MSI Utility V3 in "1. Graphic Tweaks" in "LexBoosT OS" folder in Desktop.
+- Add script for clean browser cache in "8. Network" in "LexBoosT OS" folder in Desktop.
+- Disable Telemetry and Crash Tracking for nvlddmkm services.
+- Best scripts outing.
+- TimerCoalescing and Screensaver Tweaks.
+
+# LexboosT OS™ V3.1
+
+- Delete SVCGroup Tweak (could generate problems with the display of the processor frequency and others).
+- In LexBoosT OS folder in desktop in 1.GPU Tweaks, you have a script for Enable/Disable Dynamic PSates (Disable by default).
+- LexBoosT Tweaks and Lexboost Gaming Tweaks are now Hardcoded.
+- Code cleaning.
+
+# LexboosT OS™ V3.0
+
+- Reduced display latency in graphics applications.
+- Improved shader compilation and caching performance.
+- Enhanced memory management compatibility.
+- Potential latency improvements for network operations.
+- Optimized USB controller performance.
+- Security subsystem performance tuning.
+- Reactivation of Windows Animation.
+- Add GameBoosT to the desktop to kill the processes before launching a game to gain performance (for Steam Games).
+- Force Disable Frame Buffering for DWM.
+- Now the Powersaving tweaks are in options in AME before installation.
+- You have an option in AME for the possibility of configuring virtual memory (Minimum 0.5x of Ram, Maximum 1.5x of Ram).
+- You have an option in Ame to install PowerShell 7 and have it by default in the terminal.
+- Rectivation of the Windows Insider Program in settings.
+- Deactivation of the following services: DPS, WmiApSrv.
+- Adding high priority for CMOS clock (IRQ 0).
+- Adding a script in folder 1.Graphic tweaks in LexBoosT OS folder on desktop, to clean the shaders caches.
+- The personalized icon of the user folder no longer removes at the end of the installation of Lexboost OS.
+- Disables advanced power management (ACPI) to avoid latency.
+- Disable Power Saving for PCI Express.
+- Stops four specific Event Trace Session logs (DiagLog, WdiContextLog, LwtNetLog, and WiFiSession).
+- Add Script in LexBoosT OS Folder in desktop fot clean windows icons caches.
+- New Wallpapers for this version.
+- User image on lockscreen is now the Wolf.
+- 90 major changes for superior stability and minimum latency.
+
+# LexboosT OS™ V2.7
+
+- WMIC is deprecated on 25h2, rework some code for full compatibility on 25H2.
+- Compatible 26220.
+- Little code cleanup.
+- Add all LexBoosT OS Wallpaper in LexBoosT OS folder in desktop with soft for change lockscreen wallpaper.
+- New Wallpaper for this version.
+- Adding Windows Update Minitool on LexBoosT OS folder in desktop.
+
+# LexboosT OS™ V2.6
+
+- For the desinstallation of Edge, WebView 2 is preserved.
+- Fix The location of the widget in the Windhawk configuration.
+- Windhawk Confoguration is now available in AME Wizard directly.
+- Proposal to activate GSP Firmware during the application of Nvidia tweaks.
+- In LexBoosT OS Folder, in Network Folder, you have a script for changge TCP Congestion (CUBIC/BBR/BBR2).
+
+# LexboosT OS™ V2.5
+
+- New script for Delete Windows.old and inetpub folders.
+- Fix Filterkey on certain hardware.
+- Limit cpu usage for defender scan.
+- Disable Hibernate for new User also now.
+- Update paused 2100.
+- In LexBoosT OS Folder on Desktop, you now have a "12. LexBoosTOS Windhawk Settings folder", to install my Windhawk configuration (Taskbar, Menu etc ...)
+- New Script in "2. Latency" folder for configure manually Timer Resolution.
+- Update my LexBoosT OS power profile and adding Yuki powerplan.
+- Rework script for LexBoosT Ultimate Toolbox: Now Visual Studio Code and Visual Studio 2022 have classic installer.
+- In LexBoosT Ultimate Toolbox you have now: Floorp, Pulse Browser, Falcon, QuickLook, Lively Wallpaper, Simple Wall, Glasswire, Rizin.
+- For Nvidia Gpu Tweak, you have the possibilities ti ApplyingRemove Tweaks.
+- Fix Cloudflare DNS script.
+- Code cleaning.
+
+# LexboosT OS™ V2.4
+
+- Compatible 25H2
+- Disable Language Bar keybord shortcut
+- Modify User Icon (in LexBoosT OS Folder in Desktop)
+- Remove Windows.old/inetpub after install
+- Remove Gamebar
+- Improve mouse/keyboard tweaks
+- Improve DirectX performance
+- Add Segment Heap Manager (in LexBoosT OS Folder in Desktop)
+- Fix Widgets (in LexBoosT OS Folder in Desktop)
+- Collection of Powerplan (in LexBoosT OS Folder in Desktop)
+- Add Winmerge and Godot Engine in LexBoosT Ultimate Toolbox
+- Others little adjustments
+
