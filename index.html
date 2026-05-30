@@ -444,7 +444,7 @@
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="top">
     <div class="container">
-        <div class="badge">v26.06 — <span lang-fr>Dernière version</span><span lang-en>Latest Release</span></div>
+        <div class="badge">v26.06 — <span lang-fr>Dernière version</span><span lang-en>Latest Release</span> · 📥 <span id="dl-count">...</span> <span lang-fr>téléchargements</span><span lang-en>downloads</span></div>
         <img src="0.png" alt="LexBoosT OS" class="hero-logo">
         <h1>LexBoosT OS™</h1>
         <p class="subtitle">
@@ -734,6 +734,54 @@
     window.addEventListener('scroll', function() {
         nav.style.background = window.scrollY > 50 ? 'rgba(5, 5, 8, 0.95)' : 'rgba(5, 5, 8, 0.85)';
     });
+
+    // Download counter from GitHub API
+    (function() {
+        var countEl = document.getElementById('dl-count');
+        var cacheKey = 'lexboost-dl-count';
+        var cacheTime = 3600000; // 1 hour
+
+        function format(n) {
+            if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';
+            return String(n);
+        }
+
+        function updateCache(count) {
+            localStorage.setItem(cacheKey, JSON.stringify({ count: count, ts: Date.now() }));
+        }
+
+        function showCount(count) {
+            countEl.textContent = format(count);
+        }
+
+        // Try cache first
+        try {
+            var cached = JSON.parse(localStorage.getItem(cacheKey));
+            if (cached && (Date.now() - cached.ts) < cacheTime) {
+                showCount(cached.count);
+                return;
+            }
+        } catch(e) {}
+
+        // Fetch from GitHub API
+        fetch('https://api.github.com/repos/LexBoosT/LexBoosT_OS/releases?per_page=100')
+            .then(function(r) { return r.json(); })
+            .then(function(releases) {
+                var total = 0;
+                releases.forEach(function(rel) {
+                    rel.assets.forEach(function(asset) {
+                        if (asset.name === 'LexBoosT_OS.apbx') {
+                            total += asset.download_count;
+                        }
+                    });
+                });
+                updateCache(total);
+                showCount(total);
+            })
+            .catch(function() {
+                countEl.textContent = '---';
+            });
+    })();
 })();
 </script>
 
