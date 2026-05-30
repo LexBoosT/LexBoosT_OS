@@ -151,6 +151,11 @@
             letter-spacing: 0.5px;
             margin-bottom: 28px;
         }
+        .hero-logo {
+            display: block;
+            margin: 0 auto 24px;
+            filter: drop-shadow(0 0 40px var(--accent-glow));
+        }
         .hero h1 {
             font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 900;
@@ -396,6 +401,20 @@
             background-clip: text;
         }
         .stat .label { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── Showcase ── */
+        .showcase {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .showcase-img {
+            width: 100%;
+            max-width: 100%;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -406,6 +425,7 @@
         <ul class="nav-links">
             <li><a href="#perf"><span lang-fr>Performances</span><span lang-en>Performance</span></a></li>
             <li><a href="#features"><span lang-fr>Fonctionnalités</span><span lang-en>Features</span></a></li>
+            <li><a href="#launcher"><span lang-fr>Launcher</span><span lang-en>Launcher</span></a></li>
             <li><a href="#install"><span lang-fr>Installation</span><span lang-en>Installation</span></a></li>
             <li><a href="#support">Support</a></li>
             <li>
@@ -422,6 +442,7 @@
 <section class="hero" id="top">
     <div class="container">
         <div class="badge">v26.06 — <span lang-fr>Dernière version</span><span lang-en>Latest Release</span></div>
+        <img src="0.png" alt="LexBoosT OS" class="hero-logo" width="200" height="200">
         <h1>LexBoosT OS™</h1>
         <p class="subtitle">
             <span lang-fr>Libérez des performances supérieures — sans compromis.<br>Un playbook d'optimisation Windows 11 qui transforme votre système en profondeur.</span>
@@ -570,6 +591,20 @@
                     <li><span lang-fr>Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7</span><span lang-en>Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7</span></li>
                 </ul>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ LAUNCHER SHOWCASE ═══════════ -->
+<section id="launcher">
+    <div class="container">
+        <div class="section-header reveal">
+            <div class="icon">🚀</div>
+            <h2><span lang-fr>LexBoosT Launcher</span><span lang-en>LexBoosT Launcher</span></h2>
+            <p><span lang-fr>40+ outils post-installation pour garder le contrôle total de votre système.</span><span lang-en>40+ post-install tools to keep full control of your system.</span></p>
+        </div>
+        <div class="showcase reveal">
+            <img src="1.png" alt="LexBoosT OS Launcher" class="showcase-img">
         </div>
     </div>
 </section>
