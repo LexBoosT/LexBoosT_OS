@@ -30,9 +30,7 @@
             --radius: 12px;
             --radius-lg: 20px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         html { scroll-behavior: smooth; }
 
         body {
@@ -42,8 +40,6 @@
             line-height: 1.7;
             overflow-x: hidden;
         }
-
-        /* Animated background */
         body::before {
             content: '';
             position: fixed;
@@ -54,8 +50,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
-        /* Grid pattern */
         body::after {
             content: '';
             position: fixed;
@@ -67,7 +61,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
         .container {
             max-width: 1100px;
             margin: 0 auto;
@@ -104,7 +97,7 @@
             background-clip: text;
             letter-spacing: -0.5px;
         }
-        nav .nav-links { display: flex; gap: 28px; list-style: none; }
+        nav .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
         nav .nav-links a {
             color: var(--text-dim);
             text-decoration: none;
@@ -114,7 +107,35 @@
         }
         nav .nav-links a:hover { color: var(--accent); }
         @media (max-width: 768px) {
-            nav .nav-links { display: none; }
+            nav .nav-links { gap: 12px; }
+            nav .nav-links a { font-size: 0.75rem; }
+        }
+
+        /* ── Language Toggle ── */
+        .lang-toggle {
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        .lang-toggle button {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .lang-toggle button.active {
+            background: var(--gradient-1);
+            color: #fff;
+        }
+        .lang-toggle button:not(.active):hover {
+            color: var(--accent);
         }
 
         /* ── Hero ── */
@@ -171,28 +192,19 @@
             color: #fff;
             box-shadow: 0 0 30px var(--accent-glow);
         }
-        .btn-primary:hover {
-            box-shadow: 0 0 50px var(--accent-glow);
-            transform: translateY(-2px);
-        }
+        .btn-primary:hover { box-shadow: 0 0 50px var(--accent-glow); transform: translateY(-2px); }
         .btn-outline {
             border: 1px solid var(--border);
             color: var(--text);
             background: transparent;
         }
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
         .btn-accent2 {
             background: var(--gradient-2);
             color: #fff;
             box-shadow: 0 0 25px var(--accent2-glow);
         }
-        .btn-accent2:hover {
-            box-shadow: 0 0 45px var(--accent2-glow);
-            transform: translateY(-2px);
-        }
+        .btn-accent2:hover { box-shadow: 0 0 45px var(--accent2-glow); transform: translateY(-2px); }
 
         /* ── Section ── */
         section { padding: 90px 0; }
@@ -235,7 +247,6 @@
         .perf-table .metric { font-weight: 700; }
         .perf-table .gain { color: var(--green); font-weight: 700; }
         .perf-table tr:hover td { background: var(--bg-card-hover); }
-        .perf-table .divider td { padding: 0; border-top: 1px solid rgba(139, 92, 246, 0.2); }
 
         /* ── Feature Cards ── */
         .cards-grid {
@@ -275,10 +286,7 @@
             margin-bottom: 12px;
             letter-spacing: -0.3px;
         }
-        .card ul {
-            list-style: none;
-            padding: 0;
-        }
+        .card ul { list-style: none; padding: 0; }
         .card ul li {
             padding: 3px 0;
             color: var(--text-dim);
@@ -380,18 +388,6 @@
             transform: translateY(0);
         }
 
-        /* ── Language toggle ── */
-        .lang-switch {
-            background: none; border: 1px solid var(--border);
-            color: var(--text-dim); padding: 4px 12px;
-            border-radius: 50px; font-size: 0.75rem; cursor: pointer;
-            transition: all 0.2s; font-weight: 600;
-        }
-        .lang-switch:hover, .lang-switch.active {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
         /* ── Stats bar ── */
         .stats-bar {
             display: grid;
@@ -415,6 +411,9 @@
             background-clip: text;
         }
         .stat .label { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── Hidden by default until JS sets lang ── */
+        [data-fr], [data-en] { display: none; }
     </style>
 </head>
 <body>
@@ -423,10 +422,16 @@
     <div class="nav-inner">
         <span class="logo">LexBoosT OS™</span>
         <ul class="nav-links">
-            <li><a href="#perf">Performances</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#install">Installation</a></li>
+            <li><a href="#perf"><span data-fr>Performances</span><span data-en>Performance</span></a></li>
+            <li><a href="#features"><span data-fr>Fonctionnalités</span><span data-en>Features</span></a></li>
+            <li><a href="#install"><span data-fr>Installation</span><span data-en>Installation</span></a></li>
             <li><a href="#support">Support</a></li>
+            <li>
+                <div class="lang-toggle">
+                    <button id="btn-fr" onclick="setLang('fr')">FR</button>
+                    <button id="btn-en" onclick="setLang('en')">EN</button>
+                </div>
+            </li>
         </ul>
     </div>
 </nav>
@@ -434,22 +439,29 @@
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="top">
     <div class="container">
-        <div class="badge">v26.06 — Latest Release</div>
+        <div class="badge">v26.06 — <span data-fr>Dernière version</span><span data-en>Latest Release</span></div>
         <h1>LexBoosT OS™</h1>
-        <p class="subtitle">Libérez des performances supérieures — sans compromis.<br>Un playbook d'optimisation Windows 11 qui transforme votre système en profondeur.</p>
+        <p class="subtitle">
+            <span data-fr>Libérez des performances supérieures — sans compromis.<br>Un playbook d'optimisation Windows 11 qui transforme votre système en profondeur.</span>
+            <span data-en>Unleash Superior Performance — Zero Compromise.<br>A Windows 11 optimization playbook that deeply transforms your system.</span>
+        </p>
         <div class="cta-group">
             <a href="https://github.com/LexBoosT/LexBoosT_OS" class="btn btn-primary" target="_blank" rel="noopener">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                Voir sur GitHub
+                <span data-fr>Voir sur GitHub</span><span data-en>View on GitHub</span>
             </a>
-            <a href="#install" class="btn btn-outline">📥 Installation</a>
-            <a href="https://ko-fi.com/lexboostdev" class="btn btn-accent2" target="_blank" rel="noopener">☕ Support the Project</a>
+            <a href="#install" class="btn btn-outline">
+                <span data-fr>📥 Installation</span><span data-en>📥 Installation</span>
+            </a>
+            <a href="https://ko-fi.com/lexboostdev" class="btn btn-accent2" target="_blank" rel="noopener">
+                <span data-fr>☕ Soutenir le projet</span><span data-en>☕ Support the Project</span>
+            </a>
         </div>
         <div class="stats-bar">
-            <div class="stat"><div class="value">250+</div><div class="label">Services Reconfigurés</div></div>
-            <div class="stat"><div class="value">100+</div><div class="label">Bloatware Supprimés</div></div>
-            <div class="stat"><div class="value">60+</div><div class="label">Familles de Tweaks</div></div>
-            <div class="stat"><div class="value">7</div><div class="label">Phases de Déploiement</div></div>
+            <div class="stat"><div class="value">250+</div><div class="label" data-fr="Services Reconfigurés" data-en="Services Reconfigured"></div></div>
+            <div class="stat"><div class="value">100+</div><div class="label" data-fr="Bloatware Supprimés" data-en="Bloatware Removed"></div></div>
+            <div class="stat"><div class="value">60+</div><div class="label" data-fr="Familles de Tweaks" data-en="Tweak Families"></div></div>
+            <div class="stat"><div class="value">7</div><div class="label" data-fr="Phases de Déploiement" data-en="Deployment Phases"></div></div>
         </div>
     </div>
 </section>
@@ -459,74 +471,35 @@
     <div class="container">
         <div class="section-header reveal">
             <div class="icon">🚀</div>
-            <h2>Performances vs Windows 11 Stock</h2>
-            <p>Mesures indicatives sur hardware moyen (Ryzen 5 / Core i5, 16 GB RAM, NVMe SSD).</p>
+            <h2>
+                <span data-fr>Performances vs Windows 11 Stock</span>
+                <span data-en>Performance vs Stock Windows 11</span>
+            </h2>
+            <p>
+                <span data-fr>Mesures indicatives sur hardware moyen (Ryzen 5 / Core i5, 16 GB RAM, NVMe SSD).</span>
+                <span data-en>Indicative measurements on mid-range hardware (Ryzen 5 / Core i5, 16 GB RAM, NVMe SSD).</span>
+            </p>
         </div>
         <div class="perf-table-wrapper reveal">
             <table class="perf-table">
                 <thead>
                     <tr>
-                        <th>Indicateur</th>
+                        <th><span data-fr>Indicateur</span><span data-en>Metric</span></th>
                         <th>Windows 11 Stock</th>
                         <th>LexBoosT OS™</th>
-                        <th>Gain</th>
+                        <th><span data-fr>Gain</span><span data-en>Improvement</span></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="metric">Processus en idle</td>
-                        <td>~180-220</td>
-                        <td>~50-70</td>
-                        <td class="gain">-65%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">RAM idle (16 GB)</td>
-                        <td>~4.5-5.5 GB</td>
-                        <td>~1.8-2.5 GB</td>
-                        <td class="gain">-50%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Services exécutés</td>
-                        <td>~120-150</td>
-                        <td>~40-60</td>
-                        <td class="gain">-60%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Latence DPC</td>
-                        <td>300-800 µs</td>
-                        <td>50-150 µs</td>
-                        <td class="gain">-70%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Temps de boot</td>
-                        <td>25-40 sec</td>
-                        <td>10-18 sec</td>
-                        <td class="gain">-55%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">FPS moyen (gaming)</td>
-                        <td>Baseline</td>
-                        <td>+10-20%</td>
-                        <td class="gain">+15%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Perf CPU (Spectre off)</td>
-                        <td>Baseline</td>
-                        <td>+5-15%</td>
-                        <td class="gain">+10%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Télémétrie sortante</td>
-                        <td>~250 req/h</td>
-                        <td>0</td>
-                        <td class="gain">-100%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric">Applications inutiles</td>
-                        <td>30+</td>
-                        <td>0</td>
-                        <td class="gain">-100%</td>
-                    </tr>
+                    <tr><td class="metric"><span data-fr>Processus en idle</span><span data-en>Idle processes</span></td><td>~180-220</td><td>~50-70</td><td class="gain">-65%</td></tr>
+                    <tr><td class="metric">RAM idle (16 GB)</td><td>~4.5-5.5 GB</td><td>~1.8-2.5 GB</td><td class="gain">-50%</td></tr>
+                    <tr><td class="metric"><span data-fr>Services exécutés</span><span data-en>Running services</span></td><td>~120-150</td><td>~40-60</td><td class="gain">-60%</td></tr>
+                    <tr><td class="metric"><span data-fr>Latence DPC</span><span data-en>DPC latency</span></td><td>300-800 µs</td><td>50-150 µs</td><td class="gain">-70%</td></tr>
+                    <tr><td class="metric"><span data-fr>Temps de boot</span><span data-en>Boot time</span></td><td>25-40 sec</td><td>10-18 sec</td><td class="gain">-55%</td></tr>
+                    <tr><td class="metric"><span data-fr>FPS moyen (gaming)</span><span data-en>Avg FPS (gaming)</span></td><td>Baseline</td><td>+10-20%</td><td class="gain">+15%</td></tr>
+                    <tr><td class="metric"><span data-fr>Perf CPU (Spectre off)</span><span data-en>CPU perf (Spectre off)</span></td><td>Baseline</td><td>+5-15%</td><td class="gain">+10%</td></tr>
+                    <tr><td class="metric"><span data-fr>Télémétrie sortante</span><span data-en>Outgoing telemetry</span></td><td>~250 req/h</td><td>0</td><td class="gain">-100%</td></tr>
+                    <tr><td class="metric"><span data-fr>Applications inutiles</span><span data-en>Bloatware apps</span></td><td>30+</td><td>0</td><td class="gain">-100%</td></tr>
                 </tbody>
             </table>
         </div>
@@ -538,34 +511,40 @@
     <div class="container">
         <div class="section-header reveal">
             <div class="icon">⚡</div>
-            <h2>Ce que fait LexBoosT OS™</h2>
-            <p>7 catégories d'optimisations pour des performances radicales.</p>
+            <h2>
+                <span data-fr>Ce que fait LexBoosT OS™</span>
+                <span data-en>What LexBoosT OS™ Does</span>
+            </h2>
+            <p>
+                <span data-fr>7 catégories d'optimisations pour des performances radicales.</span>
+                <span data-en>7 categories of optimizations for radical performance.</span>
+            </p>
         </div>
 
         <div class="cards-grid">
             <!-- System -->
             <div class="card accent-purple reveal">
                 <div class="card-icon">💻</div>
-                <h3>Optimisations Système</h3>
+                <h3><span data-fr>Optimisations Système</span><span data-en>System Optimizations</span></h3>
                 <ul>
-                    <li>MMCSS recalibré, TSX activé, ThreadDpcEnable</li>
-                    <li>Mitigations Spectre/Meltdown désactivées (+5-15% CPU)</li>
-                    <li>Core Parking contrôlable, priorités IFEO par processus</li>
-                    <li>DisablePagingExecutive, Memory Compression désactivée</li>
-                    <li>BCD tweaks, NTFS optimisé, ServicesPipeTimeout=30s</li>
+                    <li data-fr="MMCSS recalibré, TSX activé, ThreadDpcEnable" data-en="MMCSS recalibrated, TSX enabled, ThreadDpcEnable"></li>
+                    <li data-fr="Mitigations Spectre/Meltdown désactivées (+5-15% CPU)" data-en="Spectre/Meltdown mitigations disabled (+5-15% CPU)"></li>
+                    <li data-fr="Core Parking contrôlable, priorités IFEO par processus" data-en="Core Parking exposed & controllable, IFEO per-process priorities"></li>
+                    <li data-fr="DisablePagingExecutive, Memory Compression désactivée" data-en="DisablePagingExecutive, Memory Compression disabled"></li>
+                    <li data-fr="BCD tweaks, NTFS optimisé, ServicesPipeTimeout=30s" data-en="BCD tweaks, NTFS optimized, ServicesPipeTimeout=30s"></li>
                 </ul>
             </div>
 
             <!-- Network -->
             <div class="card accent-purple reveal">
                 <div class="card-icon">🌐</div>
-                <h3>Optimisations Réseau</h3>
+                <h3><span data-fr>Optimisations Réseau</span><span data-en>Network Optimizations</span></h3>
                 <ul>
-                    <li>Nagle désactivé, TcpTimedWaitDelay=30s</li>
-                    <li>MaxUserPort=65534, MaxFreeTcbs=65536</li>
-                    <li>DNS-over-HTTPS natif, Cache TTL 24h</li>
-                    <li>29 apps VoIP priorisées (Discord, Teams, Zoom, Skype)</li>
-                    <li>EEE désactivé, FlowControl off, RSS activé</li>
+                    <li data-fr="Nagle désactivé, TcpTimedWaitDelay=30s" data-en="Nagle disabled, TcpTimedWaitDelay=30s"></li>
+                    <li data-fr="MaxUserPort=65534, MaxFreeTcbs=65536" data-en="MaxUserPort=65534, MaxFreeTcbs=65536"></li>
+                    <li data-fr="DNS-over-HTTPS natif, Cache TTL 24h" data-en="Native DNS-over-HTTPS, Cache TTL 24h"></li>
+                    <li data-fr="29 apps VoIP priorisées (Discord, Teams, Zoom, Skype)" data-en="29 VoIP apps prioritized (Discord, Teams, Zoom, Skype)"></li>
+                    <li data-fr="EEE désactivé, FlowControl off, RSS activé" data-en="EEE disabled, FlowControl off, RSS enabled"></li>
                 </ul>
             </div>
 
@@ -574,63 +553,63 @@
                 <div class="card-icon">🎮</div>
                 <h3>Gaming & GPU</h3>
                 <ul>
-                    <li>MMCSS Games Task: GPU Priority=8, SFIO Priority=High</li>
-                    <li>HAGS activé (Hardware-Accelerated GPU Scheduling)</li>
-                    <li>Game DVR complètement désactivé (HKLM+HKCU)</li>
-                    <li>DWM: MaxQueuedPresentBuffers=2, FrameLatency=1</li>
-                    <li>MPO/DWM overlays nettoyés (anti-flickering)</li>
+                    <li data-fr="MMCSS Games Task: GPU Priority=8, SFIO Priority=High" data-en="MMCSS Games Task: GPU Priority=8, SFIO Priority=High"></li>
+                    <li data-fr="HAGS activé (Hardware-Accelerated GPU Scheduling)" data-en="HAGS enabled (Hardware-Accelerated GPU Scheduling)"></li>
+                    <li data-fr="Game DVR complètement désactivé (HKLM+HKCU)" data-en="Game DVR fully disabled (HKLM+HKCU)"></li>
+                    <li data-fr="DWM: MaxQueuedPresentBuffers=2, FrameLatency=1" data-en="DWM: MaxQueuedPresentBuffers=2, FrameLatency=1"></li>
+                    <li data-fr="MPO/DWM overlays nettoyés (anti-flickering)" data-en="MPO/DWM overlays cleaned (anti-flickering)"></li>
                 </ul>
             </div>
 
             <!-- Privacy -->
             <div class="card accent-purple reveal">
                 <div class="card-icon">🔒</div>
-                <h3>Privacy Radicale</h3>
+                <h3><span data-fr>Privacy Radicale</span><span data-en>Radical Privacy</span></h3>
                 <ul>
-                    <li>AllowTelemetry=0 sur 5 chemins</li>
-                    <li>IA bloquée: generativeAI=Deny, Copilot supprimé</li>
-                    <li>Cortana, Advertising ID, Cloud Search désactivés</li>
-                    <li>OneDrive KFM bloqué, PerfTrack désactivé</li>
-                    <li>Edge telemetry, WER, Feedback Notifications supprimés</li>
+                    <li data-fr="AllowTelemetry=0 sur 5 chemins" data-en="AllowTelemetry=0 across 5 paths"></li>
+                    <li data-fr="IA bloquée: generativeAI=Deny, Copilot supprimé" data-en="AI blocked: generativeAI=Deny, Copilot removed"></li>
+                    <li data-fr="Cortana, Advertising ID, Cloud Search désactivés" data-en="Cortana, Advertising ID, Cloud Search disabled"></li>
+                    <li data-fr="OneDrive KFM bloqué, PerfTrack désactivé" data-en="OneDrive KFM blocked, PerfTrack disabled"></li>
+                    <li data-fr="Edge telemetry, WER, Feedback Notifications supprimés" data-en="Edge telemetry, WER, Feedback Notifications removed"></li>
                 </ul>
             </div>
 
             <!-- Debloat -->
             <div class="card accent-orange reveal">
                 <div class="card-icon">🧹</div>
-                <h3>Débloat Agressif</h3>
+                <h3><span data-fr>Débloat Agressif</span><span data-en>Aggressive Debloating</span></h3>
                 <ul>
-                    <li>100+ packages AppX supprimés</li>
-                    <li>Copilot, Teams, Xbox GameBar, OneDrive, Cortana</li>
-                    <li>Bing*, Zune*, Office Hub, Skype, Spotify, LinkedIn</li>
-                    <li>Microsoft Edge supprimable, OneDrive désinstallable</li>
-                    <li>WinSxS nettoyé, DISM features superflues désactivées</li>
+                    <li data-fr="100+ packages AppX supprimés" data-en="100+ AppX packages removed"></li>
+                    <li data-fr="Copilot, Teams, Xbox GameBar, OneDrive, Cortana" data-en="Copilot, Teams, Xbox GameBar, OneDrive, Cortana"></li>
+                    <li data-fr="Bing*, Zune*, Office Hub, Skype, Spotify, LinkedIn" data-en="Bing*, Zune*, Office Hub, Skype, Spotify, LinkedIn"></li>
+                    <li data-fr="Microsoft Edge supprimable, OneDrive désinstallable" data-en="Microsoft Edge removable, OneDrive uninstallable"></li>
+                    <li data-fr="WinSxS nettoyé, DISM features superflues désactivées" data-en="WinSxS cleaned, unneeded DISM features disabled"></li>
                 </ul>
             </div>
 
             <!-- Reliability -->
             <div class="card accent-purple reveal">
                 <div class="card-icon">🛡️</div>
-                <h3>Fiabilité & Stabilité</h3>
+                <h3><span data-fr>Fiabilité & Stabilité</span><span data-en>Reliability & Stability</span></h3>
                 <ul>
-                    <li>Valeurs conservatrices, pas de DPC &lt; 50ms</li>
-                    <li>Pas de Large Pages forcées, SEHOP conservé</li>
-                    <li>Bugs corrigés: DisableExceptionChainValidation, LargePageMinimum</li>
-                    <li>Compatibilité: SysMain=Manual, ClipSVC=Auto (Win+V)</li>
-                    <li>TokenBroker=Auto (MS Store), lsass.exe PerfOptions</li>
+                    <li data-fr="Valeurs conservatrices, pas de DPC &lt; 50ms" data-en="Conservative values, no DPC &lt; 50ms"></li>
+                    <li data-fr="Pas de Large Pages forcées, SEHOP conservé" data-en="No forced Large Pages, SEHOP kept enabled"></li>
+                    <li data-fr="Bugs corrigés: DisableExceptionChainValidation, LargePageMinimum" data-en="Bugs fixed: DisableExceptionChainValidation, LargePageMinimum"></li>
+                    <li data-fr="Compatibilité: SysMain=Manual, ClipSVC=Auto (Win+V)" data-en="Compatibility: SysMain=Manual, ClipSVC=Auto (Win+V)"></li>
+                    <li data-fr="TokenBroker=Auto (MS Store), lsass.exe PerfOptions" data-en="TokenBroker=Auto (MS Store), lsass.exe PerfOptions"></li>
                 </ul>
             </div>
 
             <!-- UX -->
             <div class="card accent-orange reveal">
                 <div class="card-icon">🎨</div>
-                <h3>UX & Personnalisation</h3>
+                <h3>UX & <span data-fr>Personnalisation</span><span data-en>Customization</span></h3>
                 <ul>
-                    <li>6 navigateurs au choix (Brave, Firefox, Vivaldi, etc.)</li>
-                    <li>Thème dark personnalisé, wallpapers, avatar</li>
-                    <li>Menu Démarrer nettoyable (Wipe!), icônes desktop</li>
-                    <li>LexBoosT Launcher: 40+ outils post-installation</li>
-                    <li>Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7</li>
+                    <li data-fr="6 navigateurs au choix (Brave, Firefox, Vivaldi, etc.)" data-en="6 browsers to choose from (Brave, Firefox, Vivaldi, etc.)"></li>
+                    <li data-fr="Thème dark personnalisé, wallpapers, avatar" data-en="Custom dark theme, wallpapers, avatar"></li>
+                    <li data-fr="Menu Démarrer nettoyable (Wipe!), icônes desktop" data-en="Cleanable Start Menu (Wipe!), desktop icons"></li>
+                    <li data-fr="LexBoosT Launcher: 40+ outils post-installation" data-en="LexBoosT Launcher: 40+ post-install tools"></li>
+                    <li data-fr="Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7" data-en="Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7"></li>
                 </ul>
             </div>
         </div>
@@ -642,42 +621,60 @@
     <div class="container">
         <div class="section-header reveal">
             <div class="icon">📥</div>
-            <h2>Installation</h2>
-            <p>Déployez LexBoosT OS™ en quelques minutes.</p>
+            <h2><span data-fr>Installation</span><span data-en>Installation</span></h2>
+            <p>
+                <span data-fr>Déployez LexBoosT OS™ en quelques minutes.</span>
+                <span data-en>Deploy LexBoosT OS™ in just a few minutes.</span>
+            </p>
         </div>
         <div class="steps">
             <div class="step reveal">
                 <div class="step-num">1</div>
                 <div class="step-content">
-                    <h4>Prérequis</h4>
-                    <p>Windows 11 propre (builds 22000-28020), pilotes à jour, apps Store à jour, Widgets connectés au compte Microsoft. <strong>Créez un point de restauration système.</strong> Redémarrez.</p>
+                    <h4><span data-fr>Prérequis</span><span data-en>Requirements</span></h4>
+                    <p>
+                        <span data-fr>Windows 11 propre (builds 22000-28020), pilotes à jour, apps Store à jour, Widgets connectés au compte Microsoft. <strong>Créez un point de restauration système.</strong> Redémarrez.</span>
+                        <span data-en>Clean Windows 11 (builds 22000-28020 supported), updated drivers, updated Store apps, Widgets connected to your Microsoft account. <strong>Create a system restore point.</strong> Reboot.</span>
+                    </p>
                 </div>
             </div>
             <div class="step reveal">
                 <div class="step-num">2</div>
                 <div class="step-content">
-                    <h4>Lancez le Playbook</h4>
-                    <p>Téléchargez et exécutez le playbook LexBoosT OS™ depuis le repo GitHub.</p>
+                    <h4><span data-fr>Lancez le Playbook</span><span data-en>Launch the Playbook</span></h4>
+                    <p>
+                        <span data-fr>Téléchargez et exécutez le playbook LexBoosT OS™ depuis le repo GitHub.</span>
+                        <span data-en>Download and run the LexBoosT OS™ playbook from the GitHub repo.</span>
+                    </p>
                 </div>
             </div>
             <div class="step reveal">
                 <div class="step-num">3</div>
                 <div class="step-content">
-                    <h4>Suivez les options</h4>
-                    <p>Choisissez votre navigateur, les packages à supprimer, le thème et les personnalisations.</p>
+                    <h4><span data-fr>Suivez les options</span><span data-en>Follow the options</span></h4>
+                    <p>
+                        <span data-fr>Choisissez votre navigateur, les packages à supprimer, le thème et les personnalisations.</span>
+                        <span data-en>Choose your browser, packages to remove, theme, and customizations.</span>
+                    </p>
                 </div>
             </div>
             <div class="step reveal">
                 <div class="step-num">4</div>
                 <div class="step-content">
-                    <h4>Redémarrez</h4>
-                    <p>Une fois l'installation terminée, redémarrez pour appliquer tous les changements.</p>
+                    <h4><span data-fr>Redémarrez</span><span data-en>Reboot</span></h4>
+                    <p>
+                        <span data-fr>Une fois l'installation terminée, redémarrez pour appliquer tous les changements.</span>
+                        <span data-en>Once installation is complete, reboot to apply all changes.</span>
+                    </p>
                 </div>
             </div>
         </div>
         <div class="compat-banner reveal">
             <span class="icon">💡</span>
-            <p><strong>Compatibilité matérielle :</strong> AMD Ryzen / Intel Core 8ᵉ gén+, 8 GB RAM minimum (16 GB recommandé), SSD/NVMe recommandé.</p>
+            <p>
+                <span data-fr><strong>Compatibilité matérielle :</strong> AMD Ryzen / Intel Core 8ᵉ gén+, 8 GB RAM minimum (16 GB recommandé), SSD/NVMe recommandé.</span>
+                <span data-en><strong>Hardware compatibility:</strong> AMD Ryzen / Intel Core 8th gen+, 8 GB RAM minimum (16 GB recommended), SSD/NVMe recommended.</span>
+            </p>
         </div>
     </div>
 </section>
@@ -687,8 +684,11 @@
     <div class="container">
         <div class="section-header reveal">
             <div class="icon">💙</div>
-            <h2>Support the Project</h2>
-            <p>LexBoosT OS™ est un projet indépendant. Votre soutien aide à le maintenir.</p>
+            <h2><span data-fr>Soutenir le Projet</span><span data-en>Support the Project</span></h2>
+            <p>
+                <span data-fr>LexBoosT OS™ est un projet indépendant. Votre soutien aide à le maintenir.</span>
+                <span data-en>LexBoosT OS™ is an independent project. Your support helps keep it going.</span>
+            </p>
         </div>
         <div class="support-grid">
             <a href="https://github.com/LexBoosT/LexBoosT_OS" class="support-card reveal" target="_blank" rel="noopener">
@@ -696,17 +696,17 @@
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
                 </div>
                 <h3>GitHub</h3>
-                <p>Explorez le code source et contribuez</p>
+                <p><span data-fr>Explorez le code source et contribuez</span><span data-en>Explore the source code and contribute</span></p>
             </a>
             <a href="https://ko-fi.com/lexboostdev" class="support-card reveal" target="_blank" rel="noopener">
                 <div class="icon">☕</div>
                 <h3>Ko-fi</h3>
-                <p>Soutenez le développement avec un don</p>
+                <p><span data-fr>Soutenez le développement avec un don</span><span data-en>Support development with a donation</span></p>
             </a>
             <a href="https://lextermina7.wixsite.com/astralex" class="support-card reveal" target="_blank" rel="noopener">
                 <div class="icon">🌐</div>
-                <h3>Site Web</h3>
-                <p>Visitez astralex pour plus d'infos</p>
+                <h3><span data-fr>Site Web</span><span data-en>Website</span></h3>
+                <p><span data-fr>Visitez astralex pour plus d'infos</span><span data-en>Visit astralex for more info</span></p>
             </a>
         </div>
     </div>
@@ -715,12 +715,36 @@
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer>
     <div class="container">
-        <p><span class="version">LexBoosT OS™ v26.06</span> — Built for performance. Engineered for reliability.</p>
+        <p><span class="version">LexBoosT OS™ v26.06</span> — <span data-fr>Conçu pour la performance. Pensé pour la fiabilité.</span><span data-en>Built for performance. Engineered for reliability.</span></p>
         <p style="margin-top:8px;">© 2025-2026 LexBoosT™ — <a href="https://github.com/LexBoosT/LexBoosT_OS" target="_blank" rel="noopener">GitHub</a> · <a href="https://ko-fi.com/lexboostdev" target="_blank" rel="noopener">Ko-fi</a></p>
     </div>
 </footer>
 
 <script>
+    // Language management
+    function setLang(lang) {
+        document.documentElement.lang = lang;
+        localStorage.setItem('lexboost-lang', lang);
+
+        // Update buttons
+        document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+
+        // Show/hide text elements with matching data-* attributes
+        document.querySelectorAll('[data-fr]').forEach(el => {
+            el.style.display = lang === 'fr' ? '' : 'none';
+        });
+        document.querySelectorAll('[data-en]').forEach(el => {
+            el.style.display = lang === 'en' ? '' : 'none';
+        });
+    }
+
+    // Init: detect saved lang or browser preference
+    const savedLang = localStorage.getItem('lexboost-lang');
+    const browserLang = navigator.language ? navigator.language.split('-')[0] : 'fr';
+    const defaultLang = savedLang || (['fr', 'en'].includes(browserLang) ? browserLang : 'fr');
+    setLang(defaultLang);
+
     // Scroll reveal animation
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -735,11 +759,7 @@
     // Nav background on scroll
     const nav = document.querySelector('nav');
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            nav.style.background = 'rgba(5, 5, 8, 0.95)';
-        } else {
-            nav.style.background = 'rgba(5, 5, 8, 0.85)';
-        }
+        nav.style.background = window.scrollY > 50 ? 'rgba(5, 5, 8, 0.95)' : 'rgba(5, 5, 8, 0.85)';
     });
 </script>
 
