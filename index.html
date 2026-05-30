@@ -740,7 +740,7 @@
     (function() {
         var countEl = document.getElementById('dl-count');
         var cacheKey = 'lexboost-dl-count';
-        var cacheTime = 3600000; // 1 hour
+        var cacheTime = 300000; // 5 minutes
 
         function format(n) {
             if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';
