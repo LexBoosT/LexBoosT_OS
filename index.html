@@ -199,6 +199,14 @@
             box-shadow: 0 0 25px var(--accent2-glow);
         }
         .btn-accent2:hover { box-shadow: 0 0 45px var(--accent2-glow); transform: translateY(-2px); }
+        .btn-download {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+            font-size: 1rem;
+            padding: 14px 32px;
+        }
+        .btn-download:hover { box-shadow: 0 0 45px rgba(16, 185, 129, 0.4); transform: translateY(-2px); }
 
         /* ── Section ── */
         section { padding: 90px 0; }
@@ -413,11 +421,14 @@
             <span lang-en>Unleash Superior Performance — Zero Compromise.<br>A Windows 11 optimization playbook that deeply transforms your system.</span>
         </p>
         <div class="cta-group">
+            <a href="https://github.com/LexBoosT/LexBoosT_OS/releases/latest/download/LexBoosT_OS.apbx" class="btn btn-download" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span lang-fr>Télécharger (.apbx)</span><span lang-en>Download (.apbx)</span>
+            </a>
             <a href="https://github.com/LexBoosT/LexBoosT_OS" class="btn btn-primary" target="_blank" rel="noopener">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
                 <span lang-fr>Voir sur GitHub</span><span lang-en>View on GitHub</span>
             </a>
-            <a href="#install" class="btn btn-outline"><span lang-fr>📥 Installation</span><span lang-en>📥 Installation</span></a>
             <a href="https://ko-fi.com/lexboostdev" class="btn btn-accent2" target="_blank" rel="noopener"><span lang-fr>☕ Soutenir le projet</span><span lang-en>☕ Support the Project</span></a>
         </div>
         <div class="stats-bar">
