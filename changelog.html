@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ v26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -160,7 +160,52 @@
 </nav>
 
 <div class="container">
-    <h1>LexBoosT OS™ V26.06</h1>
+    <h1>LexBoosT OS™ V26.06.1</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>34</strong> changements</div>
+        <div class="stat">🪛 <strong>12</strong> fixes</div>
+        <div class="stat">✨ <strong>18</strong> improvements</div>
+        <div class="stat">🆕 <strong>2</strong> new features</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 Set-DesktopPowerOptimizations: added hibernation policy reinforcement (AllowHibernate=0, HibernateChecksummingEnabled=0, EnableMinimalHiberFile=0, HiberFileSizePercent=0, ForceHibernateDisabled=1). DisableIdleStatesAtBoot=2 prevents deep idle during boot. SleepStudy directory permissions blocked (icacls remove SYSTEM/Administrators). DMA remapping compatibility disabled across all services to reduce IOMMU overhead. All desktop-only (skipped on laptops via Get-CachedLaptopStatus).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 Set-DrivesConfiguration: enables disk write cache (UserWriteCacheSetting=1) and marks cache as power-protected (CacheIsPowerProtected=1) on all enumerated disk drives. Safe for laptops (battery acts as power protection).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 Set-DrivesConfiguration: NTFS optimizations — USN change journal disabled (reduce disk writes), NTFS metadata in non-paged pool (enablenonpagedntfs=1, faster access), disk quotas disabled on C:, extended characters in 8.3 names allowed (allowextchar=1).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> power.yml: PlatformRoleOverride=0 added — lets Windows auto-detect desktop/mobile platform role correctly, preventing mistaken mobile power policies on desktop.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml GPU Scheduler: 6 keys added to ControlSet001\GraphicsDrivers\Scheduler — AdjustWorkerThreadPriority=0, AudioDgAutoBoostPriority=0, AutoSyncToCPUPriority=0, ForegroundPriorityBoost=0, FrameServerAutoBoostPriority=0, QueuedPresentLimit=1. Reduces GPU scheduling overhead and render queue latency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml GPU Drivers: DisableVersionMismatchCheck=1 (skip driver version mismatch rejection), DisableBoostedVSyncVirtualization=1 (reduce VSync buffering overhead). Both in ControlSet001 for next-boot persistence.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> dwm-optimization.yml Advanced Visual & Latency: 9 keys added — AnimationsShiftKey=0, ParallelModePolicy=1 (simultaneous surface composition), EnableBloom=0, EnableCpuClipping=0 (GPU-side clipping), EnableMegaRects=0, ForceDesktopTreeFullDirty=0, GammaBlendPencil=1, GammaBlendWithFP16=1 (FP16 precision blending), MousewheelAnimationDurationMs=100 (snappier scroll).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> advanced-system-optimization.yml: FeatureSettings=1 enables memory management feature flags. NtfsDisableVolsnapHints=1 disables VSS snapshot hints to reduce disk I/O stutters during gaming. Executive worker threads zeroed (AdditionalCriticalWorkerThreads, AdditionalDelayedWorkerThreads, TickcountRolloverDelay, KernelWorkerTestFlags) — no extra threads above kernel defaults.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> telemetry.yml: WTDS telemetry data service disabled (ServiceEnabled=0). Performance diagnostic tracing disabled at kernel level (DisableDiagnosticTracing=1).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> privacy.yml: End-of-Service notifications disabled (DiscontinueEOS=1). Auto-removal of unused language packs blocked (BlockCleanupOfUnusedPreinstalledLangPacks=1). Push notification toasts disabled globally (ToastEnabled=0, HKCU).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> cloud-content.yml: online tips in Explorer disabled (AllowOnlineTips=0). Automatic device metadata download blocked (PreventDeviceMetadataFromNetwork=1).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> ceip.yml: Visual Studio 2017 Software Quality Metrics telemetry opted out (VSCommon SQM OptIn=0).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> audio-latency.yml: audio endpoint effects disabled on all capture and render devices (AGC/NoiseSuppression via PKEY_AudioEndpoint_Disable_SysFx). Reduces audio processing latency. Effects can be re-enabled per-device in Sound Settings.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> explorer.yml: UseCompactMode enabled (1) — compact mode in File Explorer for denser file listing. Auto-scan and auto-voice accessibility triggers disabled (selfscan=0, selfvoice=0) — prevents accidental Narrator activation during gaming.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DISM-FEATURES.PS1: 2 features disabled — WindowsMediaPlayer. 2 capabilities removed — App.StepsRecorder (Steps Recorder), Media.WindowsMediaPlayer (WMP legacy). Reserved Storage disabled (frees ~7 GB). New Remove-Capability helper function added alongside existing Update-Feature.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> win-settings.yml SettingSync: 7 keys added — HKCU SyncPolicy=5 (master switch), 5 per-category Groups disabled (Accessibility, BrowserSettings, Credentials, Personalization, Windows), HKLM DisableSyncOnPaidNetwork=1. Complements existing HKLM Disable*Sync policies and disabled SettingSync scheduled tasks.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Fix URL for chocolatey installation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Fix ps1, bat, cmd, vbscript in New on context menu.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> MAX-REFRESH-RATE.PS1: new Devices script that scans all connected displays (\\.\DISPLAY1 through \\.\DISPLAY10) and sets each display to its maximum supported refresh rate while preserving native resolution, bit depth, position and orientation. Uses EnumDisplaySettings to enumerate modes and ChangeDisplaySettingsEx with CDS_TEST + CDS_UPDATEREGISTRY. Multi-monitor ready (each display optimized independently). Added to devices-scripts.yml playbook phase. PowerShell 5.1 compatible, no admin required.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> LexBoosT-v3.0-dark.theme: added missing Crosshair (precision-select.cur) and IBeam (text-select.cur) cursor roles — all 15 Colloid cursors now mapped in theme.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> ONED.CMD: unregisters FileSyncShell*.dll before deleting AppData\Local\Microsoft\OneDrive folder to prevent locked-DLL leftover shell extensions after OneDrive removal.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> EDGE.PS1 Uninstall-EdgeUpdate: per-user Cleanup now deletes AppData\Local\Microsoft\EdgeUpdate folders, removes HKCU Run key "Microsoft Edge Update" for all user hives, and unregisters MicrosoftEdgeUpdate* scheduled tasks. Switch statement fixed to route "EdgeUpdate" mode (was hitting default/Invalid mode).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> FINALIZE5.CMD USO_UxBroker: replaced schtasks /Change /Disable with PowerShell Disable-ScheduledTask (COM API, bypasses protection on system tasks where schtasks.exe silently fails).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DISM-FEATURES.PS1: added Internet-Explorer-Optional-amd64 to disabled features (removes IE from Windows Features, safe on Win11 where already retired).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> drivers.yml: removed all ExcludeWUDriversInQualityUpdate entries (HKLM Policies, HKLM UX\Settings, HKCU Policies) — delegated to LexBoosT GPU Tweaks. Fixes "Partial" state on LexBoosT GPU Tweaks System Tweaks button after playbook installation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> WIPE_STARTMENU.PS1: fixed registry path resolution — replaced $hive.Name (returns bare "HKEY_USERS\S-...") with $hive.PSPath (returns "Microsoft.PowerShell.Core\Registry::HKEY_USERS\S-..."). The bare path caused Get-ItemProperty to silently fail, skipping all user hive processing (CloudStore tilegrid clearing, start.bin deletion, layout file copying). The wipe appeared to do nothing despite exiting cleanly.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> FILE_ASSOCIATIONS.PS1: fixed missing .bat, .cmd, .reg entries in New context menu — added parent extension keys (.bat, .cmd, .reg) to $regKeys before their ShellNew subkeys (were only creating subkeys, silently failing when parent didn't exist). Added default ProgID values (batfile, cmdfile, regfile) and PerceivedType removal for all 5 extensions (.bat, .cmd, .ps1, .reg, .vbs) to prevent Windows 10/11 from suppressing ShellNew entries.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> FINALIZE2.CMD Audio Tweaks: MMCSS Audio/ProAudio tasks deprioritized — Priority 8→1, GPU Priority 8→1, SFIO Priority High→Normal, Background Only True→False. Audio no longer steals CPU/GPU resources from games, fixing FPS drops when sound is active in Overwatch and other competitive FPS titles.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> audio-latency.yml: GPU Priority 8→1, SFIO Priority High→Normal. Aligned with FINALIZE2.CMD to prevent audio/render resource contention.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml: Games MMCSS Priority 6→8 (max, beats audio at 1). SystemResponsiveness 14%→10% — more CPU available for games, absolute safe minimum for audio.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> gaming.yml: DisableCoInstallers 1→0 — no longer breaks Realtek/Creative audio drivers. Broken audio drivers were causing CPU overload and FPS drops in games.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Toolbox: all tools now launch as Administrator by default — fixes issues where certain tweaks and scripts would silently fail due to insufficient privileges.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Packages Manager: application now auto-restarts after module installation to ensure all changes are properly applied.</li>
+    </ul>
+
+    <h1 style="margin-top: 64px;">LexBoosT OS™ V26.06</h1>
 
     <div class="stats">
         <div class="stat"><strong>121</strong> changements</div>
@@ -294,7 +339,7 @@
 
 <footer>
     <div class="container" style="padding:0;">
-        <p>LexBoosT OS™ v26.06 — <a href="./">← Back to site</a></p>
+        <p>LexBoosT OS™ v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
     </div>
 </footer>
 
