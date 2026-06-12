@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ V26.06.1 / V26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -160,7 +160,54 @@
 </nav>
 
 <div class="container">
-    <h1>LexBoosT OS™ V26.06.1</h1>
+    <h1>LexBoosT OS™ V26.06.2</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>34</strong> changements</div>
+        <div class="stat">🪛 <strong>2</strong> fixes</div>
+        <div class="stat">✨ <strong>28</strong> improvements</div>
+        <div class="stat">🆕 <strong>2</strong> new features</div>
+        <div class="stat">💥 <strong>2</strong> breaking changes</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-new">🆕 NEW</span> 25H2 Build 26300.8553+: Hide All Apps section on Start Menu and Small Start Menu Enabled.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 Set-DrivesConfiguration: centralized all disk tweaks — NTFS registry optimizations (NtfsMemoryUsage=2, LongPathsEnabled=1, NtfsDisableCompression=0, NtfsDisableEncryption=1, NtfsEncryptPagingFile=0, NTFSDisableLastAccessUpdate=0x80000001, NtfsDisable8dot3NameCreation=1, NtfsMftZoneReservation=4), boot defrag disabled, StorageD3InModernStandby=0, IoLatencyCap=0 on all storage services. Reduces disk I/O latency and CPU overhead.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> ifeo.yml Process Priorities: added 25 entries — dwm.exe CPU=1/I/O=0 (frees CPU for games), wininit.exe CPU=4, lsass.exe I/O=0, spoolsv.exe I/O=0, WmiPrvSE.exe CPU=1/I/O=0, launchers (Steam/Epic/EA/Battle.net/Agent) CPU=5 (Below Normal), webviews (QtWebEngine/steamwebhelper/steamservice/EABackgroundService) CPU=1/I/O=0. Prioritizes games over background processes.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml Large Pages: UseLargePages=1 for explorer.exe, dllhost.exe, ISLC, Overwatch (1 & 2), Valorant. Reduces TLB misses and page faults for memory-intensive processes.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml MMCSS: added IdleDetectionCycles=1 (cycle-based idle detection) and LazyModeTimeout=10000 (10s delay before lazy mode). Improves responsiveness under load.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> telemetry.yml Autologgers: fixed DiagLog and WdiContextLog to Start=1 (prevents Task Manager freeze on exit).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> usb-optimization.yml ThreadPriority: USBXHCI and USBHUB3 set to 15 (Highest). Reduces USB input latency for mice/keyboards/controllers.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> advanced-system-optimization.yml I/O System: added PassiveIntRealTimeWorkerPriority=18. Boosts real-time interrupt handling priority for lower latency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> DEVICES.PS1 Set-IRQPriority: new function with dynamic GPU IRQ detection via WMI/PnP. Automatically detects GPU IRQ number and sets high priority (replaces static IRQ16 guess). Optimizes GPU interrupt latency.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Disable Windows Defender sample submission nag.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> LexBoosT GPU Tweaks: disables the NVIDIA tray icon and NVTray service (ShowTrayIcon=0, StartOnLogin=0, ShowInSedona=0) across all ControlSets. Cleans up the system tray for users who don't need the NVIDIA overlay icon.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> ONED.CMD: kill OneDrive.exe and OneDrive.App.exe processes before uninstall, delete system-wide folders (ProgramData, ProgramFiles), extended registry cleanup (Run\OneDriveSetup, Environment\OneDrive, BannerStore, AutoplayHandlers, App Paths, SyncRootManager, WOW6432Node CLSID), system-wide Start Menu shortcuts wildcard cleanup. Complements existing shell DLL unregistration and DisableFileSyncNGSC policy.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> FINALIZE5.CMD: 44 additional scheduled tasks disabled (UpdateOrchestrator, WindowsUpdate, InstallService, Diagnosis, AccountHealth, WindowsAI, Hotpatch, PerformanceTrace, UsageAndQualityInsights, CEIP Server/BthSQM/Uploader, MemoryDiagnostic, Sustainability, Office wildcard). Windows Update AUOptions=2, UScheduler DevHomeUpdate/OutlookUpdate keys, UScheduler_Oobe deletions.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> mouse-keyboard.yml: 30 input optimization registry keys (IsInputAppPreloadEnabled HKLM, BluebirdDTWMultiplier, DisableExpressiveInputShellHotkey, DisablePersonalizationGTKM, DynamicAutocorrectionAllowed, INLINEPREDICTIONMIN*, CursorMagnetism, proc_1\loc_0409\im_1 autocorrection/period/emoji subkeys). Reduces text prediction and touch keyboard overhead.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> disable-logging.yml: 22 diagnostic/logging entries disabled (DeviceGuard KeyGuard telemetry, Cryptography performance counters, WMF call stack tracing, Schedule adapter logging, Winlogon debug/RSoP, UIPI SQM, LSA audit/tracing, WDF global logs/sleep study, diagnostic tracing, Win32kWPP verbose, EventLog protected logging). Leaner kernel trace paths.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> explorer.yml: 40+ Explorer/UI entries added — DesktopLivePreviewHoverTime, Start_NotifyNewApps, 14 Start_Track* contracts (HKLM+HKCU), DisablePreviewDesktop/Window, NoNetCrawling (HKCU), TaskbarFlashOverrideBreatheCount, ShowCortanaButton, 9 Explorer Policies (NoNetCrawling, NoRemoteChangeNotify, NoRemoteRecursiveEvents, TurnOffSPIAnimations, DisableThumbsDBOnNetworkFolders, NoRecentDocsMenu, NoSMHelp, SkipNetworkShieldCheck), EdgeUI DisableCharms/DisableRecentApps. Leaner Explorer with less tracking.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> dwm-optimization.yml: DisableProjectedShadows (reduce GPU shadow rendering), DisableGlobalAnimations (XAML). Lighter compositing.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> control-panel.yml: PenVisualization disabled, AutoColorization disabled, SmoothScroll disabled, Desktop Slideshow AnimationDuration=0. Cleaner visual desktop.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> win-settings.yml: SettingSync SyncPolicy/DisableAppSyncSettingSync/UserOverride, PolicyManager AllowSyncMySettings=0, Maps AllowUntriggeredNetworkTraffic/AutoDownloadAndUpdateMapData, HandwritingErrorReports/TabletPC data sharing disabled, LocationSyncEnabled=0, FindMyDevice, HKCU Insights/UserStatsEnabled, HourlyTelemetyThreshold, SchedulingAgent ViewHiddenTasks, Clipboard CloudClipboardAutomaticUpload/RDPOverride, ShellFeedsTaskbarViewMode. Complete privacy and visual lockdown.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> search.yml: 26 search/Cortana/Speech entries — DeviceHistoryEnabled, VoiceShortcut, CortanaConsent/CanBeEnabled/Enabled (HKCU), Speech_OneCore VoiceActivationOn/EnableAboveLockscreen/ModelDownloadAllowed, HKLM AllowCortanaAboveLock/AllowSearchToUseLocation/EnableDynamicContentInWSB/PreventIndexingLowDiskSpaceMB/DisableBackoff/DisableRemovableDriveIndexing/PreventIndexingOutlook, Explorer DisableSearchBoxSuggestions HKLM, OOBE DisableVoice, PolicyManager AllowCortana, HKLM CortanaEnabled/CortanaInAmbientMode, Windows Search SetupCompletedSuccessfully.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> wer.yml: DisableArchive, DisableWerUpload, DontSendAdditionalData (policies), HKCU Disabled. Complete WER lockdown.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> telemetry.yml: AllowDesktopAnalyticsProcessing, AllowWUfBCloudProcessing, AllowUpdateComplianceProcessing, DisableOneSettingsDownloads, MaxTelemetryAllowed. Extended data collection block.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> security.yml: WinHTTP DisableWpad, BFE CollectNetEvents. Network privacy hardening.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> network-stack.yml: DNS EnableNetbios=0, DHCP PdcActivationDisabled=1. Network stack cleanup.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> cloud-content.yml: DisableWindowsSpotlightFeatures (HKCU). Extended spotlight block.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> disable-AI-programs.yml: AutoOpenCopilotLargeScreens, FeatureUsage Copilot tracking, WindowsCopilot DisableAIDataAnalysis (HKLM), WindowsAI DisableAIDataAnalysis/AllowRecallEnablement (HKCU). AI telemetry hardening.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> notifications.yml: InitializePlatformOnStartup=0 (HKLM PushNotifications). Leaner startup.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> privacy.yml: NoGenTicket (Software Protection Platform HKLM). License check reduction.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> services.yml: 15 disabled services added — MessagingSvc* (SMS sync), UserDataSvc*/ContactDataSvc*/OneSyncSvc*/PimIndexMaintenanceSvc*/UnistoreSvc* (per-user Microsoft account sync wildcards), TermService (Remote Desktop), diagnosticshub.standardcollector.service (Diag Hub), dusmsvc/UCPD (network data usage & telemetry), amdfendr/amdfendrmgr (AMD Crash Defender), tcpipreg (TCP/IP registry), midisrv (MIDI), MicrosoftCopilotElevationService (Copilot). Ndu set to Automatic. UCPD velocity scheduled task disabled. Services already present left at their original startup values.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> TensorRT/CUDA/pip compatibility fixes: DCOM re-enabled (EnableDCOM=Y in security.yml — was "N", breaking MSI-based pip wheel installers like TensorRT). BITS service set to Automatic (was Manual — pip relies on BITS for large wheel downloads). Driver Install scheduled task kept enabled (was disabled in FINALIZE5.CMD). DriverSearching re-enabled: DriverUpdateWizardWuSearchEnabled=1, SearchOrderConfig=1, DontSearchWindowsUpdate=0. Hibernation preserved on desktop (powercfg /h off removed from DEVICES.PS1 — hiberfil.sys required for CUDA/TensorRT large contiguous memory allocations). HPET kept enabled on Intel (useplatformclock no removed — some CUDA operations depend on HPET for GPU timing precision). DisableVersionMismatchCheck removed from gaming.yml (was masking GPU driver version mismatches, preventing TensorRT from validating correct driver).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Windows Update re-enabled: ALL policy keys under Policies\Microsoft\Windows\WindowsUpdate DELETED (AUPowerManagement, DisableOSUpgrade, ExcludeWUDriversInQualityUpdate, DeferFeatureUpdates, DeferFeatureUpdatesPeriodInDays, TargetReleaseVersion, TargetReleaseVersionInfo, AUOptions, NoAUAsDefaultShutdownOption, NoAutoRebootWithLoggedOnUsers, SetUpdateNotificationLevel). DisableOSUpgrade also DELETED from WindowsStore. Any policy key presence greys out the UI toggle. IsContinuousInnovationOptedIn=1 explicitly enables "Get latest updates as soon as they're available". Users now have full control over Windows Update settings.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Fix LexBoosT Hibernation Manager.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span> Removing LexBoosT Hyper-V Manager.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span> LexBoosT ISO Compressor WIM&lt;&gt;ESD.</li>
+    </ul>
+
+    <h1 style="margin-top: 64px;">LexBoosT OS™ V26.06.1</h1>
 
     <div class="stats">
         <div class="stat"><strong>34</strong> changements</div>
@@ -339,7 +386,7 @@
 
 <footer>
     <div class="container" style="padding:0;">
-        <p>LexBoosT OS™ v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
+        <p>LexBoosT OS™ v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
     </div>
 </footer>
 
