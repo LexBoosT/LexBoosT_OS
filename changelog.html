@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -160,6 +160,107 @@
 </nav>
 
 <div class="container">
+    <h1>LexBoosT OS&#8482; V26.07</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>88</strong> changements</div>
+        <div class="stat">&#x1FA9B; <strong>56</strong> fixes</div>
+        <div class="stat">&#x2728; <strong>31</strong> improvements</div>
+        <div class="stat">&#x1F185; <strong>1</strong> new features</div>
+        <div class="stat">&#x1F4A5; <strong>0</strong> breaking changes</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Complete rewrite of the playbook from scratch.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Services: Reintegrated ~200+ services from Beta2 playbook. services.yml expanded from 48 to 331 lines (245 unique services, 0 duplicates). Categories: Telemetry, Troubleshooting, Xbox, Network, Devices, Search, System, ACPI/Power/Drivers, Hyper-V, per-user sync wildcards.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Nvidia_DLSS_GOM.bat: Complete rewrite. Default mode is now auto-download (silent). /MENU flag for interactive mode. Anti-boucle elevation guard via temp flag. Admin check uses whoami /groups (S-1-16-12288) instead of net session (which fails when LanmanServer is Manual). Temp files moved to %TEMP%.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> GPUTweaks: DLSS Updater button now passes /AUTO argument to Nvidia_DLSS_GOM.bat.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks NVIDIA tweaks: Replaced all previous tweaks with 30 individual tweaks sourced from Configure Nvidia.bat (DLSS indicator, DevTools, tray icon, power saving, runtime power mgmt, perf counters, HD audio D3Cold, RMPowerFeature, HW fault buffer, DPC queueing, engine gatings, GC6, hot plug, FBSR, L2 compression, MS hybrid, non-contiguous alloc, LRC coalescing, registry caching, D3 PC latency, compstat access, panel refresh, driver logging, nvlddmkm logging, debug features, telemetry, NvTelemetry service, ECC, HDCP).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks AMD tweaks: Added 19 individual tweaks sourced from Configure AMD.bat (light sleep, ULPS, Radeon Boost, 3D clock gating, display/media clock gating, graphics/media power gating, powerdown, ASPM, performance mode, ClkReq, FBC, UVD, tile downgrade, spread spectrum, power saver, AMD services, auto update, animations).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks: Bilingual tooltips (FrEn). All tweak names, descriptions, and detailed descriptions now display in French if system language is French, English for all other languages. Uses CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> SYSTEM_TWEAKS.PS1: GlobalTimerResolutionRequests no longer forced to 0. Left at Windows default — TimerControl app now has full control over timer resolution.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> SCHEDULED-TASKS-DISABLE.PS1: Removed ProgramDataUpdater and Microsoft Compatibility Appraiser from task list (protected by Windows, caused 10x retry + failure log spam). Fixed double UTF-8 BOM corruption.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> TELEMETRY.PS1: Removed #Requires directives (AME handles elevation). Fixed UTF-8 BOM encoding issues. Final Write-Log string moved to variable to avoid AME copy corruption of inline double-quoted strings.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> tasks.yml: Removed ProgramDataUpdater, StartupAppScan, Microsoft Compatibility Appraiser scheduled tasks (protected by Windows — AME retry spam).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> APPX-REMOVER.PS1: Added Microsoft.Windows.AugLoop.CBS to protected packages (system package used by Windows Update — always in use, removal fails with 0x80073D02). Skip S-1-5-18 (SYSTEM) SID in per-user removal loop (Remove-AppxPackage does not support SYSTEM — &quot;Value is not within the expected range&quot;). Removed AugLoop.CBS from APPX-REMOVE-LIST.TXT.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LOW-LATENCY-PROFILE.PS1: ViVeTool now bundled locally in Executables\LexBoosTOS\Utilities\ViVeTool\ (4 files: ViVeTool.exe, Albacore.ViVe.dll, FeatureDictionary.pfs, Newtonsoft.Json.dll). Script uses local copy instead of downloading from GitHub. Falls back gracefully if not found (exit 0). Works offline.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> writeStatus: All 50+ writeStatus strings in YAML files shortened to maximum 25 characters for AME UI compatibility.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DEVICES.PS1 Configure-Ntfs: powercfg disk power settings now query GUID existence before applying (powercfg -query SCHEME_CURRENT SUB_DISK &lt;GUID&gt;). Eliminates &quot;The specified power management mode, subgroup, or setting does not exist&quot; errors for GUIDs not present in the current power scheme.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> services.yml ACPI/POWER/DRIVERS: All 16 services (acpipagr, AcpiPmi, acpitime, acpiex, intelpmt, PRM, WmiAcpi, bam, dam, iorate, fvevol, rdyboost, Dfsc, bowser, mrxsmb, mrxsmb20) changed from Disabled (4) to Manual (3). Devices can start when needed instead of being permanently disabled.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> services.yml: Added rdpbus (RDP Device Redirector Bus), CompositeBus (Composite Bus Enumerator), umbus (UMBus Root Bus Enumerator) as Manual (3).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> services.yml Hyper-V: HvHost and all 9 vmic* guest services changed from Automatic (2) to Manual (3). Only needed inside VMs.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DISM-FEATURES.PS1: Removed MSRDC-Infrastructure from disabled features list. Was removing the RDP Bus Redirector device (rdpbus). Now preserved.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Ram Cleaner: Scheduled task replaces shell:startup shortcut. Start with Windows now uses task scheduler trigger with -minimized for silent tray startup. No more UAC after initial setup.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> network.yml: NETSH-EXTRAS.PS1 and NETWORK-EXTRAS2.PS1 merged into NETWORK-EXTRAS.PS1. Single execution point for RSS/NetBIOS/QoS/SMB/LanmanServer/Maintenance.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> KILL_PROCESSES.PS1: added new process names `TodoListManager` and `LexBoosT_Ram_Cleaner` (old `TodoGUI_Pro` / `LexBoosTRamCleaner` kept for compatibility).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> custom.yml: `powercfg /h /type reduced` now checks return code and skips gracefully when hibernation is disabled by secure policy / S0 modern standby.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> EDGE-LATENCY.PS1: skips user hives already loaded (logged-on user) instead of failing with &quot;file in use&quot; on `reg load`.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> NETWORK-EXTRAS.PS1: scheduled task disable now checks task existence and exit code before logging success, avoids false positives on systems without MaintenanceConfigurator/IdleMaintenance/RegularMaintenance.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT HideIcons Desktop: Scheduled task replaces shell:startup shortcut. Start with Windows now uses task scheduler trigger with -minimized for silent tray startup. No more UAC after initial setup.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Todo List Manager: Scheduled task replaces shell:startup shortcut. Start with Windows now uses task scheduler trigger with -minimized for silent tray startup. No more UAC after initial setup.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: HvHost service set to Automatic (was Manual). Ensures Hyper-V host infrastructure always starts.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: 9 vmic* guest integration services set to Automatic (vmicguestinterface, vmicheartbeat, vmickvpexchange, vmicrdv, vmicshutdown, vmictimesync, vmicvmsession, vmicvss, vmvss). Prevents broken triggers from blocking guest heartbeat/time sync/shutdown/VSS.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: TermService (Remote Desktop) set to Manual instead of Disabled. Preserves Hyper-V Enhanced Session Mode (clipboard sharing, drive redirection, audio passthrough in VMConnect).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: NDIS WatchDog re-enabled (DisableNDISWatchDog=0). Hyper-V virtual switches (vEthernet) depend on NDIS for network recovery on driver hangs.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: SvcHostSplitDisable now excludes Hyper-V services (vmic|vmms|vmcompute|HvHost|nvspwmi|vmwp). Prevents Hyper-V services from sharing svchost with non-Hyper-V services, preserving isolation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: Windows Containers CmCleanup scheduled task left enabled (was disabled in FINALIZE5.CMD). Prevents orphaned container layer accumulation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Hyper-V Compatibility: DMA enumeration policy block removed from FINALIZE1.CMD. Prevents interference with Hyper-V Discrete Device Assignment (DDA) for PCIe passthrough.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> SYSTEM_TWEAKS.PS1: TimeSlip changed from 1 to 0. Undocumented kernel key — value 1 caused clock drift on some chipsets. Reverted to Windows default (stable).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> appx.yml: 9 media codecs excluded from debloat (WebMedia, RawImage, HEIF, HEVC, VP9, AV1, AVC Encoder, MPEG2, WebpImage). Removal prevented opening common photo/video formats without manual reinstall.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> services.yml: VERIFY-SERVICES.PS1 script added at end of phase. Validates 67 critical services (40 Disabled + 27 Auto) are in expected state after configuration. Logs mismatches without blocking the playbook.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> system.yml (new): Fault Tolerant Heap disabled (HKLM + WOW6432Node). FTH throttles apps 10-50x after 5+ crashes — disabled, crashing apps just crash without performance degradation on next launch.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> explorer.yml: ForegroundLockTimeout=0 (HKCU + .DEFAULT). Prevents background apps from stealing focus while typing in another window.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> explorer.yml: AlwaysUnloadDll=1. Explorer frees RAM from unused DLLs instead of keeping them cached.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> gaming.yml: Fullscreen Optimizations disabled (GameDVR_FSEBehaviorMode=2, GameDVR_HonorUserDSEBehaviorMode=1). Restores true Fullscreen Exclusive (DWM bypassed) to reduce input lag in games.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> dwm.yml: MaxQueuedPresentBuffers 2→3 (Windows default). Fixes upside-down desktop icons during drag-and-drop. FrameLatency removed (undocumented key interfering with DWM buffer synchronization).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> explorer.yml: FR regional format block removed (sShortDate, sDecimal, iFirstDayOfWeek, etc.). Was forcing FR format for all users, breaking US, Chinese and other locales.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> custom.yml + system.yml: Fast Startup enabled with reduced hiberfil (powercfg /h /type reduced, FastBoot=1). hiberfil.sys at ~20% of RAM instead of 40-75%. Eliminates black screen with spinner before logon, without sacrificing too much disk space.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> MSA Login Chain: NoGenTicket HKCU+HKLM set to 0 (was 1). Half-disabled Microsoft Account chain (TokenBroker/wlidsvc ON but NoGenTicket/CloudExperienceHost/Provisioning tasks OFF) broke login for MSA users without local password. Restored coherent MSA support.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> CloudExperienceHostOOBE AutoLogger: removed forced Start=0 (telemetry.yml). Required for MSA OOBE login flow.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Scheduled Tasks MSA: Provisioning\Logon, CloudExperienceHost\CreateObjectTask, AccountHealth\RecoverabilityToastTask no longer disabled (FINALIZE5.CMD). Required for MSA login/recovery.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> GlobalTimerResolutionRequests comment clarified in FINALIZE1.CMD: enables NtSetTimerResolution API (does NOT set 0.5ms itself — that&#39;s done by SetTimerResolution.exe).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Defender Manager: VBS/HVCI, hypervisor, LSA RunAsPPL, and VulnerableDriverBlocklist removed from Optimized script (CreateOptimizeScript). Optimized mode now ONLY disables Defender features — all boot-critical security features (VBS, HVCI, hypervisor, LSA, driver blocklist) are preserved. Zero conflict with playbook VBS=ON policy.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Defender Manager: Smart App Control (VerifiedAndReputableTrustModeEnabled, SmartLockerMode, SMARTLOCKER, VerifiedAndReputablePolicyState) removed from BOTH Optimized and Default scripts. SAC is a one-time OOBE decision — forcing it in either direction is irreversible without Windows reinstall. PUAProtection kept (independent feature).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> LexBoosT Defender Manager: Safe Mode reboot flow hardened — user is asked for restart confirmation BEFORE bcdedit /set safeboot is written. If user cancels, the RunOnce script entry is cleaned up (reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce) so next manual boot stays normal. Previously safeboot was written before the dialog, making &quot;No&quot; misleading.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> VBS settings: Defender Manager &quot;Optimized&quot; incompatibility warning removed — no longer applicable since Optimized does not touch VBS/HVCI. (vbs.yml removed — VBS settings now managed by LexBoosT Defender Manager)</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks: ApplyTweak now checks WriteDwordValue return value. If registry write fails, the key is skipped (continue) and not added to backup — prevents silent failures where backup is saved but value was never written.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> TimerControl: TimerDefaultValue changed from 5200 (0.520ms) to 5000 (0.500ms). Default timer resolution now matches the minimum value (TimerMinValue=5000).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> FINALIZE1.CMD: GlobalTimerResolutionRequests registry key no longer forced by playbook. Timer resolution is now configured exclusively via TimerControl app — playbook stays neutral, user controls everything from the TimerControl UI.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Force Timer Resolution.xml: default --resolution argument updated from 5200 to 5000 in the scheduled task template.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks: Revert now restores original registry values instead of deleting everything. Original state persisted to C:\ProgramData\LexBoosTOS\GPUTweaks\&lt;vendor&gt;\&lt;tweak&gt;.json before Apply.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> TimerControl: unified schtasks /delete path (removed double backslash). DisableTimerResolution now checks task deletion result and returns warning on failure instead of silent &quot;success&quot;.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> TimerControl: StopMonitoring no longer hardcodes 0.5080ms — queries actual timer resolution via NtQueryTimerResolution.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> TimerControl: DisableButton_Click now checks for Error/Failed in result before showing Success dialog.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Added Themed Terminal in option in AME.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> SYSTEM_TWEAKS.PS1: SearchIndexer.exe, RuntimeBroker.exe, backgroundTaskHost.exe, and sihost.exe CpuPriorityClass raised to 3 (Normal) to fix empty Start Menu search results on Windows 11 25H2/26H2.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Laptop detected: skipping max refresh-rate enforcement. Set your preferred refresh rate manually in Settings or GPU driver panel.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> gaming.yml: removed tearing/VSync-breaking keys (AllowTearing=1, QueuedPresentLimit=1, DisableBoostedVSyncVirtualization=1, GameDVR_FSEBehaviorMode=2). Fixes broken FPS limiters, V-Sync and screen tearing reported by users.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> dwm.yml: removed UseCopyOnPresent=1 and reduced DWM tweaking (DWM_MAX_BUFFER_AGE, DWM_TRIPLE_BUFFER, OverlayMinFPS removed). Restores stable DWM presentation.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> GPUTweaks: removed &#39;Disable MPO&#39; tweak and MPO mention from Low Latency Tweaks. MPO/OverlayTestMode is a Windows-wide tweak and is out of scope for a GPU-vendor-only utility.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> GPUTweaks .nip profiles: VRR/G-SYNC and Vertical Sync values aligned between standard and G-SYNC profiles. Standard profile keeps application-controlled VSync; G-SYNC profile keeps VSync ON + Smooth V-Sync.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks: NVIDIA FTS keys now written to both `HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\FTS` and `\Parameters\FTS` for compatibility with old and new NVIDIA drivers (post-581.15 moved FTS).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> GPUTweaks: RmGpsPsEnablePerCpuCoreDpc now written to five locations (GraphicsDrivers, nvlddmkm, nvlddmkm\NVAPI, nvlddmkm\Global\NVTweak, GraphicsDrivers\Power) per community reference scripts.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Updates LexBoosT Todo List Manager, LexBoosT Ram Cleaner Pro and LexBoosT Desktop Icons Toggle: Removal of the application&#39;s minimize button and the Close button puts the application in the notification area.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Update LexBoosT Tools Launcher to v2.4: Allows you to launch the application in the notification area, search for automatic updates at startup or depending on the time you give it. The Close button also puts the application in the notification area.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Revert ifeo changes.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> GPUTweaks: Added NVIDIA Control Panel download button.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> LexBoosT Discord Debloater: &quot;Debloat&quot; button replaced by &quot;Optimize&quot;: settings.json tweaks (SKIP_HOST_UPDATE, HW accel/auto-start deactivation), keep-list module (core/modules/utils/voice), cleaning caches/logs/crashpad, deletion of old app-* versions, deactivation of Windows startup, IFEO CpuPriorityClass=3 (Above Normal).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> BCD optimizations: Set-BcdOptimizations rewritten with per-CPU conditional logic. Applies disabledynamictick=yes, deletes useplatformclock/useplatformtick, plus disableelamdrivers, isolatedcontext No, nx optin, bootmenupolicy Legacy. Skips dynamic tick disable on AMD 3D V-Cache dual-CCD (&gt;8 cores) to preserve Windows CCD coordination.</li>
+        <li><span class="tag tag-new">🆕 NEW</span> Added LexBoosT Game Governor utility.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Updated LexBoosT Timer Resolution Manager with integrated xperf DPC/ISR test.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> SCHEDULED-TASKS-DISABLE.PS1 (new): Consolidated scheduled task disabler. 207 tasks + Office wildcard + PS cmdlet tasks (USO_UxBroker, UCPD velocity, DeviceDirectoryClient unregister) in a single script. Query-before-disable pattern — no errors logged for absent tasks. Summary counters (disabled/already disabled/not found/failed).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> FINALIZE5.CMD: 230 schtasks /Disable lines removed (consolidated into SCHEDULED-TASKS-DISABLE.PS1). Kept WINEVT channel disable, QoS Bufferbloat task creation, Driver Install /Enable, and WU Orchestrator registry cleanup.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> NETWORK-EXTRAS.PS1: TaskScheduler section removed (MaintenanceConfigurator, IdleMaintenance, RegularMaintenance moved to SCHEDULED-TASKS-DISABLE.PS1).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> DISABLE_OFFICE_TASKS.PS1: Deleted. Office wildcard disable moved to SCHEDULED-TASKS-DISABLE.PS1.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> final.yml: DISABLE_OFFICE_TASKS.PS1 reference replaced by SCHEDULED-TASKS-DISABLE.PS1 (weight 50→200).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> telemetry.yml: 11 additional privacy/telemetry keys — Font Providers, Handwriting Error Reporting, Wi-Fi Sense, NCSI Passive Polling, OneDrive Camera Roll Upload, Startup Telemetry, Store Telemetry, WinSAT, Shared PC Mode, PointAndPrint hardening, IE SQM. No breakage — each key disables a specific telemetry channel.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> telemetry.yml: 2 WER extras (DisableWerSendSecondLevelReports, DWEnabled/DrWatson) + 10 Microsoft Edge privacy policies (UsageTracking, MetricsReporting, NetworkPrediction, SwitchToTab sharing, TrackingPrevention=Strict, SearchSuggest, Collections transmission, PersonalizationReporting). No-op if Edge is removed; reinforces privacy if reinstalled.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Re added defender cpu usage tweaks.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span> Theme application fix.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Improved LexBoosT Packages Manager. Added checkbox for start with windows.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span> Improved Notepad++ VSCode Theme Installer.</li>
+    </ul>
+
     <h1>LexBoosT OS™ V26.06.2</h1>
 
     <div class="stats">
@@ -386,7 +487,7 @@
 
 <footer>
     <div class="container" style="padding:0;">
-        <p>LexBoosT OS™ v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
+        <p>LexBoosT OS™ v26.07 / v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
     </div>
 </footer>
 
