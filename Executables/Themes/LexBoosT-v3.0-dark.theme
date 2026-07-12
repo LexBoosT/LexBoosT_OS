@@ -1,46 +1,43 @@
 [Theme]
-DisplayName=LexBoosT™ v3.0 Dark
+DisplayName=LexBoosT v3.0 Dark
 ThemeId={FB5C68CD-E525-4324-9830-18BFE1746747}
 SetLogonBackground=0
 
 [Control Panel\Desktop]
-Wallpaper=%windir%\Web\Wallpaper\LexBoosTOS\v3\desktop.jpg
+Wallpaper=C:\Windows\Web\Wallpaper\LexBoosTOS\v3\desktop.jpg
 Pattern=
 MultimonBackgrounds=0
 PicturePosition=4
 
 [LockScreen]
-Wallpaper=%windir%\Web\Wallpaper\LexBoosTOS\v3\lockscreen.jpg
+Wallpaper=C:\Windows\Web\Wallpaper\LexBoosTOS\v3\lockscreen.jpg
 
 [Control Panel\Cursors]
-AppStarting=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\working-in-background.ani
-Arrow=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\normal-select.cur
-Hand=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\link-select.cur
-Help=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\help-select.cur
-No=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\unavailable.cur
-NWPen=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\handwriting.cur
-SizeAll=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\move.cur
-SizeNESW=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\diagonal-resize-2.cur
-SizeNS=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\vertical-resize.cur
-SizeNWSE=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\diagonal-resize-1.cur
-SizeWE=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\horizontal-resize.cur
-UpArrow=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\alt-select.cur
-Wait=%windir%\LexBoosTOS\Resources\LexCursorsApp\Colloid\busy.ani
-DefaultValue=LexBoosT™ Capitain
-DefaultValue.MUI=@main.cpl,-1020
+AppStarting=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\working-in-background.ani
+Arrow=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\normal-select.cur
+Crosshair=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\precision-select.cur
+Hand=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\link-select.cur
+Help=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\help-select.cur
+IBeam=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\text-select.cur
+No=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\unavailable.cur
+NWPen=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\handwriting.cur
+SizeAll=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\move.cur
+SizeNESW=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\diagonal-resize-2.cur
+SizeNS=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\vertical-resize.cur
+SizeNWSE=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\diagonal-resize-1.cur
+SizeWE=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\horizontal-resize.cur
+UpArrow=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\alt-select.cur
+Wait=C:\Windows\LexBoosTOS\Resources\LexCursorsApp\Colloid\busy.ani
 
 [VisualStyles]
-Path=%windir%\resources\themes\Aero\Aero.msstyles
+Path=C:\Windows\Resources\Themes\aero\aero.msstyles
 ColorStyle=NormalColor
 Size=NormalSize
 AutoColorization=0
-ColorizationColor=0xFF4A90E2
+ColorizationColor=0xB631FF
 SystemMode=Dark
 AppMode=Dark
 VisualStyleVersion=10
 
 [MasterThemeSelector]
 MTSM=RJSPBS
-
-[Sounds]
-SchemeName=@%SystemRoot%\System32\mmres.dll,-800

@@ -37,11 +37,11 @@ actions:
       path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
       value: "Model",
       type: REG_SZ,
-      data: "LexBoosT OS™ 26.06",
+      data: "LexBoosT OS™ 26.07",
     }
   - !registryValue: {
       path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation',
       value: "RegisteredOrganization",
       type: REG_SZ,
-      data: "LexBoosT OS™ 26.06",
+      data: "LexBoosT OS™ 26.07",
     }

@@ -1,0 +1,47 @@
+---
+title: Power
+description: Power tweaks — registry/commands migrated to DEVICES.PS1 (Configure-RegistryPowerTweaks) and DISABLE-DEVICE-POWER-SAVING.CMD
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Power Tweaks'}
+
+  # ============================================
+  # Disable device power saving (USB selective suspend)
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\DISABLE-DEVICE-POWER-SAVING.CMD'
+      runas: currentUserElevated
+      wait: true
+
+  # ============================================
+  # Privileged registry tweaks (USB LPM, etc.)
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\PRIVILEGED-REGISTRY-TWEAKS.CMD'
+      wait: true
+
+  # ============================================
+  # All 50+ power registry tweaks migrated to DEVICES.PS1
+  # (Configure-RegistryPowerTweaks — was power.yml)
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES.PS1" -Device @("Configure-RegistryPowerTweaks")'
+      runas: currentUserElevated
+      wait: true
+      weight: 8
+
+  # ============================================
+  # HID device wake disable
+  # ============================================
+  - !status: {status: 'Disabling HID Device Wake'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DISABLE-HIDDEVICEWAKE.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

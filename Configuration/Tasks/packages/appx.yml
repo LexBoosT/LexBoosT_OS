@@ -1,162 +1,30 @@
 ---
-title: APPX
-description: Removal of APPX packages
+title: AppX
 privilege: TrustedInstaller
 actions:
-  - !status: {
-      status: "Removing Appx Packages",
-      option: "remove-appx-packages",
-      onUpgrade: false,
-    }
-  - !powerShell:
-    option: "remove-appx-packages"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 48
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages @(
-        'Microsoft.Windows.SecureAssessmentBrowser',
-        'Microsoft.Windows.PeopleExperienceHost',
-        'Microsoft.WindowsCamera',
-        'Microsoft.WindowsAlarms',
-        'Microsoft.WindowsMaps',
-        'Microsoft.MicrosoftStickyNotes',
-        'Microsoft.WindowsCommunicationsApps',
-        'Microsoft.People',
-        'Microsoft.BingNews',
-        'Microsoft.BingWeather',
-        'Microsoft.BingSearch',
-        'Microsoft.MicrosoftSolitaireCollection',
-        'Microsoft.GetHelp',
-        'Microsoft.Getstarted',
-        'Microsoft.Todos',
-        'MicrosoftCorporationII.QuickAssist',
-        'MicrosoftCorporationII.MicrosoftFamily',
-        'Microsoft.WindowsSoundRecorder',
-        'Clipchamp.Clipchamp',
-        'Microsoft.Whiteboard',
-        'Microsoft.MicrosoftTeamsforSurfaceHub',
-        'MicrosoftCorporationII.MailforSurfaceHub',
-        'Microsoft.PowerAutomateDesktop',
-        'Microsoft.MicrosoftPowerBIForWindows',
-        'Microsoft.SkypeApp',
-        'Microsoft.MicrosoftOfficeHub',
-        'Microsoft.Office.Excel',
-        'Microsoft.Office.PowerPoint',
-        'Microsoft.Office.Word',
-        'Microsoft.Office.OneNote',
-        'Microsoft.WebMediaExtensions',
-        'Microsoft.RawImageExtension',
-        'Microsoft.HEIFImageExtension',
-        'Microsoft.HEVCVideoExtension',
-        'Microsoft.VP9VideoExtensions',
-        'Microsoft.AV1VideoExtension',
-        'Microsoft.AVCEncoderVideoExtension',
-        'Microsoft.MPEG2VideoExtension',
-        'Microsoft.WebpImageExtension',
-        'SpotifyAB.SpotifyMusic',
-        'Flipgrid',
-        'Microsoft.Microsoft3DViewer',
-        'Microsoft.Advertising',
-        'MixedReality.Portal',
-        'Microsoft.MSPaint',
-        'MicrosoftTeams',
-        'MSTeams',
-        'LinkedIn.LinkedIn',
-        'Ink.Handwriting.Main.Store.en-US1.0',
-        'LinkedInCorporation.LinkedInforWindows',
-        'Microsoft.WindowsFeedbackHub',
-        'Microsoft.Windows.Client.AIX',
-        'Microsoft.Copilot',
-        'Microsoft.Copilot_8wekyb3d8bbwe',
-        'Microsoft.CopilotPro',
-        'Microsoft.Windows.Ai.Copilot.Provider',
-        'Microsoft.CopilotGrowth',
-        'MicrosoftWindows.Client.Copilot'
-      ) -Force
+  - !status: {status: 'Removing AppX'}
 
-  - !status: {
-      status: "Removing Music",
-      option: "remove-appx-music",
-    }
-  - !powerShell:
-    option: "remove-appx-music"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 10
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages 'Microsoft.ZuneMusic' -Force
+  - !taskKill: {name: 'msteams*', ignoreErrors: true}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications', value: 'ConfigureChatAutoInstall', data: '0', type: REG_DWORD}
 
-  - !status: {
-      status: "Removing Video",
-      option: "remove-appx-video",
-    }
-  - !powerShell:
-    option: "remove-appx-video"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 10
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages 'Microsoft.ZuneVideo' -Force
+  # ============================================
+  # Full AppX debloat — handled by APPX-REMOVER.PS1
+  # Package list is read from APPX-REMOVE-LIST.TXT (single source of truth).
+  # ============================================
+  - !status: {status: 'Removing AppX Packages'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPX-REMOVER.PS1" -PackageCsv ".\Scripts\APPX-REMOVE-LIST.TXT" -AppxOnly -Force'
+      runas: currentUserElevated
+      wait: true
+      weight: 100
 
-  - !status: {
-      status: "Removing Outlook",
-      option: "remove-appx-outlook",
-    }
-  - !powerShell:
-    option: "remove-appx-outlook"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 10
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages 'Microsoft.OutlookForWindows' -Force -AppxOnly
-
-  - !powerShell:
-    option: "remove-appx-outlook"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 10
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages 'Microsoft.OutlookPWA' -Force -AppxOnly
-
-  - !status: {
-      status: "Removing Dev Home",
-      option: "remove-appx-devhome",
-    }
-  - !powerShell:
-    option: "remove-appx-devhome"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 10
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages 'Microsoft.Windows.DevHome' -Force
-
-  - !status: {
-      status: "Removing Your Phone",
-      option: "remove-appx-yourphone",
-    }
-  - !powerShell:
-    option: "remove-appx-yourphone"
-    runas: currentUserElevated
-    wait: true
-    exeDir: true
-    errorAction: Ignore
-    weight: 20
-    command: >-
-      .\\Scripts\\Cleanup\\APPX-REMOVER.PS1 -Packages @(
-        'Microsoft.YourPhone',
-        'MicrosoftWindows.CrossDevice'
-      ) -Force
-
+  # Disable CrossDeviceResume scheduled task (specific to that feature)
+  - !status: {status: 'Disabling CrossDevice'}
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\CROSSDEVICERESUME.CMD'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

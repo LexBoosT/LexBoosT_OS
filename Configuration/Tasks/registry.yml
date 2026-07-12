@@ -1,245 +1,75 @@
 ---
 title: Registry
-description: LexBoosT OS™ registry configuration
+description: LexBoosT OS registry configuration
 privilege: TrustedInstaller
 actions:
   # ============================================
-  # PHASE 1: OS INFORMATION
+  # PHASE 1: OS INFORMATION (Branding)
   # ============================================
-  - !status: {
-      status: "Config OS Info",
-    }
-  - !task: {
-      path: 'Tasks\registry\os-info\edition.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\os-info\oem-info.yml',
-    }
+  - !status: {status: 'Config OS Info'}
+  - !task: {path: 'Tasks\registry\os-info\edition.yml'}
+  - !task: {path: 'Tasks\registry\os-info\oem-info.yml'}
 
   # ============================================
-  # PHASE 2: EXPLORER CONFIGURATION
+  # PHASE 2: EXPLORER
   # ============================================
-  - !status: {
-      status: "Config Explorer",
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\explorer.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\context-menu.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\control-panel.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\notifications.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\search.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\start-menu.yml',
-      onUpgrade: false,
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\taskbar.yml',
-      onUpgrade: false,
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\view.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\mouse-keyboard.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\explorer\win-settings.yml',
-    }
-
-  # ============================================
-  # PHASE 3: PRIVACY SETTINGS
-  # ============================================
-  - !status: {
-      status: "Config Privacy",
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\privacy.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\app-compat.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\cdm.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\ceip.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\cloud-content.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\telemetry.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\privacy\wer.yml',
-    }
-
-  # ============================================
-  # PHASE 4: SECURITY SETTINGS
-  # ============================================
-  - !status: {
-      status: "Config Security",
-    }
-  - !task: {
-      path: 'Tasks\registry\security\security.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\bitlocker.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\vulnerable-driver-blocklist.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\storage-security.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\adobe-security.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\office-security.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\security\vbs.yml',
-    }
-
-  # ============================================
-  # PHASE 5: SYSTEM OPTIMIZATIONS
-  # ============================================
-  - !status: {
-      status: "Config System",
-    }
-  - !task: {
-      path: 'Tasks\registry\system\boot.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\bypass-requirements.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\disable-automatic-maintenance.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\ifeo.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\system-process-performance-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\kernel.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\logon.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\power.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\win32ps.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\audio-latency.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\irq.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\disable-modern-standby.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\memory-management-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\advanced-system-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\gaming.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\dwm-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\timer-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\usb-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\shutdown-speed.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\realtime-clock.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\extreme-performance-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\network-performance-optimization.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\ndis.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\system\additional-performance-optimization.yml',
-    }
-
-  # ============================================
-  # PHASE 6: WINDOWS UPDATE
-  # ============================================
-  - !status: {
-      status: "Config Updates",
-    }
-  - !task: {
-      path: 'Tasks\registry\updates\updates.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\updates\drivers.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\updates\ms-store.yml',
-    }
-
-  # ============================================
-  # PHASE 7: MISCELLANEOUS
-  # ============================================
-  - !status: {
-      status: "Config Miscellaneous",
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\deprovisioned-apps.yml',
-      onUpgrade: false,
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\disable-installing-teams.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\disable-logging.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\enable-audio-communications-do-nothing.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\fixes.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\msi-installer-in-safe-mode.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\limit-defender-usage.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\disable-storage-sense.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\disable-AI-programs.yml',
-    }
-  - !task: {
-      path: 'Tasks\registry\misc\remove-efi-drive-letter.yml',
-    }
+  - !status: {status: 'Config explorer'}
+  - !task: {path: 'Tasks\registry\explorer.yml'}
+  - !status: {status: 'Config search'}
+  - !task: {path: 'Tasks\registry\search.yml'}
+  - !status: {status: 'Config notifications'}
+  - !task: {path: 'Tasks\registry\notifications.yml'}
+  - !status: {status: 'Config gamebar'}
+  - !task: {path: 'Tasks\registry\gamebar.yml'}
+  - !status: {status: 'Config clipboard'}
+  - !task: {path: 'Tasks\registry\clipboard.yml'}
+  - !status: {status: 'Config themes'}
+  - !task: {path: 'Tasks\registry\themes.yml'}
+  - !status: {status: 'Config mouse'}
+  - !task: {path: 'Tasks\registry\mouse.yml'}
+  - !status: {status: 'Config keyboard'}
+  - !task: {path: 'Tasks\registry\keyboard.yml'}
+  - !status: {status: 'Config accessibility'}
+  - !task: {path: 'Tasks\registry\accessibility.yml'}
+  - !status: {status: 'Config dwm'}
+  - !task: {path: 'Tasks\registry\dwm.yml'}
+  - !status: {status: 'Config sounds'}
+  - !task: {path: 'Tasks\registry\sounds.yml'}
+  - !status: {status: 'Config ntfs'}
+  - !task: {path: 'Tasks\registry\ntfs.yml'}
+  - !status: {status: 'Config bcdedit'}
+  - !task: {path: 'Tasks\registry\bcdedit.yml'}
+  - !status: {status: 'Config gaming'}
+  - !task: {path: 'Tasks\registry\gaming.yml'}
+  - !status: {status: 'Config power'}
+  - !task: {path: 'Tasks\registry\power.yml'}
+  - !status: {status: 'Config mobsync'}
+  - !task: {path: 'Tasks\registry\mobsync.yml'}
+  - !status: {status: 'Config audio'}
+  - !task: {path: 'Tasks\registry\audio.yml'}
+  - !status: {status: 'Config graphics'}
+  - !task: {path: 'Tasks\registry\graphics.yml'}
+  - !status: {status: 'Config explorer menu'}
+  - !task: {path: 'Tasks\registry\explorermenu.yml'}
+  - !status: {status: 'Config location'}
+  - !task: {path: 'Tasks\registry\location.yml'}
+  - !status: {status: 'Config broker'}
+  - !task: {path: 'Tasks\registry\broker.yml'}
+  - !status: {status: 'Config remote'}
+  - !task: {path: 'Tasks\registry\remote.yml'}
+  - !status: {status: 'Config systemservices'}
+  - !task: {path: 'Tasks\registry\systemservices.yml'}
+  - !status: {status: 'Config security', onUpgrade: false}
+  - !task: {path: 'Tasks\registry\security.yml', onUpgrade: false}
+  - !status: {status: 'Config system', onUpgrade: false}
+  - !task: {path: 'Tasks\registry\system.yml', onUpgrade: false}
+  - !status: {status: 'Config network'}
+  - !task: {path: 'Tasks\registry\network.yml'}
+  - !status: {status: 'Config software', onUpgrade: false}
+  - !task: {path: 'Tasks\registry\software.yml', onUpgrade: false}
+  - !status: {status: 'Config ceip'}
+  - !task: {path: 'Tasks\registry\ceip.yml'}
+  - !status: {status: 'Config telemetry'}
+  - !task: {path: 'Tasks\registry\telemetry.yml'}
+  - !status: {status: 'Config misc'}
+  - !task: {path: 'Tasks\registry\misc.yml'}

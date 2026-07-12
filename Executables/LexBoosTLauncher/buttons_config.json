@@ -31,7 +31,7 @@
     },
     {
       "name": "LexBoosT Ram Cleaner Pro",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosTRamCleaner.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Ram_Cleaner.exe",
       "category": "Performance",
       "tooltip": "Free up RAM and improve system performance",
       "tooltipFr": "Libérer de la RAM et améliorer les performances système"
@@ -107,13 +107,6 @@
       "tooltipFr": "Activer ou désactiver la mise en hibernation Windows"
     },
     {
-      "name": "LexBoosT Hyper-V Manager",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\HyperV_Manager.exe",
-      "category": "System",
-      "tooltip": "Manage Hyper-V settings (Valorant, FaceIt and other kernel-level anti-cheats will no longer work with Hyper-V cut)",
-      "tooltipFr": "Gérer les paramètres Hyper-V (Valorant, FaceIt et autres anti-trich au niveau du noyau ne fonctionneront plus avec Hyper-V coupé)"
-    },
-    {
       "name": "Windows Update Mini Tool",
       "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\WindowsUpdateMiniTool\\wumt_x64.exe",
       "category": "System",
@@ -141,9 +134,9 @@
       "tooltip": "Remove-Restore language bar keyboard shortcut and language bar visibility",
       "tooltipFr": "Supprimer-Restaurer le raccourci clavier et la visibilité de la barre de langue"
     },
-    {
+	{
       "name": "LexBoosT Drive-Folder Compactor",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Lex_Compactor.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Drive_Compactor.exe",
       "category": "System",
       "tooltip": "Compress drives and folders to save disk space",
       "tooltipFr": "Compresser les lecteurs et dossiers pour économiser de l'espace"
@@ -248,17 +241,10 @@
     },
     {
       "name": "LexBoosT Todo List Manager Pro",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\TodoGUI_Pro.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\TodoListManager.exe",
       "category": "Utilities",
       "tooltip": "Manage your tasks and todo lists efficiently",
       "tooltipFr": "Gérer vos tâches et listes de choses à faire efficacement"
-    },
-    {
-      "name": "LexBoosT ISO Compressor WIM<>ESD",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\ISO_Compressor\\LexBoosT_Windows_Iso_Compressor.exe",
-      "category": "Utilities",
-      "tooltip": "Compress Windows ISO files to save disk space or Make bootable Windows Iso Folder",
-      "tooltipFr": "Compresser les ISO Windows pour économiser de l'espace ou créer un ISO Windows amorçable"
     },
     {
       "name": "LexBoosT Images Compressor & Crop",
@@ -327,10 +313,17 @@
     },
     {
       "name": "LexBoosT Discord Debloater",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Discord_Debloat.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Discord_Debloater.exe",
       "category": "Security & Cleanup",
-      "tooltip": "Remove Discord bloatware and optimize performance",
-      "tooltipFr": "Supprimer les éléments superflus de Discord et optimiser les performances"
+      "tooltip": "Manage gaming profiles and optimize system services for lower latency",
+      "tooltipFr": "Gérer les profils de jeu et optimiser les services système pour réduire la latence"
+    },
+	  {
+      "name": "LexBoosT Game Governor",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_GameGovernor.exe",
+      "category": "Performance",
+      "tooltip": "Manage gaming profiles and optimize system services for lower latency",
+      "tooltipFr": "Gérer les profils de jeu et optimiser les services système pour réduire la latence"
     },
     {
       "name": "Lex Snake",

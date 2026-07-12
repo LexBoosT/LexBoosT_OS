@@ -1,0 +1,63 @@
+---
+title: LexBoosT OS™ 26.07
+description: Applies LexBoosT OS™ 26.07 configuration tasks, including registry tweaks, service tweaks, and system tweaks
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Starting Playbook Setup'}
+
+  - !status: {
+      status: "LexBoosT OS™ 26.07",
+    }
+
+  # ============================================
+  # PRE-INSTALL: System scan for AME Wizard log
+  # ============================================
+  - !powerShell: {
+      command: '.\Scripts\SYSTEM-SCAN.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      ignoreErrors: true,
+      weight: 50,
+    }
+
+  - !status: {status: 'Disabling sleep'}
+  - !powerShell:
+    command: >-
+      powercfg /x monitor-timeout-ac 0;
+      powercfg /x monitor-timeout-dc 0;
+      powercfg /x standby-timeout-ac 0;
+      powercfg /x standby-timeout-dc 0;
+      powercfg /x disk-timeout-ac 0;
+      powercfg /x disk-timeout-dc 0;
+      powercfg /x hibernate-timeout-ac 0;
+      powercfg /x hibernate-timeout-dc 0;
+
+  - !powerShell: {command: '$env:PATH="$([Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory());$env:PATH";foreach($a in [AppDomain]::CurrentDomain.GetAssemblies()){if($a.Location){[void](ngen install $a.Location /nologo 2>&1);[IO.Path]::GetFileName($a.Location)}}'}
+
+  - !taskKill: {
+      name: "explorer",
+      errorAction: Ignore,
+    }
+
+tasks:
+  # Phase 1: Pre-setup / initialization
+  - Tasks\setup.yml
+
+  # Phase 2: Security hardening / debloat
+  - Tasks\registry\security.yml
+
+  # Phase 3: AppX, features, scheduled tasks, OneDrive, Edge removal
+  - Tasks\packages.yml
+
+  # Phase 4: Service configuration
+  - Tasks\services.yml
+
+  # Phase 5: Registry tweaks by category
+  - Tasks\registry.yml
+
+  # Phase 6: Final cleanup
+  - Tasks\final.yml
+
+  # Phase 7: Utilities (HKCU hive propagation, rollback, max refresh, network extras, power extras)
+  - Tasks\utilities.yml

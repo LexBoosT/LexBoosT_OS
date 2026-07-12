@@ -1,4 +1,9 @@
 @echo off
+net session >nul 2>&1
+if %errorLevel% neq 0 (
+    PowerShell -Command "Start-Process cmd.exe -ArgumentList '/c \"%0\"' -Verb RunAs"
+    exit
+)
 echo ========================================
 echo  COMPLETE WINDOWS ICON CACHE CLEANING
 echo ========================================

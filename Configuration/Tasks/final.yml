@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: Finalization
 description: Applies LexBoosT OS™ final configurations
 privilege: TrustedInstaller
 actions:
@@ -7,23 +7,24 @@ actions:
   # PHASE 1: TIME & SYSTEM CONFIGURATION
   # ============================================
   - !powerShell: {
-    command: '.\\Scripts\\Finalize\\TIME_NTP.PS1',
+    command: '.\\Scripts\\TIME_NTP.PS1',
     exeDir: true,
     runas: currentUserElevated,
     wait: true,
+    onUpgrade: false,
   }
 
   # Disable Windows Update Auto Registration
   - !registryValue: {
-      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Services\Pending\7971f918-a847-4430-9279-4a52d1efe18d',
+      path: 'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Services\\Pending\\7971f918-a847-4430-9279-4a52d1efe18d',
       value: "RegisterWithAU",
       type: REG_DWORD,
       data: "0",
     }
 
-  # Network Performance (Disable Link-Local Multicast Name Resolution (LLMNR) protocol as it is vulnerable and has been replaced by DNS)
+  # Network Performance (Disable LLMNR)
   - !registryValue: {
-      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient',
+      path: 'HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient',
       value: "EnableMulticast",
       type: REG_DWORD,
       data: "0",
@@ -33,28 +34,28 @@ actions:
   # PHASE 2: POWER SCHEME CONFIGURATION
   # ============================================
   - !registryValue: {
-      path: 'HKCR\powerscheme\DefaultIcon',
+      path: 'HKCR\\powerscheme\\DefaultIcon',
       value: "",
       type: REG_SZ,
       data: "%windir%\\System32\\powercpl.dll,1",
       onUpgrade: false,
     }
   - !registryValue: {
-      path: 'HKCR\powerscheme\Shell\open\command',
+      path: 'HKCR\\powerscheme\\Shell\\open\\command',
       value: "",
       type: REG_SZ,
       data: 'powercfg /import "%1"',
       onUpgrade: false,
     }
   - !registryValue: {
-      path: 'HKCR\.pow',
+      path: 'HKCR\\.pow',
       value: "",
       type: REG_SZ,
       data: "powerscheme",
       onUpgrade: false,
     }
   - !registryValue: {
-      path: 'HKCR\.pow',
+      path: 'HKCR\\.pow',
       value: "FriendlyTypeName",
       type: REG_SZ,
       data: "Power Scheme",
@@ -62,19 +63,14 @@ actions:
     }
 
   # ============================================
-  # PHASE 3: TELEMETRY OPT-OUT
+  # PHASE 3: POWERSHELL NOLOGO
   # ============================================
   - !powerShell: {
-    command: '.\Scripts\Finalize\TELEMETRY_OPTOUT.PS1',
-    exeDir: true,
-    runas: currentUserElevated,
-    wait: true,
-  }
-  - !powerShell: {
-      command: '.\\Scripts\\UI\\POWERSHELL_NOLOGO.PS1',
+      command: '.\\Scripts\\POWERSHELL_NOLOGO.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
+      onUpgrade: false,
     }
 
   # ============================================
@@ -85,24 +81,20 @@ actions:
       option: "wipe-startmenu",
     }
 
+  - !run: { exeDir: true, exe: ".\\Scripts\\STARTMENU.CMD", weight: 400, option: "wipe-startmenu"}
+  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\DELETE_PINS.PS1', option: "wipe-startmenu" }
+  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\STARTMENU_FOLDERS.PS1', option: "wipe-startmenu" }
+  - !status: {
+      status: "Config Scheduled Tasks",
+      onUpgrade: false,
+    }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\WIPE_STARTMENU.PS1',
+      command: '.\\Scripts\\SCHEDULED-TASKS-DISABLE.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
       weight: 200,
-      option: "wipe-startmenu",
-    }
-  - !status: {
-      status: "Config Office Tasks",
       onUpgrade: false,
-    }
-  - !powerShell: {
-      command: '.\\Scripts\\Cleanup\\DISABLE_OFFICE_TASKS.PS1',
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 50,
     }
 
   # ============================================
@@ -113,7 +105,7 @@ actions:
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\THEME_DEPLOY.PS1 -Action CopyWallpapers',
+      command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action CopyWallpapers',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -126,7 +118,7 @@ actions:
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\WALLPAPER.PS1 -Mode Desktop -ImagePath $env:systemroot\Web\Wallpaper\LexBoosTOS\v3\desktop.jpg',
+      command: '.\\Scripts\\WALLPAPER.PS1 -Mode Desktop -ImagePath $env:systemroot\\Web\\Wallpaper\\LexBoosTOS\\v3\\desktop.jpg',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -134,7 +126,7 @@ actions:
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\WALLPAPER.PS1 -Mode LockScreen -ImagePath $env:systemroot\Web\Wallpaper\LexBoosTOS\v3\lockscreen.jpg',
+      command: '.\\Scripts\\WALLPAPER.PS1 -Mode LockScreen -ImagePath $env:systemroot\\Web\\Wallpaper\\LexBoosTOS\\v3\\lockscreen.jpg',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -142,7 +134,7 @@ actions:
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\THEME_DEPLOY.PS1 -Action SetDefaultTile',
+      command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action SetDefaultTile',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -150,7 +142,7 @@ actions:
       option: "configure-theme",
     }
   - !cmd: {
-      command: 'copy /y "Themes" "%windir%\Resources\Themes" > nul',
+      command: 'copy /y "Themes" "%windir%\\Resources\\Themes" > nul',
       runas: currentUserElevated,
       wait: true,
       weight: 10,
@@ -162,22 +154,22 @@ actions:
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\PFP.PS1',
+      command: '.\\Scripts\\PFP.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
       option: "configure-theme",
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\TERMINAL.PS1',
+      command: '.\\Scripts\\TERMINAL.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
-      option: "configure-theme",
+      option: "configure-terminal",
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\WINVER.PS1',
+      command: '.\\Scripts\\WINVER.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -190,7 +182,7 @@ actions:
       status: "Copying Launcher Files",
     }
   - !powerShell: {
-      command: '.\\Scripts\\Setup\\COPY_LAUNCHER_FILES.PS1',
+      command: '.\\Scripts\\COPY_LAUNCHER_FILES.PS1',
       exeDir: true,
       wait: true,
       weight: 200,
@@ -202,7 +194,7 @@ actions:
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\UI\\VISUAL.PS1',
+      command: '.\\Scripts\\VISUAL.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -210,56 +202,45 @@ actions:
       option: "lex-visual",
       onUpgrade: false,
     }
-  - !status: {
-      status: "Config CPU Cache",
-      onUpgrade: false,
-    }
-  - !powerShell: {
-      command: '.\\Scripts\\Performance\\L2L3.PS1',
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 200,
-      onUpgrade: false,
-    }
 
   # ============================================
   # PHASE 7: FILE ASSOCIATIONS & CONTEXT MENU
   # ============================================
   - !powerShell: {
-    command: '.\Scripts\Finalize\FILE_ASSOCIATIONS.PS1',
+    command: '.\\Scripts\\FILE_ASSOCIATIONS.PS1',
     exeDir: true,
     runas: currentUserElevated,
     wait: true,
+    onUpgrade: false,
   }
 
   # Rollback context menu on desktop background
   - !registryValue: {
-      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      path: 'HKCR\\DesktopBackground\\Shell\\LexBoosTRollback',
       value: "MUIVerb",
       type: REG_SZ,
       data: "Restore LexBoosT OS Backup",
       option: "backup",
     }
   - !registryValue: {
-      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      path: 'HKCR\\DesktopBackground\\Shell\\LexBoosTRollback',
       value: "Icon",
       type: REG_SZ,
       data: "rstrui.exe",
       option: "backup",
     }
   - !registryValue: {
-      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback',
+      path: 'HKCR\\DesktopBackground\\Shell\\LexBoosTRollback',
       value: "Position",
       type: REG_SZ,
       data: "Bottom",
       option: "backup",
     }
   - !registryValue: {
-      path: 'HKCR\DesktopBackground\Shell\LexBoosTRollback\command',
+      path: 'HKCR\\DesktopBackground\\Shell\\LexBoosTRollback\\command',
       value: "",
       type: REG_SZ,
-      data: 'powershell.EXE -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -Verb RunAs -FilePath powershell.EXE -ArgumentList ',
+      data: 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\\ProgramData\\LexBoosTOS\\Scripts\\ROLLBACK.ps1"',
       option: "backup",
     }
 
@@ -270,7 +251,7 @@ actions:
       status: "Config Explorer",
     }
   - !registryValue: {
-      path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager',
+      path: 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\OperationStatusManager',
       value: "EnthusiastMode",
       type: REG_DWORD,
       data: "1",
@@ -281,21 +262,21 @@ actions:
       status: "Disabling Remote Assistance",
     }
   - !registryValue: {
-      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance',
+      path: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance',
       value: "fAllowFullControl",
       type: REG_DWORD,
       data: "0",
       onUpgrade: false,
     }
   - !registryValue: {
-      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance',
+      path: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance',
       value: "fAllowToGetHelp",
       type: REG_DWORD,
       data: "0",
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\Cleanup\\DISABLE_REMOTE_ASSIST_FIREWALL.PS1',
+      command: '.\\Scripts\\DISABLE_REMOTE_ASSIST_FIREWALL.PS1',
       exeDir: true,
       runas: currentUserElevated,
       ignoreErrors: true,
@@ -308,7 +289,7 @@ actions:
       status: "LexBoosT™ Optimizations 1/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE1.CMD",
+      exe: ".\\Scripts\\FINALIZE1.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -328,7 +309,7 @@ actions:
       status: "LexBoosT™ Optimizations 2/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE2.CMD",
+      exe: ".\\Scripts\\FINALIZE2.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -348,7 +329,7 @@ actions:
       status: "LexBoosT™ Optimizations 3/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE3.CMD",
+      exe: ".\\Scripts\\FINALIZE3.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -368,7 +349,7 @@ actions:
       status: "LexBoosT™ Optimizations 4/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE4.CMD",
+      exe: ".\\Scripts\\FINALIZE4.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -388,7 +369,7 @@ actions:
       status: "LexBoosT™ Optimizations 5/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE5.CMD",
+      exe: ".\\Scripts\\FINALIZE5.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -408,7 +389,7 @@ actions:
       status: "LexBoosT™ Optimizations 6/6",
     }
   - !run: {
-      exe: ".\\Scripts\\Finalize\\FINALIZE6.CMD",
+      exe: ".\\Scripts\\FINALIZE6.CMD",
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -424,33 +405,17 @@ actions:
       wait: true,
       weight: 200,
     }
-  - !run: {
-      exe: ".\\Scripts\\PAUSE.CMD",
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 200,
-    }
-  - !status: {
-      status: "Desktop Preparation",
-    }
-  - !powerShell: {
-      command: '.\\Scripts\\UI\\ICONS_DESK.PS1',
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 200,
-    }
   - !status: {
       status: "Enable Low Latency Profile",
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\Performance\\LOW-LATENCY-PROFILE.PS1',
+      command: '.\\Scripts\\LOW-LATENCY-PROFILE.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
       weight: 200,
+      onUpgrade: false,
     }
 
   # ============================================
@@ -461,7 +426,7 @@ actions:
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\Cleanup\\CLEANUP-ACTIVE-SETUP.PS1',
+      command: '.\\Scripts\\CLEANUP-ACTIVE-SETUP.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -473,7 +438,7 @@ actions:
       onUpgrade: false,
     }
   - !powerShell: {
-      command: '.\\Scripts\\Cleanup\\DEL_WINOLD_INETPUB.PS1',
+      command: '.\\Scripts\\DEL_WINOLD_INETPUB.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
@@ -501,15 +466,51 @@ actions:
 
   # Reactivate widgets after Windows update
   - !powerShell: {
-      command: '.\\Scripts\\Cleanup\\RESET_WEBEXPERIENCE.PS1',
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-    }
-
-  - !powerShell: {
-    command: '.\\Scripts\\Finalize\\FINAL_POST.PS1',
+    command: '.\Scripts\RESET_WEBEXPERIENCE.PS1',
     exeDir: true,
     runas: currentUserElevated,
     wait: true,
   }
+
+  - !powerShell: {
+    command: '.\Scripts\FINAL_POST.PS1',
+    exeDir: true,
+    runas: currentUserElevated,
+    wait: true,
+  }
+
+  # ============================================
+  # RUNTIMES / .NET optimization
+  # ============================================
+  - !status: {status: 'Configuring Runtimes', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\RUNTIMES.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 100
+      onUpgrade: false
+
+  # ============================================
+  # Save system configuration log
+  # ============================================
+  - !status: {status: 'Saving System Config Log'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\SAVE-SYSTEMCONFIGURATIONLOG.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 100
+
+  - !status: {
+      status: "Desktop Preparation",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\ICONS_DESK.PS1',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 200,
+    }

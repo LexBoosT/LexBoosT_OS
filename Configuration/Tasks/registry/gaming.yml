@@ -1,0 +1,35 @@
+---
+title: Gaming
+description: Applies Gaming tweaks via registry values and scripts
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Disabling Gamemode'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '0'}
+
+  - !status: {status: 'Configuring GameDVR'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_DSEBehavior', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_DXGIHonorFSEWindowsCompatible', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_EFSEFeatureFlags', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_FSEBehaviorMode', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_HonorUserFSEBehaviorMode', type: REG_DWORD, data: '1'}
+
+  - !status: {status: 'Config Memory Compression', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\GAMING_MEMORY_COMPRESSION.PS1"'
+      wait: true
+      weight: 200
+      onUpgrade: false
+
+  - !status: {status: 'Configuring L2/L3 Cache', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\L2L3.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200
+      onUpgrade: false
+

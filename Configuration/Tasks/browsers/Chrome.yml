@@ -1,0 +1,12 @@
+---
+title: Chrome Installation
+description: Installs Google Chrome browser
+privilege: TrustedInstaller
+actions:
+  - !run:
+      runas: currentUserElevated
+      exeDir: true
+      wait: true
+      option: "Chrome"
+      exe: "powershell"
+      args: '-EP Bypass -C ".\\Scripts\\SOFTWARE.PS1 -Software Install-Chrome"'

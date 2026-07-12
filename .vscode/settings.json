@@ -1,0 +1,32 @@
+{
+  "files.eol": "\n",
+  "files.encoding": "utf8",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "yaml.customTags": [
+    "!run: mapping",
+    "!registryKey: mapping",
+    "!registryValue: mapping",
+    "!appx: mapping",
+    "!file: mapping",
+    "!service: mapping",
+    "!scheduledTask: mapping",
+    "!taskKill: mapping",
+    "!systemPackage: mapping",
+    "!cmd: mapping",
+    "!powerShell: mapping",
+    "!status: mapping",
+    "!task: mapping",
+    "!download: mapping"
+
+  ],
+  "yaml.schemas": {
+    ".vscode/tasks.schema.json": [
+      "Configuration/Tasks/**/*.yml",
+      "Configuration/*.yml"
+    ]
+  },
+  "files.associations": {
+    "playbook.conf": "xml"
+  }
+}

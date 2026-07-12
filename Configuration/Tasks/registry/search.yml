@@ -1,0 +1,7 @@
+---
+title: Search
+description: Applies Windows Search tweaks via SEARCH.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Search Tweaks'}
+  - !powerShell: {command: '.\\Scripts\\SEARCH.PS1', exeDir: true, runas: currentUserElevated, wait: true}

@@ -1,0 +1,35 @@
+---
+title: Themes
+privilege: TrustedInstaller
+description: Apply LexBoosT OS™ theme and visual preferences
+actions:
+  - !status: {status: 'Applying Themes'}
+  - !registryValue:
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+      value: 'EnableTransparency'
+      type: REG_DWORD
+      data: '0'
+  - !registryValue:
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+      value: 'ColorPrevalence'
+      type: REG_DWORD
+      data: '0'
+  - !registryValue:
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer'
+      value: 'UseDefaultTile'
+      type: REG_DWORD
+      data: '1'
+  - !registryValue:
+      path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Themes'
+      value: 'ThemePolicy'
+      type: REG_DWORD
+      data: '0'
+  - !registryValue:
+      path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects'
+      value: 'VisualFXSetting'
+      type: REG_DWORD
+      data: '3'
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'AmbientLightingEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'ControlledByForegroundApp', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'UseSystemAccentColor', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize', value: 'AppsUseLightTheme', type: REG_DWORD, data: '0'}

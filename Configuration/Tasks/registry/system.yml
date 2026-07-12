@@ -1,0 +1,43 @@
+---
+title: System
+privilege: TrustedInstaller
+description: Core system tweaks — values migrated to SYSTEM_TWEAKS.PS1
+actions:
+  - !status: {status: 'Applying System Tweaks', onUpgrade: false}
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\SYSTEM_TWEAKS.PS1"'
+    weight: 200
+    wait: true
+    onUpgrade: false
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES.PS1" -Device @("Configure-PowerScheme","Configure-Adapters","Configure-Drives","Configure-PowerThrottling","Configure-IRQAffinity","Configure-IRQPriority","Configure-NDISOptimizer","Configure-DesktopPowerOptimizations","Configure-IntelHybridVisibility")'
+    weight: 200
+    wait: true
+    onUpgrade: false
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES-TWEAKER-AUTO.PS1"'
+    weight: 200
+    wait: true
+    onUpgrade: false
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\MMCSS-NIC.PS1"'
+    weight: 200
+    wait: true
+    onUpgrade: false
+
+  - !status: {status: 'Removing EFI Drive Letter'}
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\REMOVE_EFI_DRIVE_LETTER.PS1"'
+    wait: true
+    weight: 200
+    onUpgrade: false

@@ -1,0 +1,7 @@
+---
+title: Audio
+description: Applies audio tweaks via AUDIO.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Audio Tweaks'}
+  - !powerShell: {command: '.\\Scripts\\AUDIO.PS1', exeDir: true, runas: currentUserElevated, wait: true}

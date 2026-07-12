@@ -1,0 +1,14 @@
+---
+title: NTFS
+description: NTFS behavior + disk power settings — all migrated to DEVICES.PS1 (Configure-Ntfs)
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying NTFS'}
+
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES.PS1" -Device @("Configure-Ntfs")'
+      runas: currentUserElevated
+      wait: true
+      weight: 8

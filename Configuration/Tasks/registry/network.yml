@@ -1,0 +1,40 @@
+---
+title: Network
+description: Network tweaks — all netsh/registry/NetBT migrated to NETWORK-EXTRAS.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Configuring Network'}
+
+  # ============================================
+  # Find and display network adapter path
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\FIND-NETWORK-ADAPTER-PATH.CMD'
+      runas: currentUserElevated
+      wait: true
+
+  # ============================================
+  # NETSH TCP/IP tuning (from NETSH_TCPIP_APPLY.PS1)
+  # ============================================
+  - !status: {status: 'Applying NETSH Tuning'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NETSH_TCPIP_APPLY.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200
+
+  # ============================================
+  # Network extras — RSS, NetBIOS, LMHOSTS, SMB, QoS, etc.
+  # (covers all netsh resets + reg add from this YML)
+  # ============================================
+  - !status: {status: 'Applying Network Extras'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NETWORK-EXTRAS.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

@@ -1,0 +1,7 @@
+---
+title: Broker
+description: Applies Windows Broker/runtime tweaks via BROKER.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Broker Tweaks'}
+  - !powerShell: {command: '.\\Scripts\\BROKER.PS1', exeDir: true, runas: currentUserElevated, wait: true}

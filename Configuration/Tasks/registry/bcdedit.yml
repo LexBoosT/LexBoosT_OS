@@ -1,0 +1,19 @@
+---
+title: BCDEdit
+description: BCD tweaks — all 5 commands migrated to DEVICES.PS1 (Set-BcdOptimizations)
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying BCDEdit'}
+
+  # ============================================
+  # All 5 bcdedit commands migrated to DEVICES.PS1
+  # (disableelamdrivers / isolatedcontext / nx / bootmenupolicy
+  #  + disabledynamictick was already in DEVICES.PS1)
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES.PS1" -Device @("Configure-BcdOptimizations")'
+      runas: currentUserElevated
+      wait: true
+      weight: 8

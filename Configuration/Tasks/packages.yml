@@ -1,0 +1,15 @@
+---
+title: Packages
+description: AppX, features, Edge and OneDrive removal
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Config onedrive', onUpgrade: false}
+  - !task: {path: 'Tasks\packages\onedrive.yml', onUpgrade: false}
+  - !status: {status: 'Config appx', onUpgrade: false}
+  - !task: {path: 'Tasks\packages\appx.yml', onUpgrade: false}
+  - !status: {status: 'Config features', onUpgrade: false}
+  - !task: {path: 'Tasks\packages\features.yml', onUpgrade: false}
+  - !status: {status: 'Config tasks', onUpgrade: false}
+  - !task: {path: 'Tasks\packages\tasks.yml', onUpgrade: false}
+  - !status: {status: 'Config edge', onUpgrade: false}
+  - !task: {path: 'Tasks\packages\edge.yml', onUpgrade: false}

@@ -1,0 +1,66 @@
+---
+title: Security
+description: Applies security tweaks via registry values and DENY-CONSENTSTOREPERMISSIONS.PS1
+privilege: TrustedInstaller
+onUpgrade: false
+actions:
+  - !status: {status: 'Configuring Permissions', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+
+  - !status: {status: 'Denying ConsentStore', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DENY-CONSENTSTOREPERMISSIONS.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200
+      onUpgrade: false
+
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\activity', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userDataTasks', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\chat', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\radios', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\bluetoothSync', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\broadFileSystemAccess', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam', value: 'Value', type: REG_SZ, data: 'Allow', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone', value: 'Value', type: REG_SZ, data: 'Allow', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCall', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\documentsLibrary', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\downloadsFolder', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\musicLibrary', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\picturesLibrary', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\videosLibrary', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\graphicsCaptureWithoutBorder', value: 'Value', type: REG_SZ, data: 'Deny', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\graphicsCaptureProgrammatic', value: 'Value', type: REG_SZ, data: 'Allow', onUpgrade: false}
+
+  # ============================================
+  # Microsoft Defender real-time scan optimization
+  # Reduces msmpeng.exe CPU/disk I/O during gaming without disabling Defender.
+  # ============================================
+  - !status: {status: 'Limit Defender usage'}
+  # CPU limiting
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'AvgCPULoadFactor', type: REG_DWORD, data: '25', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'ScanAvgCPULoadFactor', type: REG_DWORD, data: '25', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'LowPriority', type: REG_DWORD, data: '1', onUpgrade: false}
+  # Disable scheduled scans
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'DisableScheduledScan', type: REG_DWORD, data: '1', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'ScheduleDay', type: REG_DWORD, data: '8', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Schedule', value: 'ScheduleDay', type: REG_DWORD, data: '8', onUpgrade: false}
+  # Disable catch-up scans (after missed scheduled scan)
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'DisableCatchupFullScan', type: REG_DWORD, data: '1', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'DisableCatchupQuickScan', type: REG_DWORD, data: '1', onUpgrade: false}
+  # Scan only when idle
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'ScanOnlyIfIdle', type: REG_DWORD, data: '1', onUpgrade: false}
+  # Disable restore point before scan (avoids disk I/O spike)
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Scan', value: 'DisableRestorePoint', type: REG_DWORD, data: '1', onUpgrade: false}
+  # Reduce signature update frequency
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'ForceUpdateFromMU', type: REG_DWORD, data: '0', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'SignatureUpdateInterval', type: REG_DWORD, data: '24', onUpgrade: false}

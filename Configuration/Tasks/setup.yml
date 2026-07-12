@@ -1,0 +1,56 @@
+---
+title: Setup
+description: Applies pre-setup tasks, including backup, process killing, and copying LexBoosT OS files
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Detecting Custom OS'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DETECT-CUSTOM-OS.PS1"'
+      wait: true
+      weight: 600
+
+  - !status: {status: 'Creating System Backup'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\BACKUP.PS1"'
+      wait: true
+      weight: 100
+      option: "backup"
+
+  - !status: {status: 'Killing Pre-Setup Procs'}
+  - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\KILL_PROCESSES.PS1"'}
+
+  - !status: {status: 'Copying LexBoosT OS Files'}
+  - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\COPY_LEXBOOSTOS.PS1"', wait: true, weight: 10}
+
+  - !status: {status: 'Configuring AV Exclusions', onUpgrade: false}
+  - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\AVEXCLUDE.PS1"', runas: currentUserElevated, wait: true, weight: 200, onUpgrade: false}
+
+  - !status: {status: 'Configuring User Folders'}
+  - !run: {exeDir: true, exe: '.\Scripts\FOLDER_USER.CMD', runas: currentUserElevated, wait: true, weight: 200}
+
+  - !status: {status: 'Running NGEN'}
+  - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NGEN.PS1"', runas: currentUserElevated, wait: true, weight: 200}
+
+  - !status: {status: 'Rename PC to LexBoosT_OS-PC', onUpgrade: false}
+  - !powerShell: { command: "if ((Get-CimInstance Win32_ComputerSystem).Name -ne 'LexBoosT_OS-PC') { Rename-Computer -NewName 'LexBoosT_OS-PC' -Force }", runas: currentUserElevated, wait: true, onUpgrade: false }
+
+  - !status: {status: 'Configuring PowerShell'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell', value: 'ExecutionPolicy', type: REG_SZ, data: 'Unrestricted'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell', value: 'ExecutionPolicy', type: REG_SZ, data: 'Unrestricted'}
+  - !cmd: {command: 'ftype Microsoft.PowerShellScript.1="%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -EP Unrestricted -File "%1" %*'}
+  - !registryValue: {path: 'HKCR\Microsoft.PowerShellScript.1\Shell', value: '', type: REG_SZ, data: 'Open'}
+  - !registryValue: {path: 'HKCR\Microsoft.PowerShellScript.1\Shell\Open\Command', value: '', type: REG_EXPAND_SZ, data: '"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" "%1"'}
+  - !registryValue: {path: 'HKCR\Microsoft.PowerShellScript.1\Shell\RunAs', value: 'HasLUAShield', type: REG_SZ, data: ''}
+  - !registryValue: {path: 'HKCR\Microsoft.PowerShellScript.1\Shell\RunAs\Command', value: '', type: REG_EXPAND_SZ, data: '"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" "%1"'}
+  - !registryValue: {path: 'HKCR\.psm1', value: '', type: REG_SZ, data: 'Microsoft.PowerShellModule.1'}
+  - !registryValue: {path: 'HKCR\Microsoft.PowerShellModule.1\Shell', value: '', type: REG_SZ, data: 'Open'}
+  - !registryKey: {path: 'HKCR\.psm1\OpenWithProgids'}
+  - !registryKey: {path: 'HKCR\.ps1\OpenWithProgids'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging', value: 'EnableScriptBlockLogging', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging', value: 'EnableScriptBlockInvocationLogging', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging', value: 'EnableModuleLogging', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription', value: 'EnableTranscripting', type: REG_DWORD, data: '0'}

@@ -1,0 +1,12 @@
+---
+title: Brave Installation
+description: Installs Brave browser
+privilege: TrustedInstaller
+actions:
+  - !run:
+      runas: currentUserElevated
+      exeDir: true
+      wait: true
+      option: "Brave"
+      exe: "powershell"
+      args: '-EP Bypass -C ".\\Scripts\\SOFTWARE.PS1 -Software Install-Brave"'

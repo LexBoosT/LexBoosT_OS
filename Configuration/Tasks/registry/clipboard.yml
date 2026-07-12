@@ -1,0 +1,10 @@
+---
+title: Clipboard
+description: Enables Clipboard history and expressive input via registry tweaks
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Enabling Clipboard'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Clipboard', value: 'EnableClipboardHistory', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Input\Settings', value: 'EnableExtraCandidateDirection', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Input\Settings', value: 'EnableExpressiveInputShellHotkey', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\SmartActionPlatform\SmartClipboard', value: 'Disabled', type: REG_DWORD, data: '1'}

@@ -1,0 +1,16 @@
+---
+title: Miscellaneous Registry
+description: Applies miscellaneous registry tweaks via BACKUP.PS1 and registry values
+privilege: TrustedInstaller
+actions:
+  - !status: {status: "Applying Miscellaneous"}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Taskband', value: 'Favorites', operation: delete}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon', value: 'RestartApps', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Control Panel\TimeDate', value: 'DstNotification', type: REG_DWORD, data: '0'}
+  # === Hide stripped components from Settings
+  - !registryValue: {
+      path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer',
+      value: "SettingsPageVisibility",
+      type: REG_SZ,
+      data: "hide:privacy-feedback;home",
+    }

@@ -1,0 +1,8 @@
+---
+title: Explorer Menu
+description: Applies Explorer menu and desktop tweaks via EXPLORER.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Explorer Menu'}
+  - !cmd: {command: 'net user defaultuser0 /delete & exit 0', onUpgrade: false}
+  - !powerShell: {command: '.\\Scripts\\EXPLORER.PS1', exeDir: true, runas: currentUserElevated, wait: true}
