@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 ﻿# LexBoosT OS™ 26.07
+=======
+# My Website: https://lexboost.github.io/LexBoosT_OS/
+ 
+# LexBoosT OS™ 26.06
+>>>>>>> 89fc916bdc2ba1d2db05be5506a8c071c6f345e7
 
 🌍 **Languages**: [🇫🇷 Français](#lexboost-os-26055--documentation-française) | [🇬🇧 English](#lexboost-os-26055--english-documentation)
 
@@ -46,6 +52,29 @@
 | **Type** | Playbook | Playbook | Playbook | Playbook | Playbook |
 | **Processus idle** | ~55-80 | ~60-85 | ~40-65 | ~50-75 | ~50-70 |
 | **RAM idle (16 GB)** | ~1.5-2.5 GB | ~1.8-2.8 GB | ~1.2-2.0 GB | ~1.5-2.5 GB | ~1.6-2.5 GB |
+| **Services exécutés** | ~50-70 | ~55-75 | ~35-55 | ~45-65 | ~40-60 |
+| **Defender** | Optionnel | Optionnel | Désactivé | Désactivé | ✅ Conservé (limité) |
+| **VBS/Memory Integrity** | Désactivé | — | Désactivé | Désactivé | ✅ Conservé ON |
+| **Mises à jour Windows** | ✅ | ✅ | ⚠️ Partiel | ❌ Bloquées | ✅ Fonctionnelles |
+| **Tweaks DWM** | Basique | ~5 clés | ~15 clés | Basique | **124 clés** |
+| **Tweaks Timer** | Basique | — | — | — | **43 clés** (TimeBroker+Schedule) |
+| **Tweaks USB** | Power saving off | — | — | — | **30 clés** (XHCI/HUB3/Audio) |
+| **Outils post-install** | AtlasDesktop (9 cat) | Revision Tool | GPU/USB/MSI tools + HIDUSBF | Vain Toolbox | **40+ outils** (Launcher) |
+| **Compatibilité anti-cheat** | ⚠️ VBS off | ✅ | ❌ Defender off | ❌ Defender off | ✅ Valorant/FaceIT |
+| **Gaming optimisé** | ✅ MMCSS | ✅ MMCSS + TSX | ✅ GPU/IRQ | ✅ Power plan | ✅ MMCSS+TSX+GPU/IRQ+Timer+USB/Power plan |
+| **Temps d'installation** | ~15 min | ~10 min | ~15 min | ~5 min | ~10-15 min |
+
+*Mesures indicatives sur hardware moyen (Ryzen 5 / Core i5, 16 GB RAM, NVMe SSD). Les résultats varient selon la configuration.*
+
+---
+
+### 🆚 Comparatif Playbooks — Windows 11 24H2/25H2/26H1/26H2
+
+| Indicateur | AtlasOS 0.5 | ReviOS 26.04 | SapphireOS | Vain v14 | LexBoosT OS™ |
+|---|---|---|---|---|---|
+| **Type** | Playbook | Playbook | Playbook | Playbook | Playbook |
+| **Processus idle** | ~55-80 | ~60-85 | ~40-65 | ~50-75 | ~50-70 |
+| **RAM idle (16 GB)** | ~1.5-2.5 GB | ~1.8-2.8 GB | ~1.2-2.0 GB | ~1.5-2.5 GB | ~1.8-2.5 GB |
 | **Services exécutés** | ~50-70 | ~55-75 | ~35-55 | ~45-65 | ~40-60 |
 | **Defender** | Optionnel | Optionnel | Désactivé | Désactivé | ✅ Conservé (limité) |
 | **VBS/Memory Integrity** | Désactivé | — | Désactivé | Désactivé | ✅ Conservé ON |
@@ -177,7 +206,11 @@
 |---|---|---|---|---|---|
 | **Type** | Playbook | Playbook | Playbook | Playbook | Playbook |
 | **Idle processes** | ~55-80 | ~60-85 | ~40-65 | ~50-75 | ~50-70 |
+<<<<<<< HEAD
 | **Idle RAM (16 GB)** | ~1.5-2.5 GB | ~1.8-2.8 GB | ~1.2-2.0 GB | ~1.5-2.5 GB | ~1.6-2.5 GB |
+=======
+| **Idle RAM (16 GB)** | ~1.5-2.5 GB | ~1.8-2.8 GB | ~1.2-2.0 GB | ~1.5-2.5 GB | ~1.8-2.5 GB |
+>>>>>>> 89fc916bdc2ba1d2db05be5506a8c071c6f345e7
 | **Running services** | ~50-70 | ~55-75 | ~35-55 | ~45-65 | ~40-60 |
 | **Defender** | Optional | Optional | Disabled | Disabled | ✅ Kept (limited) |
 | **VBS/Memory Integrity** | Disabled | — | Disabled | Disabled | ✅ Kept ON |
