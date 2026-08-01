@@ -11,6 +11,15 @@ call :CheckAdmin
 :: 2. GAMING PERFORMANCE
 call :GamingOptimizations
 
+<<<<<<< HEAD
+=======
+:: 3. SYSTEM TWEAKS (from YML — merged into script)
+echo [+] Applying system registry tweaks...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0SYSTEM_TWEAKS.PS1" >nul 2>&1
+
+goto :eof
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 :: ================================================
 :: FUNCTIONS
 :: ================================================
@@ -55,7 +64,11 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProf
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v BackgroundPriority /t REG_DWORD /d 1 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "Background Only" /t REG_SZ /d False /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "Clock Rate" /t REG_DWORD /d 10000 /f >nul 2>&1
+<<<<<<< HEAD
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "GPU Priority" /t REG_DWORD /d 8 /f >nul 2>&1
+=======
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "GPU Priority" /t REG_DWORD /d 1 /f >nul 2>&1
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v Priority /t REG_DWORD /d 1 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "Scheduling Category" /t REG_SZ /d High /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio" /v "SFIO Priority" /t REG_SZ /d Normal /f >nul 2>&1
@@ -65,7 +78,11 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProf
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v BackgroundPriority /t REG_DWORD /d 1 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "Background Only" /t REG_SZ /d False /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "Clock Rate" /t REG_DWORD /d 10000 /f >nul 2>&1
+<<<<<<< HEAD
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "GPU Priority" /t REG_DWORD /d 8 /f >nul 2>&1
+=======
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "GPU Priority" /t REG_DWORD /d 1 /f >nul 2>&1
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v Priority /t REG_DWORD /d 1 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "Scheduling Category" /t REG_SZ /d Medium /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio" /v "SFIO Priority" /t REG_SZ /d Normal /f >nul 2>&1
@@ -176,6 +193,7 @@ reg add "HKCU\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v 
 reg add "HKCU\SOFTWARE\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
 
+<<<<<<< HEAD
 :: ============================================================
 :: SAFE TOUCH / TABLET / TOUCHPAD DISABLE (desktop-only guard)
 :: ============================================================
@@ -204,6 +222,13 @@ powershell -NoP -Command ^
     "if($touchPnP -or $touchWMI -or $i2cHID){ 'PNP_TOUCH_OR_TOUCHPAD'; $skip=$true } " ^
   "}; " ^
   "exit ([int]$skip)" >nul 2>&1
+=======
+echo [+] Disable TOUCH SCREEN Advanced Stuff (only if no touch device detected)
+:: Verifie si un peripherique tactile est present avant de desactiver.
+:: Sur un desktop sans ecran tactile, toutes les entrees suivantes sont appliquees.
+:: Sur un laptop avec touchpad/touchscreen, cette section est ignoree pour preserver la navigation.
+powershell -NoP -Command "$hasTouchOrPen = (Get-PnpDevice -Class 'HIDClass','Pen' -Status OK -ErrorAction SilentlyContinue | Where-Object { $_.FriendlyName -match 'Touch|Pen|Stylus|Digitizer|HID-compliant touch' }) -or (Get-CimInstance Win32_PointingDevice | Where-Object { $_.Name -match 'Touch|Touchpad|HID' }); exit ([int]($hasTouchOrPen -ne $null -and $hasTouchOrPen))" >nul 2>&1
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 if %errorlevel% equ 1 (
     echo [SKIP] Laptop chassis or touch/touchpad/I2C HID device detected — preserving input
 ) else (

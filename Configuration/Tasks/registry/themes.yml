@@ -3,6 +3,10 @@ title: Themes
 privilege: TrustedInstaller
 description: Apply LexBoosT OS™ theme and visual preferences
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying Themes'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue:
       path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
       value: 'EnableTransparency'
@@ -31,3 +35,7 @@ actions:
   - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'AmbientLightingEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'ControlledByForegroundApp', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\Software\Microsoft\Lighting', value: 'UseSystemAccentColor', type: REG_DWORD, data: '0'}
+<<<<<<< HEAD
+=======
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize', value: 'AppsUseLightTheme', type: REG_DWORD, data: '0'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

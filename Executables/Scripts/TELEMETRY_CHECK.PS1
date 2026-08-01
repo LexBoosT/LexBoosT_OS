@@ -1,3 +1,18 @@
+#Requires -RunAsAdministrator
+#Requires -Version 5.1
+
+<#
+.SYNOPSIS
+    Telemetry and data-collection disabling.
+.DESCRIPTION
+    Migrated from registry/telemetry.yml. Disables:
+    - Telemetry services (DiagTrack, WTDS)
+    - AllowTelemetry policy
+    - 30+ WMI Autologger sessions
+    - DMA remapping / StorPort idle power management
+    - Cloud SDK / Docker / .NET / VS / npm telemetry env vars
+#>
+
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference    = 'SilentlyContinue'
 
@@ -12,16 +27,12 @@ Write-Log '+' "Applying telemetry and data-collection disabling..."
 # 1. Core telemetry policies
 # =============================================================================
 # HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components is owned by
-<<<<<<< HEAD
-# TrustedInstaller - "Acces refuse" via reg add even when elevated.
-=======
-# TrustedInstaller - "Acces refuse" via reg add even when elevated. Use MinSudo.
+# TrustedInstaller ??? "Acc??s refus??" via reg add even when elevated. Use MinSudo.
 $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
 $hasMinSudo = Test-Path $minSudo
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # WTDS\Components\ServiceEnabled. The value lives in 'HKLM\...\WTDS\Components"'
-# (note the trailing double-quote in the subkey name - a Windows quirk).
+# (note the trailing double-quote in the subkey name ??? a Windows quirk).
 # The key/value pair is owned by the WTDS service and the registry ACL forbids
 # modifications by Administrators after the first write. The value is already 0
 # on any system where WTDS has been disabled even once, so we just verify and
@@ -30,7 +41,7 @@ $wtdsValue = Get-ItemProperty -Path 'Registry::HKLM\SOFTWARE\Microsoft\Windows\C
 if ($wtdsValue -and ($wtdsValue.ServiceEnabled -eq 0)) {
     Write-Log '+' "WTDS ServiceEnabled already 0 (no change needed)"
 } else {
-    Write-Log '-' "WTDS ServiceEnabled not 0 or key not accessible - leaving untouched (system-managed)"
+    Write-Log '-' "WTDS ServiceEnabled not 0 or key not accessible ??? leaving untouched (system-managed)"
 }
 
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\TaggedEnergy' /v 'TelemetryMaxTagPerApplication' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
@@ -86,11 +97,11 @@ foreach ($name in $autologgers) {
 }
 
 # =============================================================================
-<<<<<<< HEAD
-# 3. Disable StorPort idle power management
-=======
 # 3. Disable DMA remapping compatible bit (security hardening)
 # =============================================================================
+# Use the registry provider directly instead of parsing reg.exe output (avoids
+# the "ERREUR: nom de cl?? non valide" loop when a value name contains spaces
+# or special characters that confuse the regex match).
 try {
     $root = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
         [Microsoft.Win32.RegistryHive]::LocalMachine, $env:COMPUTERNAME)
@@ -116,7 +127,6 @@ $root = $null
 
 # =============================================================================
 # 4. Disable StorPort idle power management
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # =============================================================================
 try {
     $root = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
@@ -130,11 +140,7 @@ try {
                 $dev = $bus.OpenSubKey($devName)
                 if (-not $dev) { continue }
                 try {
-<<<<<<< HEAD
-                    if ($null -ne $dev.GetValue('StorPort')) {
-=======
                     if ($dev.GetValue('StorPort') -ne $null) {
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
                         $dev.SetValue('EnableIdlePowerManagement', 0, [Microsoft.Win32.RegistryValueKind]::DWord)
                     }
                 } catch { }
@@ -150,19 +156,22 @@ try {
 $root = $null
 
 # =============================================================================
-<<<<<<< HEAD
-# 4. Cloud / Dev tool telemetry env vars (per-user + system)
-=======
 # 5. Cloud / Dev tool telemetry env vars (per-user + system)
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # =============================================================================
 $envVars = @{
+    # Cloud / container tools
     'CLOUDSDK_CORE_DISABLE_PROMPTS'   = '1'
     'DOCKER_CLI_TELEMETRY_OPTOUT'     = '1'
+
+    # .NET / Visual Studio telemetry opt-out
     'DOTNET_CLI_TELEMETRY_OPTOUT'     = '1'
     'DOTNET_TRY_CLI_TELEMETRY_OPTOUT' = '1'
     'VS_TELEMETRY_OPT_OUT'            = '1'
+
+    # PowerShell telemetry opt-out
     'POWERSHELL_TELEMETRY_OPTOUT'     = '1'
+
+    # Node.js
     'npm_config_loglevel'             = 'silent'
 }
 
@@ -173,11 +182,7 @@ foreach ($name in $envVars.Keys) {
 }
 
 # =============================================================================
-<<<<<<< HEAD
-# 5. Settings sync / privacy
-=======
-# 6. Settings sync / privacy
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+# 6. Settings sync / privacy (was registry/privacy.yml)
 # =============================================================================
 Write-Log '+' "Disabling settings sync..."
 
@@ -214,6 +219,5 @@ foreach ($p in $syncPolicies.GetEnumerator()) {
     Set-ItemProperty -Path $polBase -Name $p.Key -Value $p.Value -Type DWord -Force -ErrorAction SilentlyContinue
 }
 
-$msgDone = 'Telemetry, data-collection, and settings sync disabling complete.'
-Write-Log '+' $msgDone
+Write-Log '+' "Telemetry, data-collection, and settings sync disabling complete."
 exit 0

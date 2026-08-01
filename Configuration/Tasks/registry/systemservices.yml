@@ -3,9 +3,17 @@ title: System Services
 description: Applies System Services tweaks via registry values
 privilege: TrustedInstaller
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying System Services'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power', value: 'EnableMinimalHiberFile', type: REG_DWORD, data: '0', option: 'desktop-only'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\EOSNotify', value: 'DiscontinueEOS', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System', value: 'DisableAutomaticRestartSignOn', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance', value: 'MaintenanceDisabled', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments', value: 'SaveZoneInformation', type: REG_DWORD, data: '1'}
+<<<<<<< HEAD
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat', value: 'DisablePCA', type: REG_DWORD, data: '1'}
+=======
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\AppCompat', value: 'DisablePCA', type: REG_DWORD, data: '1'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

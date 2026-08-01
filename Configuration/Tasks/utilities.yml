@@ -5,13 +5,20 @@ privilege: TrustedInstaller
 actions:
   # ============================================
   # APPLY HKCU TO ALL USER PROFILES (Default + offline)
+<<<<<<< HEAD
+=======
+  # NOTE: This must run AFTER final.yml (same position as LexBoosT OS Phase 6b).
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # ============================================
   - !status: {status: 'Applying HKCU Settings'}
   - !run:
       exeDir: true
       exe: 'powershell.exe'
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPLYDUHIVE.PS1"'
+<<<<<<< HEAD
       runas: currentUserElevated
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
       wait: true
 
   # ============================================
@@ -26,6 +33,32 @@ actions:
       wait: true
 
   # ============================================
+<<<<<<< HEAD
+=======
+  # DISPLAY: MAX REFRESH RATE
+  # ============================================
+  - !status: {status: 'Config Max Refresh Rate', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\MAX-REFRESH-RATE.PS1"'
+      wait: true
+      onUpgrade: false
+
+  # ============================================
+  # NETWORK: ADVANCED TUNING (RSS, NetBIOS, SMB, QoS)
+  # NOTE: Values from network.yml are applied first; NETWORK-EXTRAS.PS1 applies
+  # complementary RSS/NIC/low-latency tweaks not covered by the YML inline commands.
+  # ============================================
+  - !status: {status: 'Applying Network Extras'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NETWORK-EXTRAS.PS1"'
+      wait: true
+
+  # ============================================
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # POWER: EXTRAS (desktop hibernate off + AC timers)
   # NOTE: power.yml values are applied first; POWER-EXTRAS.PS1 applies additional
   # desktop-only hibernate/sleep tweaks that complement (not override) the YML.
@@ -38,21 +71,34 @@ actions:
       wait: true
 
   # ============================================
+<<<<<<< HEAD
   # DELETE OLD/DUPLICATE DRIVERS (opt-in: option "delete-old-drivers")
   # WARNING: pnputil /delete-driver can break OEM I2C/HID/ACPI/SerialIO stacks.
   # Only enable on desktop PCs where you manage your own drivers.
   # ============================================
   - !status: {status: 'Removing Old Drivers', option: 'delete-old-drivers'}
+=======
+  # DELETE OLD/DUPLICATE DRIVERS
+  # ============================================
+  - !status: {status: 'Removing Old Drivers'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !run:
       exeDir: true
       exe: 'powershell.exe'
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\\Scripts\DELETE_OLD_DRIVERS.PS1" -Verbose'
       wait: true
+<<<<<<< HEAD
       option: 'delete-old-drivers'
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
   # ============================================
   # Install Browser(s)
   # ============================================
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !status: {status: 'Installing Browser(s)'}
   - !task: {path: 'Tasks\browsers\Brave.yml', option: "Brave"}
   - !task: {path: 'Tasks\browsers\Firefox.yml', option: "Firefox"}
@@ -81,6 +127,7 @@ actions:
       weight: 50,
       option: "configure-theme",
     }
+<<<<<<< HEAD
 
   - !status: {status: 'Configuring User Folders'}
   - !run: {
@@ -90,3 +137,5 @@ actions:
       wait: true,
       weight: 50,
     }
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

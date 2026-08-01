@@ -3,4 +3,8 @@ title: Mobile Sync
 description: Disables HIPM/DIPM/HDD parking, kills mobsync and renames it, enables disk write cache via DEVICES.PS1
 privilege: TrustedInstaller
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying Mobile Sync'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !powerShell: {command: '.\\Scripts\\DEVICES.PS1 -Device Configure-MobileSync', exeDir: true, runas: currentUserElevated, wait: true}

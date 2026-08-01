@@ -3,4 +3,8 @@ title: DWM Tweaks
 description: Applies Desktop Window Manager tweaks via DWM.PS1
 privilege: TrustedInstaller
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying DWM Tweaks'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !powerShell: {command: '.\\Scripts\\DWM.PS1', exeDir: true, runas: currentUserElevated, wait: true}

@@ -3,6 +3,11 @@ title: Telemetry + Privacy
 description: Telemetry + Privacy registry values (migrated from privacy.yml)
 privilege: TrustedInstaller
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying Telemetry'}
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # ============================================
   # Timeline / Activity Feed
   # ============================================
@@ -46,6 +51,10 @@ actions:
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'SlideshowEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'SoftLandingEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'ContentDeliveryAllowed', type: REG_DWORD, data: '0'}
+<<<<<<< HEAD
+=======
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'FeatureManagementEnabled', type: REG_DWORD, data: '0'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'OemPreInstalledAppsEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'PreInstalledAppsEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', value: 'PreInstalledAppsEverEnabled', type: REG_DWORD, data: '0'}
@@ -138,13 +147,18 @@ actions:
   # ============================================
   # Shared internet connection control
   # ============================================
+<<<<<<< HEAD
   - !registryValue: {path: 'HKLM\System\CurrentControlSet\Control\Network\SharedAccessConnection', value: 'EnableControl', type: REG_DWORD, data: '0'}
+=======
+  - !registryValue: {path: 'HKLM\System\ControlSet001\Control\Network\SharedAccessConnection', value: 'EnableControl', type: REG_DWORD, data: '0'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
   # ============================================
   # Location hard block
   # ============================================
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableLocation', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge\WebView2', value: 'DefaultGeolocationSetting', type: REG_DWORD, data: '2'}
+<<<<<<< HEAD
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'accesssolution', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'olksolution', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'onenotesolution', type: REG_DWORD, data: '1'}
@@ -159,6 +173,9 @@ actions:
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedsolutiontypes', value: 'comaddins', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedsolutiontypes', value: 'documentfiles', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedsolutiontypes', value: 'templatefiles', type: REG_DWORD, data: '1'}
+=======
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # ============================================
   # TELEMETRY.PS1 — WMI Autologgers, setx, Settings sync
   # ============================================

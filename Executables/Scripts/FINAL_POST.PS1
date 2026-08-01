@@ -60,7 +60,11 @@ if ($LASTEXITCODE -ne 0) {
 # ============================================================
 # 4. Disable User Data Sync Stack
 # ============================================================
+<<<<<<< HEAD
 $Services = @("UserDataSvc", "ContactDataSvc", "OneSyncSvc", "PimIndexMaintenanceSvc", "UnistoreSvc", "MessagingService")
+=======
+$Services = @("UserDataSvc", "ContactDataSvc", "OneSyncSvc", "PimIndexMaintenanceSvc", "UnistoreSvc", "MessagingSvc")
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 try {
     foreach ($Svc in $Services) {

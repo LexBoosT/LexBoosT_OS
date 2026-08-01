@@ -1075,7 +1075,11 @@ function Set-DrivesConfiguration {
         $ntfsSettings = @(
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsMemoryUsage'; Value = 2 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'LongPathsEnabled'; Value = 1 },
+<<<<<<< HEAD
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableCompression'; Value = 1 },
+=======
+            @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableCompression'; Value = 0 },
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableEncryption'; Value = 1 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsEncryptPagingFile'; Value = 0 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NTFSDisableLastAccessUpdate'; Value = 0x80000001 },
@@ -1090,6 +1094,44 @@ function Set-DrivesConfiguration {
         Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' -Name 'Enable' -Type String -Value 'N'
         Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OptimalLayout' -Name 'EnableAutoLayout' -Type DWORD -Value 0
 
+<<<<<<< HEAD
+=======
+        Write-Log '+' "Disabling StorageD3 in Modern Standby..."
+        Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Storage' -Name 'StorageD3InModernStandby' -Type DWORD -Value 0
+
+        Write-Log '+' "Disabling IoLatencyCap on all storage services..."
+        try {
+            $serviceKeys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "IoLatencyCap" 2>$null |
+                Select-String 'HKEY_' |
+                ForEach-Object { $_.Line.Trim() }
+            foreach ($key in $serviceKeys) {
+                reg add "$key" /v "IoLatencyCap" /t REG_DWORD /d 0 /f 2>$null | Out-Null
+            }
+            Write-Log '+' "  IoLatencyCap disabled on all services"
+        }
+        catch {
+            Write-Log '-' "Failed to disable IoLatencyCap: $_"
+        }
+
+        Write-Log '+' "Enabling disk write cache on all drives..."
+        try {
+            $diskGuid = '{4d36e967-e325-11ce-bfc1-08002be10318}'
+            $enumPath = "HKLM:\SYSTEM\CurrentControlSet\Enum"
+            $diskKeys = reg query $enumPath /f $diskGuid /d /s 2>$null |
+                Select-String 'HKEY_' |
+                ForEach-Object { $_.Line.Trim() }
+            foreach ($key in $diskKeys) {
+                $diskParamPath = "$key\Device Parameters\Disk"
+                Set-ItemProperty -Path $diskParamPath -Name 'UserWriteCacheSetting' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+                Set-ItemProperty -Path $diskParamPath -Name 'CacheIsPowerProtected' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+            }
+            Write-Log '+' "[+] Disk write cache enabled (power-protected)"
+        }
+        catch {
+            Write-Log '-' "Failed to enable disk write cache: $_"
+        }
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         Write-Log '+' "Drive configuration completed successfully."
     }
     catch {
@@ -1394,6 +1436,10 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HibernateChecksummingEnabled'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'EnableMinimalHiberFile'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HiberFileSizePercent'; Value = 0 },
+<<<<<<< HEAD
+=======
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableIdleStatesAtBoot'; Value = 2 },
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IdleProcessorsRequireQosManagement'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableInboxPepGeneratedConstraints'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IgnoreCsComplianceCheck'; Value = 1 },
@@ -1402,6 +1448,10 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'FxAccountingTelemetryDisabled'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'ThermalTelemetryVerbosity'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'CoalescingFlushInterval'; Value = 0 },
+<<<<<<< HEAD
+=======
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power\ForceHibernateDisabled'; Name = 'Policy'; Value = 1 },
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'PowerSettingProfile'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'Win32CalloutWatchdogBugcheckEnabled'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel'; Name = 'SerializeTimerExpiration'; Value = 1 },
@@ -1559,13 +1609,126 @@ function Set-BcdOptimizations {
     if (-not $skipOptimizations) {
         Write-Log '+' "Disabling dynamic tick for maximum timer precision..."
         bcdedit /deletevalue useplatformclock 2>$null | Out-Null
+<<<<<<< HEAD
         bcdedit /deletevalue useplatformtick  2>$null | Out-Null
         bcdedit /set disabledynamictick yes 2>$null | Out-Null
         bcdedit /deletevalue tscsyncpolicy 2>$null | Out-Null
+=======
+        bcdedit /deletevalue useplatformtick 2>$null | Out-Null
+        bcdedit /set disabledynamictick yes 2>$null | Out-Null
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     }
     else {
         Write-Log '-' "AMD 3D V-Cache dual-CCD detected: skipping disabledynamictick (scheduler-friendly default)."
     }
+
+    # === BCD tweaks migrated from registry/bcdedit.yml ===
+    Write-Log '+' "Disabling ELAM drivers..."
+    bcdedit /set {current} disableelamdrivers yes 2>$null | Out-Null
+
+    Write-Log '+' "Setting isolated context to No..."
+    bcdedit /set {current} isolatedcontext No 2>$null | Out-Null
+
+    Write-Log '+' "Enabling NX (DEP) opt-in..."
+    bcdedit /set {current} nx optin 2>$null | Out-Null
+
+    Write-Log '+' "Setting legacy boot menu policy..."
+    bcdedit /set bootmenupolicy Legacy 2>$null | Out-Null
+}
+function Set-NtfsConfiguration {
+    [CmdletBinding()]
+    param()
+
+    Write-Log '+' "Configuring NTFS behavior and disk power settings..."
+
+    # === NTFS behavior ===
+    fsutil behavior set disable8dot3 1           | Out-Null
+    fsutil behavior set disablecompression 1      | Out-Null
+    fsutil behavior set disabledeletenotify 0     | Out-Null
+    fsutil behavior set disableencryption 1       | Out-Null
+    fsutil behavior set encryptpagingfile 0       | Out-Null
+    fsutil behavior set memoryusage 2             | Out-Null
+    fsutil behavior set mftzone 4                 | Out-Null
+    fsutil behavior set disablelastaccess 1       | Out-Null
+    fsutil behavior set quotanotify 86400         | Out-Null
+
+    # === Disk power ===
+    # Only apply power settings for GUIDs that exist in the current scheme
+    $diskSubSettings = @(
+        '0b2d69d7-a2a1-449c-9680-f91c70521c60',
+        'dab60367-53fe-4f59-828b-ccb42464c0ad',
+        'd639518a-e56d-4345-8af2-b9f32fb26109',
+        'd3d55efd-c1bd-4242-8af08-3362b6389142',
+        '25dfa149-5dd1-4736-b5ab-e8a37b5b8187'
+    )
+    foreach ($guid in $diskSubSettings) {
+        $queryResult = powercfg -query SCHEME_CURRENT SUB_DISK $guid 2>&1 | Out-String
+        if ($queryResult -match 'Power Setting GUID') {
+            powercfg -setacvalueindex SCHEME_CURRENT SUB_DISK $guid 0 2>$null | Out-Null
+        }
+    }
+
+    Write-Log '+' "NTFS and disk power configuration completed."
+}
+
+function Set-MobileSyncOptimizations {
+    [CmdletBinding()]
+    param()
+
+    Write-Log '+' "Configuring mobile sync / disk HIPM-DIPM and write cache..."
+
+    foreach ($prop in @('EnableHIPM', 'EnableDIPM', 'EnableHDDParking')) {
+        $keys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "$prop" 2>$null |
+            Select-String -Pattern '^HKEY'
+        foreach ($key in $keys) {
+            $keyPath = $key.Line.Trim()
+            reg add "$keyPath" /v "$prop" /t REG_DWORD /d "0" /f | Out-Null
+        }
+    }
+
+    taskkill /im mobsync.exe /f 2>$null | Out-Null
+    Start-Sleep -Milliseconds 500
+
+    try {
+        $mobsync = "$env:windir\system32\mobsync.exe"
+        $mobsyncOld = "$env:windir\system32\mobsync.old"
+        if (Test-Path $mobsync) {
+            # mobsync.exe is owned by TrustedInstaller — need MinSudo to rename.
+            $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+            if (Test-Path $minSudo) {
+                # Use cmd `ren` under TrustedInstaller (handles both fresh rename and replace-existing).
+                $renCmd = "if exist `"$mobsyncOld`" del /f /q `"$mobsyncOld`" & ren `"$mobsync`" mobsync.old"
+                $proc = Start-Process -FilePath $minSudo -ArgumentList "--NoLogo --TrustedInstaller --Privileged cmd.exe /c `"$renCmd`"" -Wait -PassThru -WindowStyle Hidden
+                if ($proc.ExitCode -eq 0 -and (Test-Path $mobsyncOld)) {
+                    Write-Log '+' "Renamed mobsync.exe to mobsync.old (via TrustedInstaller)"
+                } else {
+                    throw "MinSudo ren exit $($proc.ExitCode)"
+                }
+            } else {
+                # Fallback: take ownership then rename
+                $acl = Get-Acl $mobsync
+                $adminSid = [System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')
+                $acl.SetOwner($adminSid)
+                Set-Acl -Path $mobsync -AclObject $acl -ErrorAction Stop
+                if (Test-Path $mobsyncOld) { Remove-Item -Path $mobsyncOld -Force -ErrorAction Stop }
+                Rename-Item -Path $mobsync -NewName 'mobsync.old' -Force -ErrorAction Stop
+                Write-Log '+' "Renamed mobsync.exe to mobsync.old (ownership takeover)"
+            }
+        }
+    }
+    catch {
+        Write-Log '-' "Could not rename mobsync.exe: $_"
+    }
+
+    $enumKeys = reg query "hklm\SYSTEM\CurrentControlSet\Enum" /f "{4d36e967-e325-11ce-bfc1-08002be10318}" /d /s 2>$null |
+        Select-String -Pattern '^HKEY'
+    foreach ($enumKey in $enumKeys) {
+        $diskPath = Join-Path $enumKey.Line.Trim() 'Device Parameters\Disk'
+        reg add "$diskPath" /v UserWriteCacheSetting /t REG_DWORD /d 1 /f | Out-Null
+        reg add "$diskPath" /v CacheIsPowerProtected /t REG_DWORD /d 1 /f | Out-Null
+    }
+
+    Write-Log '+' "Mobile sync configuration completed."
 }
 function Set-NtfsConfiguration {
     [CmdletBinding()]
@@ -1738,15 +1901,33 @@ function Set-RegistryPowerTweaks {
     # === HKLM\SYSTEM\CurrentControlSet\Control\Power ===
     $powerBase = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'
     if ($isDesktop) {
+<<<<<<< HEAD
+=======
+        Set-RegistryValue -Path $powerBase -Name 'DisableIdleStatesAtBoot' -Type DWORD -Value 2
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         Set-RegistryValue -Path $powerBase -Name 'CoalescingTimerInterval' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'DeepIoCoalescingEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'EnergyEstimationEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'IgnoreCsComplianceCheck' -Type DWORD -Value 1
         Set-RegistryValue -Path $powerBase -Name 'MSDisabled' -Type DWORD -Value 1
         Set-RegistryValue -Path $powerBase -Name 'StandbyConnectivityGracePeriod' -Type DWORD -Value 0
+<<<<<<< HEAD
         Set-RegistryValue -Path $powerBase -Name 'SleepstudyAccountingEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'PlatformAoAcOverride' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'PlatformRoleOverride' -Type DWORD -Value 0
+=======
+        Set-RegistryValue -Path $powerBase -Name 'AllowHibernate' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'HibernateEnabled' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'HiberbootEnabled' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'HibernateEnabledDefault' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'HibernateChecksummingEnabled' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'SkipHibernateMemoryMapValidation' -Type DWORD -Value 1
+        Set-RegistryValue -Path $powerBase -Name 'HiberFileSizePercent' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'SleepstudyAccountingEnabled' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'PlatformAoAcOverride' -Type DWORD -Value 0
+        Set-RegistryValue -Path $powerBase -Name 'PlatformRoleOverride' -Type DWORD -Value 0
+        Set-RegistryValue -Path "$powerBase\ForceHibernateDisabled" -Name 'Policy' -Type DWORD -Value 1
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     }
     Set-RegistryValue -Path $powerBase -Name 'DisableInboxPepGeneratedConstraints' -Type DWORD -Value 1
     Set-RegistryValue -Path $powerBase -Name 'EnforceAusterityMode' -Type DWORD -Value 0
@@ -1761,6 +1942,7 @@ function Set-RegistryPowerTweaks {
     if (-not (Test-Path $taggedEnergy)) { New-Item -Path $taggedEnergy -Force | Out-Null }
     Set-RegistryValue -Path $taggedEnergy -Name 'DisableTaggedEnergyLogging' -Type DWORD -Value 1
     Set-RegistryValue -Path $taggedEnergy -Name 'TelemetryMaxApplication' -Type DWORD -Value 0
+<<<<<<< HEAD
     Set-RegistryValue -Path $taggedEnergy -Name 'TelemetryMaxTagPerApplication' -Type DWORD -Value 0
 
     # === Session Manager\Throttle ===
@@ -1781,6 +1963,8 @@ function Set-RegistryPowerTweaks {
 
     # === Schedule (RPC over scheduler) ===
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule' -Name 'DisableRpcOver' -Type DWORD -Value 1
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
     # === Misc policies ===
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Control Panel\International' -Name 'BlockCleanupOfUnusedPreinstalledLangPacks' -Type DWORD -Value 1
@@ -1819,6 +2003,7 @@ function Set-RegistryPowerTweaks {
     $stornvme = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'
     if (-not (Test-Path $stornvme)) { New-Item -Path $stornvme -Force | Out-Null }
     Set-RegistryValue -Path $stornvme -Name 'DisableDSTThrottle' -Type DWORD -Value 1
+<<<<<<< HEAD
     if (-not $isDesktop) {
         # Laptop: keep NVMe idle power management (battery). Desktop: 0 (perf) set by Set-DesktopPowerOptimizations.
         Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 1
@@ -1829,6 +2014,22 @@ function Set-RegistryPowerTweaks {
 
     # === Session Manager\Executive ===
     $exec = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Executive'
+=======
+    Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 0
+    Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Classpnp' -Name 'NVMeDisablePerfThrottling' -Type DWORD -Value 1
+
+    # === Graphics drivers (TDR / HwSch) ===
+    $gfx = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
+    Set-RegistryValue -Path $gfx -Name 'HwSchMode' -Type DWORD -Value 2
+    Set-RegistryValue -Path 'HKLM:\SYSTEM\ControlSet001\Control\GraphicsDrivers' -Name 'HwSchTreatExperimentalAsStable' -Type DWORD -Value 1
+    Set-RegistryValue -Path $gfx -Name 'TdrLevel'      -Type DWORD -Value 0
+    Set-RegistryValue -Path $gfx -Name 'TdrDebugMode'  -Type DWORD -Value 1
+
+    # === Session Manager\Executive ===
+    $exec = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Executive'
+    Set-RegistryValue -Path $exec -Name 'AdditionalCriticalWorkerThreads' -Type DWORD -Value 0
+    Set-RegistryValue -Path $exec -Name 'AdditionalDelayedWorkerThreads' -Type DWORD -Value 0
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     Set-RegistryValue -Path $exec -Name 'TickcountRolloverDelay' -Type DWORD -Value 0
 }
 

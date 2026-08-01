@@ -156,7 +156,11 @@ echo [+] Fixing disappearing cursor...
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableCursorSuppression /t REG_DWORD /d 0 /f >nul 2>&1
 
 :: Stop license checking on every startup
+<<<<<<< HEAD
 :: NOTE: NoGenTicket=1 breaks Microsoft Account login chain set to 0 instead (handled by privacy.yml)
+=======
+:: NOTE: NoGenTicket=1 breaks Microsoft Account login chain — set to 0 instead (handled by privacy.yml)
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 echo [+] Stopping license checking...
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform" /v NoGenTicket /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform" /v AllowWindowsEntitlementReactivation /t REG_DWORD /d 1 /f >nul 2>&1

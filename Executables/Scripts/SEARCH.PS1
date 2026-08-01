@@ -39,7 +39,11 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarFlashing'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarEnabled'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarMode'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSn'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSn'; Value = '1'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSd'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarGlomLevel'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarGlomLevel'; Value = '0'; Type = 'REG_DWORD' }
@@ -62,14 +66,22 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\SQMLogger'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\SetupPlatformTel'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Circular Kernel Context Logger'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\DiagLog'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\DiagLog'; Name = 'Start'; Value = '1'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\LwtNetLog'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Microsoft-Windows-Rdp-Graphics-RdpIdd-Trace'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\NtfsLog'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\ReFSLog'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\UBPM'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WiFiSession'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Diagtrack-Listener'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\AutoLogger-Diagtrack-Listener'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Cellcore'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\CimFSUnionFS-Filter'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\FaceTel'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
@@ -87,7 +99,11 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\TCPIPLOGGER'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\TileStore'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Tpm'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WdiContextLog'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WdiContextLog'; Name = 'Start'; Value = '1'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WFP-IPsec Trace'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WiFiDriverHVSession'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WiFiDriverHVSessionRepro'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
@@ -95,7 +111,11 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WiFiDriverIHVSessionRepro'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WMI_Traces'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PerfTrack'; Name = 'Disabled'; Value = '1'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat'; Name = 'AITEnable'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKCU\SOFTWARE\Policies\Microsoft\Windows\AppCompat'; Name = 'AITEnable'; Value = '0'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack'; Name = 'ShowedToastAtLevel'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CPSS\Store\ImproveInkingAndTyping'; Name = 'Value'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings'; Name = 'IsDeviceSearchHistoryEnabled'; Value = '0'; Type = 'REG_DWORD' }
@@ -110,7 +130,11 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection'; Name = 'AllowUpdateComplianceProcessing'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection'; Name = 'MaxTelemetryAllowed'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\System'; Name = 'EnableFontProviders'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReporting'; Name = 'PreventHandwritingErrorReports'; Value = '1'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReporting'; Name = 'PreventHandwritingData'; Value = '1'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\WcmSvc\wifiservice'; Name = 'WifiSense'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\NetworkConnectivityStatusIndicator'; Name = 'DisablePassivePolling'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\Photos'; Name = 'DisableCameraUpload'; Value = '1'; Type = 'REG_DWORD' }
@@ -119,8 +143,12 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\WinSAT'; Name = 'DisableWinSAT'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\System'; Name = 'EnableSharedPCMode'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'; Name = 'RestrictDriverInstallationToAdministrators'; Value = '1'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\SQM'; Name = 'DisableCustomerImprovementProgram'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Policies\Microsoft\Internet Explorer\SQM'; Name = 'DisableCustomerImprovementProgram'; Value = '1'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\SQM'; Name = 'DisableCustomerExperienceImprovementProgram'; Value = '0'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 )
 
 $set = 0

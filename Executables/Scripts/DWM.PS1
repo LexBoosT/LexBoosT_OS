@@ -21,6 +21,7 @@ Write-Host '       DWM Registry Tweaks'
 Write-Host '============================================'
 
 $regValues = @(
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OneCoreNoDWMRawGameController'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'MPCInputRouterWaitForDebugger'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'InteractionOutputPredictionDisabled'; Value = '1'; Type = 'REG_DWORD' }
@@ -43,6 +44,13 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableDrawListCaching'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableEffectCaching'; Value = '1'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableAdvancedDirectFlip'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableDrawListCaching'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableEffectCaching'; Value = '0'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableImageProcessing'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'UseHWDrawListEntriesOnWARP'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDDisplayScanoutCaching'; Value = '1'; Type = 'REG_DWORD' }
@@ -55,10 +63,17 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'RecurringWatchdogTelemetryTimeoutMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'InitialWatchdogTelemetryTimeoutMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnablePrimitiveReordering'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleModeOverride'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleInLinearSpace'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'HighColor'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDesktopOverlays'; Value = '0'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleModeOverride'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleInLinearSpace'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'HighColor'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDesktopOverlays'; Value = '1'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableFrontBufferRenderChecks'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCommonSuperSets'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OptimizeForDirtyExpressions'; Value = '1'; Type = 'REG_DWORD' }
@@ -75,7 +90,11 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\DWM\Schedule'; Name = 'LingerInterval'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'MaxQueuedPresentBuffers'; Value = '1'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'MaxQueuedPresentBuffers'; Value = '3'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM\ExtendedComposition'; Name = 'ExclusiveModeFramerateAveragingPeriodMs'; Value = '1000'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\ExtendedComposition'; Name = 'ExclusiveModeFramerateThresholdPercent'; Value = '45'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM\ExtendedComposition'; Name = 'ExclusiveModeFramerateThresholdPercent'; Value = '45'; Type = 'REG_DWORD' }
@@ -83,8 +102,13 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'AnimationsShiftKey'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ParallelModePolicy'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\Scene'; Name = 'EnableBloom'; Value = '0'; Type = 'REG_DWORD' }
+<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCpuClipping'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableMegaRects'; Value = '1'; Type = 'REG_DWORD' }
+=======
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCpuClipping'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableMegaRects'; Value = '0'; Type = 'REG_DWORD' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ForceDesktopTreeFullDirty'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'GammaBlendPencil'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'GammaBlendWithFP16'; Value = '1'; Type = 'REG_DWORD' }
@@ -119,4 +143,8 @@ Write-Host '============================================'
 Write-Host '       Done!'
 Write-Host '============================================'
 
+<<<<<<< HEAD
 exit 0
+=======
+exit 0
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

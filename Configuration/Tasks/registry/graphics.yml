@@ -1,0 +1,7 @@
+---
+title: Graphics
+description: Applies GPU/graphics tweaks via GRAPHICS.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Graphics Tweaks'}
+  - !powerShell: {command: '.\\Scripts\\GRAPHICS.PS1', exeDir: true, runas: currentUserElevated, wait: true}

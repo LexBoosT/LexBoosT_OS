@@ -104,11 +104,14 @@ actions:
   - !service: { name: 'PNRPsvc', operation: change, startup: 3 }
   - !service: { name: 'tcpipreg', operation: change, startup: 4 }
   # -- Disabled --
+<<<<<<< HEAD
   # Noverse cross-check (deliberate): the 7 services below are kept disabled despite docs
   # warnings — none of their features are used on a gaming desktop: AppMgmt (GPO software
   # deployment), MSDTC (distributed transactions), MapsBroker (Maps app), SEMgrSvc (NFC
   # payments), WalletService, WMPNetworkSvc (media sharing), SSDPSRV (UPnP/SSDP discovery —
   # re-enable if DLNA / network discovery is ever needed).
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !service: { name: 'AJRouter', operation: change, startup: 4 }
   - !service: { name: 'ALG', operation: change, startup: 4 }
   - !service: { name: 'Fax', operation: change, startup: 4 }
@@ -170,9 +173,15 @@ actions:
   # -- Manual --
   - !service: { name: 'CDPSvc', operation: change, startup: 3 }
   - !service: { name: 'CDPUserSvc', operation: change, startup: 3 }
+<<<<<<< HEAD
   - !service: { name: 'GpuEnergyDrv', operation: change, startup: 3 }
   - !service: { name: 'SysMain', operation: change, startup: 3 }
   - !run: { exe: 'cmd', args: '/c "sc query SysMain | find "RUNNING" >nul && net stop SysMain >nul 2>&1 || exit /b 0"', weight: 200 }
+=======
+  - !service: { name: 'GpuEnergyDrv', operation: change, startup: 4 }
+  - !service: { name: 'SysMain', operation: change, startup: 3 }
+  - !run: { exe: 'cmd', args: '/c "sc query SysMain | find "RUNNING" >nul && net stop SysMain >nul 2>&1"', weight: 200 }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !service: { name: 'VacSvc', operation: change, startup: 3 }
   - !service: { name: 'VSS', operation: change, startup: 3 }
   - !service: { name: 'WpnService', operation: change, startup: 3 }
@@ -254,7 +263,11 @@ actions:
   - !service: { name: 'vds', operation: change, startup: 2 }
   - !service: { name: 'webthreatdefsvc', operation: change, startup: 2 }
   - !service: { name: 'wlidsvc', operation: change, startup: 2 }
+<<<<<<< HEAD
   - !service: { name: 'DisplayEnhancementService', operation: change, startup: 2 }
+=======
+  - !service: { name: 'HvHost', operation: change, startup: 3 }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # -- Manual --
   - !service: { name: 'AppIDSvc', operation: change, startup: 3 }
   - !service: { name: 'AppReadiness', operation: change, startup: 3 }
@@ -274,7 +287,10 @@ actions:
   - !service: { name: 'EntAppSvc', operation: change, startup: 3 }
   - !service: { name: 'FDResPub', operation: change, startup: 3 }
   - !service: { name: 'fdPHost', operation: change, startup: 3 }
+<<<<<<< HEAD
   - !service: { name: 'HvHost', operation: change, startup: 3 }
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !service: { name: 'IEEtwCollectorService', operation: change, startup: 3 }
   - !service: { name: 'InstallService', operation: change, startup: 3 }
   - !service: { name: 'InventorySvc', operation: change, startup: 3 }
@@ -293,7 +309,12 @@ actions:
   - !service: { name: 'UnistoreSvc', operation: change, startup: 3 }
   - !service: { name: 'wuauserv', operation: change, startup: 3 }
   - !service: { name: 'wmiApSrv', operation: change, startup: 4 }
+<<<<<<< HEAD
   - !service: { name: 'GraphicsPerfSvc', operation: change, startup: 3 }
+=======
+  - !service: { name: 'GraphicsPerfSvc', operation: change, startup: 4 }
+  - !service: { name: 'DisplayEnhancementService', operation: change, startup: 4, option: 'desktop-only' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
   # -- Disabled --
   - !service: { name: 'AssignedAccessManagerSvc', operation: change, startup: 4 }

@@ -23,23 +23,47 @@ function Write-Log {
 }
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # 0. Targeted netsh settings (NO stack reset — preserves DNS + congestion provider)
 #    Removed: netsh int ip reset (wipes DNS, requires reboot to take effect)
 #    Removed: netsh winsock reset, ipv4/ipv6/tcp reset
 # -----------------------------------------------------------------------------
 Write-Log '+' 'Applying targeted netsh settings (DNS + congestion provider preserved)...'
+=======
+# 0. netsh stack reset (migrated from network.yml)
+# -----------------------------------------------------------------------------
+Write-Log '+' 'Resetting TCP/IP stack (netsh)...'
+netsh int ip reset          | Out-Null
+netsh interface ipv4 reset  | Out-Null
+netsh interface ipv6 reset  | Out-Null
+netsh interface tcp reset   | Out-Null
+netsh winsock reset         | Out-Null
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 netsh int tcp set security profiles=disabled | Out-Null
 netsh int udp set global uro=enabled         | Out-Null
 netsh int tcp set global timestamps=disabled| Out-Null
 
 # -----------------------------------------------------------------------------
+<<<<<<< HEAD
 # 0b. Disable unused bindings (live apply - no device removal; pnputil
 #     /remove-device + /scan-devices removed: it recreated the interface
 #     config of every NIC and wiped manually configured DNS servers)
+=======
+# 0b. Disable unused bindings + re-enumerate network devices
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # -----------------------------------------------------------------------------
 try {
     Disable-NetAdapterBinding -Name '*' -ComponentID 'vmware_bridge','ms_lldp','ms_lltdio','ms_implat','ms_rspndr','ms_server','ms_msclient' -ErrorAction SilentlyContinue
 } catch {}
+<<<<<<< HEAD
+=======
+try {
+    foreach ($dev in Get-PnpDevice -Class Net -Status 'OK') {
+        pnputil /remove-device $dev.InstanceId 2>&1 | Out-Null
+    }
+    pnputil /scan-devices | Out-Null
+} catch {}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # -----------------------------------------------------------------------------
 # 0c. Disable NetBT/NetBIOS/LMHOSTS via reg.exe (migrated from network.yml)
@@ -109,10 +133,14 @@ foreach ($nic in $adapters) {
         @{ Keyword='EnableGreenEthernet';      Value=0;    Name='Green Ethernet' },
         @{ Keyword='PowerSavingMode';          Value=0;    Name='Power Saving Mode' },
         @{ Keyword='UseInterruptSteering';     Value=0;    Name='Interrupt Steering' },
+<<<<<<< HEAD
         @{ Keyword='*JumboPacket';             Value=1514; Name='Jumbo Packet' },
         @{ Keyword='DisableLLDP';              Value=1;    Name='Disable LLDP' },
         @{ Keyword='*HeaderDataSplit';         Value=1;    Name='Header Data Split' },
         @{ Keyword='HDSplitAlways';            Value=1;    Name='Header Data Split Always' }
+=======
+        @{ Keyword='*JumboPacket';             Value=1514; Name='Jumbo Packet' }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     )
 
     foreach ($prop in $advancedProps) {

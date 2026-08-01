@@ -274,9 +274,15 @@ process {
         $allPackages = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -notmatch 'Microsoft.WindowsStore' }
 
         # === PRE-CLEANUP: kill processes that often lock AppX packages ===
+<<<<<<< HEAD
         # tiworker and dism are the main blockers for system AppX removal.
         try {
             $lockers = @('tiworker', 'Dism', 'dism')
+=======
+        # tiworker, dism, and aumall are the main blockers for system AppX removal.
+        try {
+            $lockers = @('tiworker', 'TiWorker', 'Dism', 'dism', 'aumall')
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
             foreach ($procName in $lockers) {
                 Get-Process -Name $procName -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
             }

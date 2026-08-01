@@ -60,7 +60,11 @@ $regValues = @(
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs\ShellNew';               Name = 'NullFile';          Value = '';                           Type = 'String' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs\ShellNew';               Name = 'ItemName';          Value = '%windir%\System32\wscript.exe,-4804'; Type = 'ExpandString' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile';                     Name = '';                  Value = 'VBScript File';               Type = 'String' },
+<<<<<<< HEAD
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile';                     Name = 'FriendlyTypeName';  Value = 'VBScript File';                Type = 'String' },
+=======
+    @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile';                     Name = 'FriendlyTypeName';  Value = 'Fichier VBScript';             Type = 'String' },
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile\DefaultIcon';         Name = '';                  Value = '%SystemRoot%\System32\WScript.exe,2'; Type = 'ExpandString' }
 )
 

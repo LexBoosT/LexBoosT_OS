@@ -1,5 +1,13 @@
 Add-Type -AssemblyName System.Drawing
 
+<<<<<<< HEAD
+=======
+function Write-Log {
+    param([string]$Status, [string]$Message)
+    Write-Host "[$Status] $Message"
+}
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 $img = [System.Drawing.Image]::FromFile((Get-Item (Join-Path (Split-Path -Parent $PSScriptRoot) 'user.png')))
 
 $resolutions = @{

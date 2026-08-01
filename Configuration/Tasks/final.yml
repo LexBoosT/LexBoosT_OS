@@ -262,12 +262,22 @@ actions:
       status: "Disabling Remote Assistance",
     }
   - !registryValue: {
-      path: 'HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance',
+      path: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance',
       value: "fAllowFullControl",
       type: REG_DWORD,
       data: "0",
       onUpgrade: false,
     }
+<<<<<<< HEAD
+=======
+  - !registryValue: {
+      path: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance',
+      value: "fAllowToGetHelp",
+      type: REG_DWORD,
+      data: "0",
+      onUpgrade: false,
+    }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !powerShell: {
       command: '.\\Scripts\\DISABLE_REMOTE_ASSIST_FIREWALL.PS1',
       exeDir: true,

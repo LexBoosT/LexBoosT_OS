@@ -38,7 +38,11 @@ try {
     Write-Log '+' "Using bundled ViVeTool: $exePath"
 
     # --- 2. Enable features ---
+<<<<<<< HEAD
     Write-Log '+' "Enabling low-latency features (IDs: 60716524, 61391826, 58989092)..."
+=======
+    Write-Log '+' "Enabling low-latency features (IDs: 60716524, 61391826, 58989092, 36435115)..."
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     $process = Start-Process -FilePath $exePath -ArgumentList '/enable /id:60716524,61391826,58989092' -NoNewWindow -Wait -PassThru
 
     if ($process.ExitCode -eq 0) {

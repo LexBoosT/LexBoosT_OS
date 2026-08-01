@@ -60,7 +60,11 @@ function Test-WindowsTerminalInstalled {
 function Test-WingetInstalled {
     try {
         $wingetCmd = Get-Command winget -ErrorAction Stop
+<<<<<<< HEAD
         return $null -ne $wingetCmd
+=======
+        return $wingetCmd -ne $null
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     } catch {
         return $false
     }

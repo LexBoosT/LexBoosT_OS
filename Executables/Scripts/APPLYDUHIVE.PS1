@@ -103,11 +103,22 @@ if (-not (Test-Path $configurationFolder)) {
         try {
             $yamlContent = Get-Content $yamlFile.FullName -Raw -ErrorAction Stop
             $parsedYaml = ConvertFrom-Yaml $yamlContent
+<<<<<<< HEAD
             foreach ($entry in @($parsedYaml.actions)) {
                 # Each action is a hashtable; only !registryValue entries carry a 'path' key
                 if ($entry.path -and $entry.path -like 'HKCU*') {
                     $subPath = $entry.path.Substring(4)
                     if (!$RegistryPaths.Contains($subPath)) { $RegistryPaths += $subPath }
+=======
+            foreach ($entry in $parsedYaml) {
+                if ($entry.actions.path) {
+                    foreach ($value in $entry.actions.path) {
+                        if ($value -like 'HKCU*') {
+                            $subPath = $value.Substring(4)
+                            if (!$RegistryPaths.Contains($subPath)) { $RegistryPaths += $subPath }
+                        }
+                    }
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
                 }
             }
         } catch {

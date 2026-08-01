@@ -4,6 +4,7 @@ description: Applies Gaming tweaks via registry values and scripts
 privilege: TrustedInstaller
 actions:
   - !status: {status: 'Disabling Gamemode'}
+<<<<<<< HEAD
   - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '0'}
 
@@ -37,16 +38,42 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile', value: 'SchedulerPeriod', type: REG_DWORD, data: '50000'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile', value: 'MaxThreadsTotal', type: REG_DWORD, data: '65535'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile', value: 'MaxThreadsPerProcess', type: REG_DWORD, data: '128'}
+=======
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '0'}
+
+  - !status: {status: 'Configuring GameDVR'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_DSEBehavior', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_DXGIHonorFSEWindowsCompatible', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_EFSEFeatureFlags', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_FSEBehaviorMode', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_HonorUserFSEBehaviorMode', type: REG_DWORD, data: '1'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
   - !status: {status: 'Config Memory Compression', onUpgrade: false}
   - !run:
       exeDir: true
       exe: 'powershell.exe'
+<<<<<<< HEAD
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\\Scripts\\GAMING_MEMORY_COMPRESSION.PS1"'
+=======
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\GAMING_MEMORY_COMPRESSION.PS1"'
       wait: true
       weight: 200
       onUpgrade: false
 
+  - !status: {status: 'Configuring L2/L3 Cache', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\L2L3.PS1"'
+      runas: currentUserElevated
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+      wait: true
+      weight: 200
+      onUpgrade: false
+
+<<<<<<< HEAD
   # ============================================
   # Microsoft Games Optimization (FPS overlay)
   # ============================================
@@ -55,3 +82,5 @@ actions:
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'FpsStatusGames', type: REG_DWORD, data: '10'}
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'FpsAll', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'GameFluidity', type: REG_DWORD, data: '1'}
+=======
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

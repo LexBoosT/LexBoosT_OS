@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿$ProtectedClasses = @(
     'HIDClass',
     'System',
@@ -39,6 +40,9 @@ $ProtectedProviders = @(
 )
 
 $OriginalFileName = @{
+=======
+﻿$OriginalFileName = @{
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     Name        = "OriginalFileName"
     Expression  = { $_.OriginalFileName | Split-Path -Leaf }
 }
@@ -50,7 +54,11 @@ $DriverDate = @{
 
 $AllDrivers = Get-WindowsDriver -Online -All |
     Where-Object { $_.Driver -like 'oem*inf' } |
+<<<<<<< HEAD
     Select-Object -Property $OriginalFileName, Driver, ClassDescription, ClassName, ProviderName, $DriverDate, Version
+=======
+    Select-Object -Property $OriginalFileName, Driver, ClassDescription, ProviderName, $DriverDate, Version
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 Write-Verbose -Message "All installed third-party drivers" -Verbose
 ($AllDrivers | Sort-Object -Property ClassDescription | Format-Table -AutoSize -Wrap | Out-String).Trim()
@@ -60,7 +68,11 @@ $DriverGroups = $AllDrivers | Group-Object -Property OriginalFileName | Where-Ob
 Write-Verbose -Message "Duplicate drivers" -Verbose
 ($DriverGroups | ForEach-Object {
     $_.Group | Sort-Object -Property DriverDate -Descending | Select-Object -Skip 1 |
+<<<<<<< HEAD
         Select-Object OriginalFileName, Driver, ClassDescription, ClassName, ProviderName,
+=======
+        Select-Object OriginalFileName, Driver, ClassDescription, ProviderName,
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
                       @{N='Date';E={$_.DriverDate.ToString('dd/MM/yyyy')}}, Version
 } | Format-Table | Out-String).Trim()
 
@@ -69,6 +81,7 @@ $DriversToRemove = $DriverGroups | ForEach-Object {
     $_.Group | Sort-Object -Property DriverDate -Descending | Select-Object -Skip 1
 }
 
+<<<<<<< HEAD
 # Filter out protected drivers by class or provider
 $FilteredDrivers = $DriversToRemove | Where-Object {
     $protected = $false
@@ -93,16 +106,24 @@ $FilteredDrivers = $DriversToRemove | Where-Object {
 
 Write-Verbose -Message "Drivers to remove (after protection filter)" -Verbose
 ($FilteredDrivers |
+=======
+Write-Verbose -Message "Drivers to remove" -Verbose
+($DriversToRemove |
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     Select-Object OriginalFileName, Driver, ClassDescription, ProviderName,
                   @{N='Date';E={$_.DriverDate.ToString('dd/MM/yyyy')}}, Version |
     Sort-Object -Property ClassDescription | Format-Table | Out-String).Trim()
 
+<<<<<<< HEAD
 if ($FilteredDrivers.Count -eq 0) {
     Write-Host "No drivers to remove after applying protection filters."
     return
 }
 
 foreach ($item in $FilteredDrivers) {
+=======
+foreach ($item in $DriversToRemove) {
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     $Name = $($item.Driver).Trim()
     Write-Host "Removing driver: $Name"
     $result = & pnputil.exe /delete-driver "$Name" /force 2>&1

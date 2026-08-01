@@ -1,6 +1,17 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
 
+<<<<<<< HEAD
+=======
+<#
+.SYNOPSIS
+    Additional safe power optimizations for desktop low-latency systems.
+.DESCRIPTION
+    Disables hibernation and hybrid sleep on desktops, and forces
+    sleep-after and disk-off timers to 0 on AC power.
+#>
+
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference    = 'SilentlyContinue'
 

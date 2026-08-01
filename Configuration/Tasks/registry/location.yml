@@ -3,6 +3,10 @@ title: Location and Sensors
 description: Applies Location and Sensors tweaks via registry values
 privilege: TrustedInstaller
 actions:
+<<<<<<< HEAD
+=======
+  - !status: {status: 'Applying Location'}
+>>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableLocationScripting', type: REG_DWORD, data: '1', option: 'desktop-only'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableSensors', type: REG_DWORD, data: '1', option: 'desktop-only'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableWindowsLocationProvider', type: REG_DWORD, data: '1', option: 'desktop-only'}

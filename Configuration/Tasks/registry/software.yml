@@ -1,0 +1,7 @@
+---
+title: Software Registry
+description: Applies 7-Zip, Notepad, and file-association registry tweaks via SOFTWARE-ASSOCIATIONS.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying Software'}
+  - !powerShell: {command: '.\\Scripts\\SOFTWARE-ASSOCIATIONS.PS1', exeDir: true, runas: currentUserElevated, wait: true}
