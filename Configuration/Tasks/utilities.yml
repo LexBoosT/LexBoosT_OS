@@ -1,0 +1,92 @@
+---
+title: Utilities
+description: Post-finalization utility scripts for LexBoosT OS NexT
+privilege: TrustedInstaller
+actions:
+  # ============================================
+  # APPLY HKCU TO ALL USER PROFILES (Default + offline)
+  # ============================================
+  - !status: {status: 'Applying HKCU Settings'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPLYDUHIVE.PS1"'
+      runas: currentUserElevated
+      wait: true
+
+  # ============================================
+  # DEPLOY ROLLBACK SCRIPT (copies ROLLBACK.PS1 to %ProgramData%\LexBoosTOS\Scripts
+  # and registers the desktop context menu entry "Restore LexBoosT OS Backup")
+  # ============================================
+  - !status: {status: 'Deploying Rollback'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEPLOY-ROLLBACKSCRIPT.PS1"'
+      wait: true
+
+  # ============================================
+  # POWER: EXTRAS (desktop hibernate off + AC timers)
+  # NOTE: power.yml values are applied first; POWER-EXTRAS.PS1 applies additional
+  # desktop-only hibernate/sleep tweaks that complement (not override) the YML.
+  # ============================================
+  - !status: {status: 'Applying Power Extras'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\POWER-EXTRAS.PS1"'
+      wait: true
+
+  # ============================================
+  # DELETE OLD/DUPLICATE DRIVERS (opt-in: option "delete-old-drivers")
+  # WARNING: pnputil /delete-driver can break OEM I2C/HID/ACPI/SerialIO stacks.
+  # Only enable on desktop PCs where you manage your own drivers.
+  # ============================================
+  - !status: {status: 'Removing Old Drivers', option: 'delete-old-drivers'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\\Scripts\DELETE_OLD_DRIVERS.PS1" -Verbose'
+      wait: true
+      option: 'delete-old-drivers'
+
+  # ============================================
+  # Install Browser(s)
+  # ============================================
+  - !status: {status: 'Installing Browser(s)'}
+  - !task: {path: 'Tasks\browsers\Brave.yml', option: "Brave"}
+  - !task: {path: 'Tasks\browsers\Firefox.yml', option: "Firefox"}
+  - !task: {path: 'Tasks\browsers\Chrome.yml', option: "Chrome"}
+  - !task: {path: 'Tasks\browsers\Zen.yml', option: "Zen"}
+  - !task: {path: 'Tasks\browsers\OperaGX.yml', option: "OperaGX"}
+  - !task: {path: 'Tasks\\browsers\\Vivaldi.yml', option: "Vivaldi"}
+
+  # ============================================
+  # APPLY THEME (after browsers are installed)
+  # ============================================
+  - !status: {status: 'Installing Theme', option: "configure-theme"}
+  - !powerShell: {
+      command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action CopyThemeFile',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 50,
+      option: "configure-theme",
+    }
+  - !powerShell: {
+      command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action InstallTheme',
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 50,
+      option: "configure-theme",
+    }
+
+  - !status: {status: 'Configuring User Folders'}
+  - !run: {
+      exe: ".\\Scripts\\FOLDER_USER.CMD",
+      exeDir: true,
+      runas: currentUserElevated,
+      wait: true,
+      weight: 50,
+    }

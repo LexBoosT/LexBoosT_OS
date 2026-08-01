@@ -1,0 +1,44 @@
+---
+title: Edge
+option: 'remove-edge'
+description: Edge uninstall — all registry/file/service actions migrated to EDGE.PS1 (-Mode Full) and EDGE-LATENCY.PS1
+privilege: TrustedInstaller
+actions:
+  # ============================================
+  # EDGE.PS1 -Mode Full: ALL uninstall actions
+  # (covers 4 taskKill + 3 service delete + 13 file + 23 registryValue delete
+  #  + 4 registryKey delete + 23 registryKey + 2 appx + 21 EdgeUpdate policy
+  #  + 2 scheduledTask + 1 systemPackage = 100% of the previous inline actions)
+  # ============================================
+  - !status: {status: 'Removing Microsoft Edge', option: 'remove-edge'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\EDGE.PS1" -Mode Full'
+      runas: currentUserElevated
+      wait: true
+      option: 'remove-edge'
+      weight: 200
+
+  # ============================================
+  # CLEANUP-EDGE-DEVTOOLS.CMD: supplementary cleanup
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\CLEANUP-EDGE-DEVTOOLS.CMD'
+      runas: currentUserElevated
+      wait: true
+      option: 'remove-edge'
+
+  # ============================================
+  # EDGE-LATENCY.PS1: disable prelaunch, tab preloading, background mode
+  # ============================================
+  - !status: {status: 'Disabling Edge Latency', option: 'remove-edge'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\EDGE-LATENCY.PS1"'
+      runas: currentUserElevated
+      wait: true
+      option: 'remove-edge'
+      weight: 200

@@ -1,0 +1,12 @@
+---
+title: Firefox Installation
+description: Installs Mozilla Firefox browser
+privilege: TrustedInstaller
+actions:
+  - !run:
+      runas: currentUserElevated
+      exeDir: true
+      wait: true
+      option: "Firefox"
+      exe: "powershell"
+      args: '-EP Bypass -C ".\\Scripts\\SOFTWARE.PS1 -Software Install-Firefox"'

@@ -1,0 +1,18 @@
+---
+title: Audio
+description: Applies audio tweaks via AUDIO.PS1
+privilege: TrustedInstaller
+actions:
+  - !powerShell: {command: '.\\Scripts\\AUDIO.PS1', exeDir: true, runas: currentUserElevated, wait: true}
+
+  # ============================================
+  # MMCSS PRO AUDIO PROFILE — Low-latency audio task scheduling
+  # ============================================
+  - !status: {status: 'Configuring MMCSS Pro Audio profile'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Affinity', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Background Only', type: REG_SZ, data: 'False'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Clock Rate', type: REG_DWORD, data: '10000'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'GPU Priority', type: REG_DWORD, data: '8'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Priority', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Scheduling Category', type: REG_SZ, data: 'High'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'SFIO Priority', type: REG_SZ, data: 'Normal'}

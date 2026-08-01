@@ -1,0 +1,448 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LexBoosT Playbook",
+  "description": "Schema for LexBoosT OS playbook YAML files",
+  "type": "object",
+  "required": ["title", "description", "privilege", "actions"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Display title for this playbook task"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what this task does"
+    },
+    "privilege": {
+      "type": "string",
+      "enum": ["Admin", "TrustedInstaller"],
+      "description": "Required privilege level (Admin or TrustedInstaller)"
+    },
+    "actions": {
+      "type": "array",
+      "description": "Ordered list of actions to execute",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/run" },
+          { "$ref": "#/definitions/registryValue" },
+          { "$ref": "#/definitions/registryKey" },
+          { "$ref": "#/definitions/powerShell" },
+          { "$ref": "#/definitions/service" },
+          { "$ref": "#/definitions/file" },
+          { "$ref": "#/definitions/cmd" },
+          { "$ref": "#/definitions/appx" },
+          { "$ref": "#/definitions/status" },
+          { "$ref": "#/definitions/task" },
+          { "$ref": "#/definitions/taskKill" },
+          { "$ref": "#/definitions/download" },
+          { "$ref": "#/definitions/scheduledTask" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "run": {
+      "description": "!run — Execute an external program or script",
+      "type": "object",
+      "required": ["exe"],
+      "additionalProperties": false,
+      "properties": {
+        "exe": {
+          "type": "string",
+          "description": "Executable name or path (e.g. w32tm, powershell, explorer.exe)"
+        },
+        "args": {
+          "type": "string",
+          "description": "Command-line arguments to pass to the executable"
+        },
+        "exeDir": {
+          "type": "boolean",
+          "description": "If true, resolve exe relative to the playbook directory"
+        },
+        "runas": {
+          "type": "string",
+          "enum": ["currentUser", "currentUserElevated"],
+          "description": "User context to run under"
+        },
+        "wait": {
+          "type": "boolean",
+          "description": "Wait for the process to exit before continuing"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "Execution priority weight"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only run if this option is enabled"
+        },
+        "onUpgrade": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
+        "oobe": {
+          "type": "boolean",
+          "description": "Only run during OOBE (Out-Of-Box Experience)"
+        },
+        "iso": {
+          "type": "boolean",
+          "description": "Only run when booted from ISO/USB"
+        }
+      }
+    },
+    "registryValue": {
+      "description": "!registryValue — Create, modify, or delete a registry value",
+      "type": "object",
+      "required": ["path", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Registry key path (e.g. HKLM\\SOFTWARE\\Microsoft\\...)"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value name (empty string for default value)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["REG_SZ", "REG_DWORD", "REG_BINARY", "REG_MULTI_SZ", "REG_EXPAND_SZ"],
+          "description": "Registry value type"
+        },
+        "data": {
+          "type": ["string", "integer"],
+          "description": "Value data. String for REG_SZ/REG_EXPAND_SZ, number or string for REG_DWORD, hex string for REG_BINARY"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["delete"],
+          "description": "When set to 'delete', removes the value (no type/data needed)"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        },
+        "onUpgrade": {
+          "type": "boolean",
+          "description": "If false, skip during upgrade runs"
+        },
+        "scope": {
+          "type": "string",
+          "description": "Scope of the registry operation (e.g. defaultUser)"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "Execution priority weight"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        }
+      }
+    },
+    "registryKey": {
+      "description": "!registryKey — Create or delete a registry key (folder)",
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Registry key path to create or delete"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["add", "delete"],
+          "description": "Key operation (defaults to 'delete' when absent)"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        }
+      }
+    },
+    "powerShell": {
+      "description": "!powerShell — Run a PowerShell command or script",
+      "type": "object",
+      "required": ["command"],
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "PowerShell command or script path (e.g. '.\\\\Scripts\\\\...')"
+        },
+        "exeDir": {
+          "type": "boolean",
+          "description": "If true, resolve command relative to the playbook directory"
+        },
+        "runas": {
+          "type": "string",
+          "enum": ["currentUser", "currentUserElevated", "trustedInstaller"],
+          "description": "User context to run under"
+        },
+        "wait": {
+          "type": "boolean",
+          "description": "Wait for the script to complete before continuing"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "Execution priority weight"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
+        "errorAction": {
+          "type": "string",
+          "enum": ["Ignore"],
+          "description": "Error handling strategy"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only run if this option is enabled"
+        },
+        "onUpgrade": {
+          "type": "boolean",
+          "description": "If false, skip during upgrade runs"
+        },
+        "cpuArch": {
+          "type": "string",
+          "enum": ["X64", "X86", "Arm64"],
+          "description": "Only run on this CPU architecture"
+        }
+      }
+    },
+    "service": {
+      "description": "!service — Manage a Windows service",
+      "type": "object",
+      "required": ["name", "operation"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Windows service name (e.g. DiagTrack, SysMain, BITS)"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["start", "change", "delete"],
+          "description": "Service operation to perform (start, change startup type, or delete the service)"
+        },
+        "startup": {
+          "type": "integer",
+          "enum": [2, 3, 4],
+          "description": "Startup type: 2=Automatic, 3=Manual, 4=Disabled. Required when operation=change"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
+        "option": {
+          "type": "string",
+          "description": "Continue even if this action fails"
+        }
+      }
+    },
+    "file": {
+      "description": "!file — Delete a file or folder",
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to file or folder to delete (supports env vars like %SystemDrive%)"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        }
+      }
+    },
+    "cmd": {
+      "description": "!cmd — Run a CMD/batch command",
+      "type": "object",
+      "required": ["command"],
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Command to execute (e.g. setx, copy)"
+        },
+        "runas": {
+          "type": "string",
+          "enum": ["currentUserElevated"],
+          "description": "User context to run under"
+        },
+        "wait": {
+          "type": "boolean",
+          "description": "Wait for the command to complete before continuing"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "Execution priority weight"
+        },
+        "exeDir": {
+          "type": "boolean",
+          "description": "If true, resolve command relative to the playbook directory"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only run if this option is enabled"
+        }
+      }
+    },
+    "appx": {
+      "description": "!appx — Remove or manage an AppX package",
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "AppX package name pattern (supports * wildcard)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["family"],
+          "description": "Package type identifier"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["clearCache"],
+          "description": "When set to 'clearCache', clears AppX cache instead of removing"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        }
+      }
+    },
+    "status": {
+      "description": "!status — Display a progress/status message in the UI",
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Status message to display (e.g. 'Initializing', 'Configuring Services')"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only show if this option is enabled"
+        },
+        "onUpgrade": {
+          "type": "boolean",
+          "description": "If false, skip during upgrade runs"
+        }
+      }
+    },
+    "task": {
+      "description": "!task — Import and execute a sub-playbook file",
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path to the sub-playbook YAML file (e.g. 'Tasks\\registry\\explorer\\explorer.yml')"
+        },
+        "onUpgrade": {
+          "type": "boolean",
+          "description": "If false, skip this sub-playbook during upgrade runs"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only import if this option is enabled"
+        }
+      }
+    },
+    "taskKill": {
+      "description": "!taskKill — Terminate a running process",
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Process name to kill (supports * wildcard, e.g. 'msedge', 'msteams*')"
+        },
+        "errorAction": {
+          "type": "string",
+          "enum": ["Ignore"],
+          "description": "Error handling strategy"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        },
+        "pathContains": {
+          "type": "string",
+          "description": "Filter by path component (e.g. '\\\\Edge')"
+        }
+      }
+    },
+    "download": {
+      "description": "!download — Download a file from a URL",
+      "type": "object",
+      "required": ["url", "destination"],
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL to download the file from"
+        },
+        "destination": {
+          "type": "string",
+          "description": "Local file path to save the downloaded file to"
+        },
+        "cpuArch": {
+          "type": "string",
+          "enum": ["X64", "X86", "Arm64"],
+          "description": "Only run on this CPU architecture"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only run if this option is enabled"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "Execution priority weight"
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        }
+      }
+    },
+    "scheduledTask": {
+      "description": "!scheduledTask — Disable, delete, or delete a folder of scheduled tasks",
+      "type": "object",
+      "required": ["path", "operation"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Full path to the scheduled task (e.g. '\\\\Microsoft\\\\Windows\\\\AppListBackup\\\\Backup')"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["disable", "delete", "deleteFolder"],
+          "description": "Action: disable the task, delete the task, or delete the entire task folder"
+        },
+        "option": {
+          "type": "string",
+          "description": "Conditional gate — only apply if this option is enabled"
+        }
+      }
+    }
+  }
+}

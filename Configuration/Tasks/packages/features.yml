@@ -1,0 +1,18 @@
+---
+title: Features
+description: DISM features + Reserved Storage — all migrated to DISM-FEATURES.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Configuring Features'}
+
+  # ============================================
+  # All DISM features/capabilities + Reserved Storage + ReserveManager
+  # migrated to DISM-FEATURES.PS1 (was 14 !run + 1 !registryValue in this YML)
+  # ============================================
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DISM-FEATURES.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

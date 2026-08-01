@@ -1,0 +1,22 @@
+---
+title: Network
+description: Network tweaks — all netsh/registry/NetBT migrated to NETWORK-EXTRAS.PS1
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying NETSH Tuning'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NETSH_TCPIP_APPLY.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200
+
+  - !status: {status: 'Applying Network Extras'}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NETWORK-EXTRAS.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

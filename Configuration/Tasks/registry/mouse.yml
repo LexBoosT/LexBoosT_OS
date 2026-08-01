@@ -1,0 +1,7 @@
+---
+title: Mouse
+description: Applies mouse/pointer tweaks via MOUSE.PS1
+privilege: TrustedInstaller
+actions:
+  - !powerShell: {command: '.\\Scripts\\MOUSE.PS1', exeDir: true, runas: currentUserElevated, wait: true}
+  - !powerShell: {command: '.\\Scripts\\OPTIMIZE-MOUSESMOOTHINGCURVES.PS1', exeDir: true, runas: currentUserElevated, wait: true}

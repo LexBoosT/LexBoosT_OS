@@ -1,0 +1,12 @@
+---
+title: Vivaldi Installation
+description: Installs Vivaldi browser
+privilege: TrustedInstaller
+actions:
+  - !run:
+      runas: currentUserElevated
+      exeDir: true
+      wait: true
+      option: "Vivaldi"
+      exe: "powershell"
+      args: '-EP Bypass -C ".\\Scripts\\SOFTWARE.PS1 -Software Install-Vivaldi"'

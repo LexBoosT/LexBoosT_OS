@@ -1,0 +1,12 @@
+---
+title: CEIP / FTH / Error Reporting
+description: CEIP + SQM + FTH + Error Reporting — all migrated to CEIP.PS1
+privilege: TrustedInstaller
+actions:
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\CEIP.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 200

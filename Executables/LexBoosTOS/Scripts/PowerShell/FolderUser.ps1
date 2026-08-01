@@ -39,9 +39,17 @@ Function Set-UserFolderIcon {
     }
 }
 
-Add-Type -AssemblyName System.Windows.Forms
+# Appliquer l'icône AVANT tout chargement graphique (important en contexte SYSTEM/TrustedInstaller)
 Set-UserFolderIcon
-Start-Sleep -Seconds 5
-[System.Windows.Forms.SendKeys]::SendWait("{F5}")
-Start-Sleep -Seconds 3
+
+# Tentative de rafraîchissement visuel (peut échouer en contexte non interactif, ignoré)
+try {
+    Add-Type -AssemblyName System.Windows.Forms
+    Start-Sleep -Seconds 5
+    [System.Windows.Forms.SendKeys]::SendWait("{F5}")
+    Start-Sleep -Seconds 3
+} catch {
+    Write-Log '-' "SendKeys refresh skipped (non-interactive session)"
+}
+
 exit
