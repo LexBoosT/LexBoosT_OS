@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.08.1 / V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -160,6 +160,36 @@
 </nav>
 
 <div class="container">
+    <h1>LexBoosT OS&#8482; V26.08.1</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>17</strong> changements</div>
+        <div class="stat">&#x1FA9B; <strong>9</strong> fixes</div>
+        <div class="stat">&#x2728; <strong>5</strong> improvements</div>
+        <div class="stat">&#x1F185; <strong>2</strong> new features</div>
+        <div class="stat">&#x1F4A5; <strong>1</strong> breaking changes</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-new">🆕 NEW</span>Vampire Rage: Shootem&#x27;up game created by tricktale for Xbox 360, ported by me for LexBoosT OS.</li>
+        <li><span class="tag tag-new">🆕 NEW</span>New HKCU registry tweaks: telemetry.yml (SubscribedContent-88000326Enabled, FeatureManagementEnabled, DisableWindowsSpotlightFeatures — extended spotlight block, ShowedToastAtLevel — DiagTrack consent toast, OnlineSpeechPrivacy HasAccepted — online dictation, Siuf PeriodInNanoSeconds — silent-install failure dialogs), search.yml (SafeSearchMode), security.yml (SmartScreen PreventOverride + EnableWebContentEvaluation), misc.yml (SettingSync Language group sync), audio.yml (UserDuckingPreference=3 — no auto audio ducking during calls), accessibility.yml (Narrator ScriptingEnabled/EchoNavigationKeys/OnlineServicesEnabled), mouse.yml (RawMouseThrottleDuration=14 — lifts the Win11 24H2+ background raw-mouse polling throttle), explorermenu.yml (&quot;Pin to Home&quot; HKCR context-menu keys pintohomefile/pintohome removed).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>keyboard.yml: FilterKeys Flags=122 and ToggleKeys Flags=58 — accessibility keyboard shortcuts (right-Shift 8s, NumLock 5s) now disabled along with the features. security.yml: microphone consent also forced to Allow per-user (HKCU) next to the existing HKLM machine-wide value.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Interrupt steering: forced enabled (InterruptSteeringFlags=2 — boot-time kernel scoring) via DEVICES.PS1 Configure-RegistryPowerTweaks; legacy InterruptSteeringDisabled=1 removed from SYSTEM_TWEAKS.PS1 (both values in the same kernel key would have left steering undefined). Routing stays Locked (Interrupt Steering Mode = 4, AC+DC) so the static SpecCPU affinities of DEVICES-TWEAKER-AUTO.PS1 keep holding.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>NIC presets reworked: per-adapter low-latency profiles now match the adapter&#x27;s vendor and type (Intel/Realtek x Ethernet/WiFi) and are applied to EVERY active adapter — a machine with both a wired and a wireless card gets both presets, each tuned for its brand.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>NIC presets now disable all offloads (checksum, LSO, USO, RSC, encapsulated offloads), set interrupt moderation/coalescing to 0, tune receive/transmit buffers per vendor, and switch off every power-saving feature (WoL, EEE, selective suspend, ASPM, idle timeouts). RSS is configured per vendor: Intel uses ClosestProcessorStatic (1 queue, base CPU 2, 4 processors), Realtek NUMAScaling (2 queues).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>TCP/IP stack completed: RSS base CPU 0, chimney/netdma/nonsackrttresiliency disabled, autotuninglevel normal, congestion provider CTCP, ECN explicitly disabled (Windows default — no Discord/Vesktop regression). Per-interface settings applied to every adapter: router discovery ControlledByDHCP, ECN marking/forwarding/weak host off, clamp MSS off, MTU 1500.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>AVEXCLUDE.PS1: Microsoft Defender now excludes C:\Program Files\WindowsApps and C:\ProgramData\Microsoft\Windows\AppRepository — real-time scanning of the AppX staging paths made Microsoft Store installs take minutes per app (download completed fast, staging crawled). Also fixed the final &quot;No exclusions could be added.&quot; message, which read the local counter instead of $global:SuccessCount and always displayed even when exclusions succeeded.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>NETSH_TCPIP_APPLY.PS1: removed ecncapability=enabled (ECN) — broke Discord/Vesktop (and other apps) connections on networks whose router/ISP middlebox mishandles ECN handshakes. Windows default (disabled) restored.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>NETSH_TCPIP_APPLY.PS1: removed VoIP QoS policies (DSCPAction 46 + PriorityValue8021Action 7 tagging on Discord.exe/Vesktop.exe/TeamSpeak/etc.) — 802.1Q-tagged frames are dropped by some routers/boxes, blocking the apps entirely. Replaced with a cleanup-only pass that removes leftover VoIP_* policies, so re-running the playbook repairs machines already affected.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span>CLEARCLASSFILTERS.CMD removed (and its call in services.yml) — clearing UpperFilters/LowerFilters on Disk/SCSIAdapter/Display device classes could make the system drive inaccessible at next boot (INACCESSIBLE_BOOT_DEVICE / KERNEL_DATA_INPAGE_ERROR) on machines with third-party storage filter drivers.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>AMD 3D V-Cache (X3D) stability: C-States, core parking, dynamic tick, Aggressive boost and interrupt-steering lock are now left at Windows defaults on ALL X3D CPUs (5700X3D/5800X3D/7800X3D/9800X3D included, previously only dual-CCD &gt;8 cores were protected) — forced C-States=0 + boost spikes caused intermittent WHEA/BSOD at reboot on X3D (stacked V-Cache traps heat).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>LOW-LATENCY-PROFILE.PS1: the Low Latency Profile (K2 CPU boost, feature IDs 58989092/60716524/61391826/62816659) is no longer enabled on AMD X3D CPUs (windows manages automatically), and requires build 26200.8728+ — forcing frequency spikes on X3D or activating unknown feature IDs on older builds could bugcheck at boot.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>DEVICES-TWEAKER-AUTO.PS1: single-CCD X3D CPUs (5700X3D/5800X3D/7800X3D/9800X3D) no longer misdetected as multi-CCD (the 3D V-Cache shows up as a second L3 instance in WMI) — multi-CCD now requires &gt;8 physical cores; interrupt-routing lock (PHASE 7) skipped on X3D.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Removed the &quot;Delete old/duplicate drivers&quot; install option (playbook.conf + utilities.yml) and DELETE_OLD_DRIVERS.PS1 — pnputil /delete-driver can remove an in-use storage controller driver package and leave the system unbootable at next reboot.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>GPUTweaks (NvidiaOptionsWindow): &quot;Failed to check online&quot; no longer shown when no NVIDIA driver is installed — GetLocalVersion() returned &quot;Unknown&quot;, which crashed CompareVersions (int.Parse(&quot;Unknown&quot;)). Now displays &quot;NO DRIVER DETECTED&quot; and skips the version comparison.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>LexBoosT Network Optimizer: loopbacklargemtu=disable when you choose BBR2 congestion (fix Steam launcher and maybe other).</li>
+    </ul>
+
     <h1>LexBoosT OS&#8482; V26.08</h1>
 
     <div class="stats">
@@ -561,7 +591,7 @@
 
 <footer>
     <div class="container" style="padding:0;">
-        <p>LexBoosT OS™ v26.08 / v26.07 / v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
+        <p>LexBoosT OS™ v26.08.1 / v26.08 / v26.07 / v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
     </div>
 </footer>
 
