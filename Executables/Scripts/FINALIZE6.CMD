@@ -60,7 +60,7 @@ echo ================================================
 echo.
 
 :: ================================================
-:: 1. Disabling Energy Efficient Ethernet (EEE) — fix per-adapter
+:: 1. Disabling Energy Efficient Ethernet (EEE) - fix per-adapter
 :: ================================================
 echo [+] Disabling Energy Efficient Ethernet (EEE) per adapter...
 powershell -NoProfile -Command ^
@@ -74,7 +74,7 @@ powershell -NoProfile -Command ^
     "Set-ItemProperty -Path $p -Name 'PowerSavingMode'       -Value '0' -Type String -Force -EA 0; " ^
     "Set-ItemProperty -Path $p -Name '*SpeedPowerManagement' -Value '0' -Type String -Force -EA 0; " ^
     "Set-ItemProperty -Path $p -Name '*FlowControl'          -Value '0' -Type String -Force -EA 0; " ^
-    "Set-ItemProperty -Path $p -Name '*InterruptModeration'  -Value 'off' -Type String -Force -EA 0; " ^
+    "Set-ItemProperty -Path $p -Name '*InterruptModeration'  -Value '0' -Type String -Force -EA 0; " ^
     "Write-Host ('[OK] Adapter: ' + $_.PSChildName) " ^
   "}" >nul 2>&1
 echo [OK] EEE disabled on all adapter entries
@@ -97,9 +97,9 @@ netsh int udp set global lowlatency=enabled >nul 2>&1 && echo [+] UDP low latenc
 netsh int udp set global flowcontrol=disabled >nul 2>&1 && echo [+] UDP flow control disabled || echo [-] failed
 
   :: ================================================
-:: 3. Redémarrage des adaptateurs physiques — SUPPRIMÉ
+:: 3. Redemarrage des adaptateurs physiques - SUPPRIME
 :: ================================================
-:: [MODIFIÉ] Le restart des cartes réseau supprimé — préserve les DNS/config statiques
+:: [MODIFIE] Le restart des cartes reseau supprime - preserve les DNS/config statiques
 echo [OK] Network adapter restart skipped (DNS preservation)
 
 :: ================================================

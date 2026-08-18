@@ -63,7 +63,9 @@ switch ($Action) {
         $installScript = Join-Path -Path $env:windir 'LexBoosTOS\Scripts\PowerShell\INSTALL-THEME.ps1'
         if (Test-Path $installScript) {
             & $installScript
-            Write-Log '+' "Theme applied"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Log '-' "Theme installer failed (exit $LASTEXITCODE)"
+            }
         } else {
             Write-Log '-' "Theme installer not found at: LexBoosTOS\Scripts\PowerShell\INSTALL-THEME.ps1"
         }

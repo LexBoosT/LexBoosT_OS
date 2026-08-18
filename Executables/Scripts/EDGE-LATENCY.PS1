@@ -50,15 +50,9 @@ Set-EdgePolicy 'SpotlightExperiencesAndRecommendationsEnabled' 0
 $profiles = Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList' |
     Where-Object { $_.PSChildName -match '^S-1-5-21-' }
 
-<<<<<<< HEAD
 foreach ($userProfile in $profiles) {
     $profilePath = $userProfile.ProfileImagePath
     $sid = $userProfile.PSChildName
-=======
-foreach ($profile in $profiles) {
-    $profilePath = $profile.ProfileImagePath
-    $sid = $profile.PSChildName
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     $ntuser = Join-Path $profilePath 'NTUSER.DAT'
     if (Test-Path $ntuser) {
         # Skip if hive is already loaded (current logged-on user, or default user)

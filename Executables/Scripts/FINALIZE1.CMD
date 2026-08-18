@@ -65,11 +65,7 @@ if /i "!diskDrive!" == "SSD" (
 
 :: Boot configuration & branding
 echo [+] Boot configuration...
-<<<<<<< HEAD
-bcdedit /set {current} description "LexBoosT OS 26.08" >nul 2>&1
-=======
-bcdedit /set {current} description "LexBoosT OS 26.07" >nul 2>&1
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+bcdedit /set {current} description "LexBoosT OS 26.08.1" >nul 2>&1
 label LexBoosT_OS >nul 2>&1
 
 :: Disable search indexing on non-system drives (reduces I/O micro-stutters during gaming)
@@ -106,22 +102,11 @@ reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notificatio
 :: Native NVMe driver optimization - STABLE MODE
 echo [+] Native NVMe driver optimization (Stable Mode)
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NativeNVMePerformance /t REG_DWORD /d 0 /f >nul 2>&1
-<<<<<<< HEAD
-=======
-rem FeatureManagement Overrides - desactives pour stabilite
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 reg delete "HKLM\SYSTEM\CurrentControlSet\Policies\Microsoft\FeatureManagement\Overrides" /f >nul 2>&1
 
 
 :: DMA protection policy removed (Hyper-V DDA compatibility)
 echo [+] Skipping DMA enumeration policy (Hyper-V DDA compatibility)
-<<<<<<< HEAD
-=======
-
-:: disable typing insights
-echo [+] Disable typing insights
-reg add "HKCU\SOFTWARE\Microsoft\input\Settings" /v InsightsEnabled /t REG_DWORD /d 0 /f >nul 2>&1
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 :: disable app-v
 echo [+] Disable app-v
@@ -150,14 +135,6 @@ echo [+] Disable wmp media sharing
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsMediaPlayer" /v PreventLibrarySharing /t REG_DWORD /d 1 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\WindowsMediaPlayer" /v PreventLibrarySharing /t REG_DWORD /d 1 /f >nul 2>&1
 
-<<<<<<< HEAD
-=======
-:: Dev-9: GlobalTimerResolutionRequests (NtSetTimerResolution API gate) moved to TimerControl app.
-:: The high-resolution timer is now user-controlled via TimerControl UI (default: 0.500ms).
-:: Other timer settings (TimeBroker, Psched) in timer-optimization.yml are kernel/platform
-:: configs separate from the application-level NtSetTimerResolution API.
-
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 :: Disable ESP padding (potentially reduces latency on some UEFI systems).
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Bfsvc" /v EspPaddingPercent /t REG_DWORD /d 0 /f >nul 2>&1
 

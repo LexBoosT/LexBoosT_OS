@@ -1,17 +1,6 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
 
-<<<<<<< HEAD
-=======
-<#
-.SYNOPSIS
-    Additional safe power optimizations for desktop low-latency systems.
-.DESCRIPTION
-    Disables hibernation and hybrid sleep on desktops, and forces
-    sleep-after and disk-off timers to 0 on AC power.
-#>
-
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference    = 'SilentlyContinue'
 
@@ -39,9 +28,16 @@ function Test-IsLaptop {
 $isLaptop = Test-IsLaptop
 
 # -----------------------------------------------------------------------------
-# 1. Disable hibernation on desktops
+# 1. Hibernation: respect DEVICES.PS1 decision (kept enabled on desktop for
+#    CUDA/TensorRT memory reservations). Only disable if not explicitly kept.
 # -----------------------------------------------------------------------------
-if (-not $isLaptop) {
+$hibernateKept = $false
+try {
+    $hibernateEnabled = Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' -Name 'HibernateEnabled' -ErrorAction SilentlyContinue
+    if ($hibernateEnabled -eq 1) { $hibernateKept = $true }
+} catch { }
+
+if (-not $isLaptop -and -not $hibernateKept) {
     Write-Log '+' 'Desktop detected: disabling hibernation...'
     try {
         powercfg /hibernate off | Out-Null
@@ -50,7 +46,7 @@ if (-not $isLaptop) {
         Write-Log '-' "Could not disable hibernation: $_"
     }
 } else {
-    Write-Log '+' 'Laptop detected: keeping hibernation enabled'
+    Write-Log '+' 'Hibernation kept enabled (required by DEVICES.PS1 for CUDA/TensorRT memory reservations)'
 }
 
 # -----------------------------------------------------------------------------
@@ -58,8 +54,9 @@ if (-not $isLaptop) {
 # -----------------------------------------------------------------------------
 Write-Log '+' 'Configuring AC power timers...'
 try {
-    $active = (powercfg /getactivescheme).Split(' ')[3]
-    if ($active -and $active -match '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$') {
+    $activeLine = (powercfg /getactivescheme)
+    $active = [regex]::Match($activeLine, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}').Value
+    if ($active) {
         powercfg /setacvalueindex $active SUB_SLEEP HYBRIDSLEEP 0 | Out-Null
         powercfg /setacvalueindex $active SUB_SLEEP HIBERNATEIDLE 0 | Out-Null
         powercfg /setacvalueindex $active SUB_SLEEP STANDBYIDLE 0 | Out-Null

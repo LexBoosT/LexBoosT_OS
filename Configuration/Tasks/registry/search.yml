@@ -3,8 +3,5 @@ title: Search
 description: Applies Windows Search tweaks via SEARCH.PS1
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
-=======
-  - !status: {status: 'Applying Search Tweaks'}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !powerShell: {command: '.\\Scripts\\SEARCH.PS1', exeDir: true, runas: currentUserElevated, wait: true}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings', value: 'SafeSearchMode', type: REG_DWORD, data: '0'}

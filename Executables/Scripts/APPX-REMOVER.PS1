@@ -1,4 +1,4 @@
-param (
+﻿param (
     [Parameter(Mandatory = $false)]
     [string[]]$Packages,
 
@@ -7,28 +7,35 @@ param (
 
     [switch]$Force = $false,
 
-    [switch]$AppxOnly = $false
+    [switch]$AppxOnly = $false,
+
+    # Internal: full;family;location — run the SYSTEM-context purge phase.
+    # Spawned via scheduled task (schtasks /RU SYSTEM) because StateRepository
+    # cache keys are ACL'd to SYSTEM only and admin cannot touch them.
+    [string]$SystemPhase
 )
 
 begin {
     # Admin check with explicit UAC request
-    if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    if (-not $SystemPhase -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         $pkgArg = if ($PackageCsv) { "-PackageCsv `"$PackageCsv`"" } else { "-Packages $($Packages -join ',')" }
         Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`" $pkgArg $(if($Force){'-Force'}) $(if($AppxOnly){'-AppxOnly'})" -Verb RunAs
         exit
     }
 
-    # Normalize package input: support both -Packages array and -PackageCsv (file path or comma-separated string)
-    if (-not $Packages -and $PackageCsv) {
-        if (Test-Path $PackageCsv) {
-            $Packages = Get-Content -Path $PackageCsv | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-        } else {
-            $Packages = $PackageCsv -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    if (-not $SystemPhase) {
+        # Normalize package input: support both -Packages array and -PackageCsv (file path or comma-separated string)
+        if (-not $Packages -and $PackageCsv) {
+            if (Test-Path $PackageCsv) {
+                $Packages = Get-Content -Path $PackageCsv | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+            } else {
+                $Packages = $PackageCsv -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+            }
         }
-    }
-    if (-not $Packages) {
-        Write-Host '[-] No packages specified. Use -Packages or -PackageCsv.'
-        exit 1
+        if (-not $Packages) {
+            Write-Host '[-] No packages specified. Use -Packages or -PackageCsv.'
+            exit 1
+        }
     }
 
     # [SAFETY] Packages that must never be removed because they break winget / Store / shell.
@@ -120,7 +127,10 @@ public class TokenManipulator {
         if (-not (Test-Path $path)) { return $true }
         try {
             $adminSid = [System.Security.Principal.SecurityIdentifier]::new("S-1-5-32-544")
-            $acl = Get-Acl $path
+            # Fresh canonical ACL: Get-Acl in PS7 returns non-canonical ACLs
+            # that AddAccessRule rejects with "ACL is not in canonical form".
+            $acl = [System.Security.AccessControl.RegistrySecurity]::new()
+            $acl.SetAccessRuleProtection($true, $false)
             $rule = New-Object System.Security.AccessControl.RegistryAccessRule(
                 $adminSid,
                 "FullControl",
@@ -245,10 +255,204 @@ public class TokenManipulator {
             return $false
         }
     }
+
+    # Purge ALL AppxAllUserStore references for a package (per-user SID keys,
+    # OSRollbackPackages value, StateRepository cache). Handles inbox packages
+    # that are "Staged" for SYSTEM (S-1-5-18) which Remove-AppxPackage skips.
+    function Remove-AllStoreReferences {
+        param([string]$fullPackageName, [string]$packageFamilyName)
+        try {
+            $base = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore'
+            $cacheRoot = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache'
+
+            # OSRollbackPackages value
+            $osrb = "$base\OSRollbackPackages"
+            if (Test-Path $osrb) {
+                Remove-ItemProperty -Path $osrb -Name $fullPackageName -ErrorAction SilentlyContinue
+            }
+
+            # Per-user SID keys (S-1-5-18, S-1-5-21-..., etc.)
+            Get-ChildItem -LiteralPath $base -ErrorAction SilentlyContinue |
+                Where-Object { $_.PSChildName -match '^S-' } |
+                ForEach-Object {
+                    $sidKey = Join-Path $_.PSPath $fullPackageName
+                    if (Test-Path -LiteralPath $sidKey) {
+                        Remove-Item -LiteralPath $sidKey -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+
+            # EndOfLife wildcard entries
+            $eolRoot = "$base\EndOfLife"
+            if (Test-Path $eolRoot) {
+                Get-ChildItem -LiteralPath $eolRoot -Recurse -ErrorAction SilentlyContinue |
+                    Where-Object { $_.PSChildName -eq $fullPackageName } |
+                    ForEach-Object { Remove-Item -LiteralPath $_.PSPath -Recurse -Force -ErrorAction SilentlyContinue }
+            }
+
+            # StateRepository cache purge. The registry keeps two stores
+            # (Package + PackageFamily) with Data keys plus Index trees that
+            # reference each Data key via its _IndexKeys values. All must go,
+            # otherwise Get-AppxPackage still reports the package as Staged
+            # and AppXSvc keeps the install folder locked.
+            foreach ($store in 'Package', 'PackageFamily') {
+                $dataPath = "$cacheRoot\$store\Data"
+                if (-not (Test-Path -LiteralPath $dataPath)) { continue }
+                Get-ChildItem -LiteralPath $dataPath -ErrorAction SilentlyContinue |
+                    ForEach-Object {
+                        $props = Get-ItemProperty -LiteralPath $_.PSPath -ErrorAction SilentlyContinue
+                        $match = ($store -eq 'Package' -and $props.PackageFullName -eq $fullPackageName) -or
+                                 ($store -eq 'PackageFamily' -and $props.PackageFamilyName -eq $familyName)
+                        if (-not $match) { return }
+                        $indexRefs = @()
+                        try { $indexRefs = @($props._IndexKeys) } catch { }
+                        foreach ($ref in $indexRefs) {
+                            $parts = $ref -split '\\'
+                            if ($parts.Count -lt 2) { continue }
+                            $category = $parts[0]
+                            $leaf = ($parts[1..($parts.Count - 1)] -join '\')
+                            $target = "$cacheRoot\$store\Index\$category\$leaf"
+                            Remove-Item -LiteralPath $target -Recurse -Force -ErrorAction SilentlyContinue
+                            $parent = Split-Path $target -Parent
+                            while ($parent -and $parent -ne "$cacheRoot\$store\Index" -and -not (Get-ChildItem -LiteralPath $parent -Force -ErrorAction SilentlyContinue)) {
+                                Remove-Item -LiteralPath $parent -Force -ErrorAction SilentlyContinue
+                                $parent = Split-Path $parent -Parent
+                            }
+                        }
+                        Remove-Item -LiteralPath $_.PSPath -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+            }
+
+            # Deprovision flag to block re-registration
+            New-Item -Path "$base\Deprovisioned\$packageFamilyName" -Force -ErrorAction SilentlyContinue | Out-Null
+
+            return $true
+        }
+        catch {
+            Write-Log '-' "Store reference purge failed: $_"
+            return $false
+        }
+    }
+
+    # Spawn the SYSTEM-context purge via a scheduled task. The StateRepository
+    # cache keys are ACL'd to SYSTEM only, so an elevated admin shell cannot
+    # remove them — hence this escalation.
+    function Invoke-SystemPhasePurge {
+        param([string]$fullPackageName, [string]$packageFamilyName, [string]$installLocation)
+        $taskName = "LexBoosTOS_AppxPurge_$(Get-Random)"
+        $marker = Join-Path $env:ProgramData 'LexBoosTOS\Logs\appx-system-phase-done.txt'
+        Remove-Item -LiteralPath $marker -Force -ErrorAction SilentlyContinue
+        $phaseArg = "$fullPackageName;$packageFamilyName;$installLocation"
+        try {
+            # /TR is limited to 261 chars; write a short wrapper that calls the
+            # main script with -SystemPhase, then point the task at the wrapper.
+            $wrapper = Join-Path $env:TEMP "LexBoosTOS_AppxPurge.ps1"
+            $phaseArgEsc = $phaseArg.Replace('"', '""')
+            $scriptPathEsc = $MyInvocation.MyCommand.Path.Replace('"', '""')
+            Set-Content -LiteralPath $wrapper -Value "& '$scriptPathEsc' -SystemPhase '$phaseArgEsc'" -Encoding UTF8
+            # Use short "powershell.exe" (Windows PowerShell, always in System32);
+            # $PSHOME may be a 76-char Store path that overflows /TR's 261 limit.
+            $tr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$wrapper`""
+            $null = schtasks.exe /Create /TN $taskName /TR $tr /SC ONCE /ST 23:59 /RU SYSTEM /RL HIGHEST /F 2>&1
+            $null = schtasks.exe /Run /TN $taskName 2>&1
+            $deadline = (Get-Date).AddSeconds(90)
+            while ((Get-Date) -lt $deadline -and -not (Test-Path -LiteralPath $marker)) {
+                Start-Sleep -Milliseconds 500
+            }
+            $done = Test-Path -LiteralPath $marker
+            if (-not $done) {
+                Write-Log '-' "SYSTEM purge task timed out for $fullPackageName"
+            }
+            return $done
+        }
+        catch {
+            Write-Log '-' "Failed to spawn SYSTEM purge for $fullPackageName : $_"
+            return $false
+        }
+        finally {
+            $null = schtasks.exe /Delete /TN $taskName /F 2>&1
+        }
+    }
+
+    # Schedule a folder for deletion at next boot via PendingFileRenameOperations.
+    # Used when the package is still registered (Staged SYSTEM) and files are locked.
+    function Add-RebootDeletion {
+        param([string]$path)
+        if (-not (Test-Path -LiteralPath $path)) { return $true }
+        try {
+            $regPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+            $existing = @()
+            try {
+                $existing = @(Get-ItemProperty -Path $regPath -Name 'PendingFileRenameOperations' -ErrorAction Stop |
+                        Select-Object -ExpandProperty PendingFileRenameOperations)
+            } catch { }
+
+            $entries = New-Object System.Collections.Generic.List[string]
+            # Cast to string[]: AddRange rejects Object[] from Get-ItemProperty.
+            $entries.AddRange([string[]]$existing)
+            # PendingFileRenameOperations is (source, dest) pairs; empty dest = delete.
+            $entries.Add("\??\$path")
+            $entries.Add("")
+            Get-ChildItem -LiteralPath $path -Recurse -Force -File -ErrorAction SilentlyContinue | ForEach-Object {
+                $entries.Add("\??\$($_.FullName)")
+                $entries.Add("")
+            }
+            Set-ItemProperty -Path $regPath -Name 'PendingFileRenameOperations' -Value $entries.ToArray() -Type MultiString
+            Write-Log '+' "Scheduled reboot deletion: $path"
+            return $true
+        }
+        catch {
+            Write-Log '-' "Failed to schedule reboot deletion for $path : $_"
+            return $false
+        }
+    }
 }
 
 process {
     try {
+        # ===== SYSTEM purge phase (spawned via scheduled task) =====
+        if ($SystemPhase) {
+            $parts = $SystemPhase -split ';'
+            $fullPkg = $parts[0]
+            $pkgFam  = $parts[1]
+            $pkgLoc  = $parts[2]
+            $marker  = Join-Path $env:ProgramData 'LexBoosTOS\Logs\appx-system-phase-done.txt'
+
+            Write-Log '+' "SYSTEM phase: $fullPkg"
+            Remove-AllStoreReferences -fullPackageName $fullPkg -packageFamilyName $pkgFam | Out-Null
+
+            try {
+                Remove-AppxPackage -Package $fullPkg -AllUsers -ErrorAction Stop *>$null
+                Write-Log '+' "Remove-AppxPackage -AllUsers OK (SYSTEM)"
+            } catch {
+                Write-Log '-' "Remove-AppxPackage -AllUsers failed (SYSTEM): $_"
+            }
+
+            $paths = @($pkgLoc)
+            foreach ($p in $paths) {
+                if ($p -and (Test-Path -LiteralPath $p)) {
+                    Remove-FileSystemItemNuclear -path $p | Out-Null
+                }
+            }
+
+            $appRepo = 'C:\ProgramData\Microsoft\Windows\AppRepository'
+            $xml = Join-Path $appRepo "$fullPkg.xml"
+            $pkgDir = Join-Path $appRepo "Packages\$fullPkg"
+            foreach ($t in @($xml, $pkgDir)) {
+                if (Test-Path -LiteralPath $t) {
+                    Remove-Item -LiteralPath $t -Recurse -Force -ErrorAction SilentlyContinue
+                    Write-Log '+' "Purged: $t"
+                }
+            }
+            $famDir = Join-Path $appRepo "Families\$pkgFam"
+            if ((Test-Path -LiteralPath $famDir) -and -not (Get-ChildItem -LiteralPath $famDir -Force -ErrorAction SilentlyContinue)) {
+                Remove-Item -LiteralPath $famDir -Force -ErrorAction SilentlyContinue
+            }
+
+            Set-Content -LiteralPath $marker -Value "ok $fullPkg $(Get-Date -Format o)" -Encoding UTF8
+            Write-Log '+' "SYSTEM phase done: $fullPkg"
+            exit 0
+        }
+
         # Elevate to SYSTEM context temporarily
 
         Write-Log '+' "Removing AppX packages..."
@@ -274,15 +478,12 @@ process {
         $allPackages = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -notmatch 'Microsoft.WindowsStore' }
 
         # === PRE-CLEANUP: kill processes that often lock AppX packages ===
-<<<<<<< HEAD
         # tiworker and dism are the main blockers for system AppX removal.
+        # ms-teams / MSTeams / Teams: the new Teams runs as ms-teams.exe, which
+        # never matches the package name "MSTeams" — kill it or removal fails
+        # with "access denied" on CodeIntegrity.cat / package files.
         try {
-            $lockers = @('tiworker', 'Dism', 'dism')
-=======
-        # tiworker, dism, and aumall are the main blockers for system AppX removal.
-        try {
-            $lockers = @('tiworker', 'TiWorker', 'Dism', 'dism', 'aumall')
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+            $lockers = @('tiworker', 'Dism', 'dism', 'ms-teams', 'ms-teamsupdate', 'MSTeams', 'Teams', 'TeamsUpdate', 'TeamsWebView')
             foreach ($procName in $lockers) {
                 Get-Process -Name $procName -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
             }
@@ -373,7 +574,8 @@ process {
                                 Write-Log '-' "Failed user removal ($userSid): package in use, killing related processes and retrying once"
                                 # Try to free the package by killing its host process (e.g. SearchHost, etc.)
                                 try {
-                                    Get-Process -Name $pkg.Name -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+                                    $related = @($pkg.Name, 'ms-teams', 'Teams', 'TeamsUpdate', 'TeamsWebView')
+                                    Get-Process -Name $related -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
                                 } catch { }
                                 Start-Sleep -Seconds 1
                                 try {
@@ -397,7 +599,10 @@ process {
                         # Package is in use system-wide (e.g. Microsoft.Windows.AugLoop.CBS held by WU).
                         # Best-effort: kill the host process and retry once.
                         Write-Log '-' "Package in use, killing '$($pkg.Name)' and retrying once..."
-                        try { Get-Process -Name $pkg.Name -ErrorAction SilentlyContinue | Stop-Process -Force } catch { }
+                        try {
+                            $related = @($pkg.Name, 'ms-teams', 'Teams', 'TeamsUpdate', 'TeamsWebView')
+                            Get-Process -Name $related -ErrorAction SilentlyContinue | Stop-Process -Force
+                        } catch { }
                         Start-Sleep -Seconds 2
                         try {
                             Remove-AppxPackage -Package $fullPackageName -AllUsers -ErrorAction Stop *>$null
@@ -442,6 +647,40 @@ process {
                     }
                     catch {
                         Write-Log '-' "Filesystem cleanup error: $_"
+                    }
+
+                    # ===== 3b. Fallback: package still registered / folder locked =====
+                    # Handles inbox packages staged for SYSTEM (S-1-5-18) that
+                    # Remove-AppxPackage cannot fully unregister (e.g. MSTeams on
+                    # Insider builds). Purge all store references, flag as
+                    # Deprovisioned, and schedule folder deletion at next boot.
+                    try {
+                        $leftovers = @($packageRoot, $installLocation) |
+                            Where-Object { $_ -and (Test-Path -LiteralPath $_) }
+                        $stillRegistered = [bool](Get-AppxPackage -AllUsers -Name $pkg.Name -ErrorAction SilentlyContinue)
+                        if ($leftovers -or $stillRegistered) {
+                            Write-Log '-' "Package files remain locked for '$fullPackageName' — running SYSTEM-context purge + reboot deletion fallback..."
+                            # StateRepository cache is SYSTEM-only; an elevated admin cannot
+                            # purge it. Spawn a SYSTEM task that unregisters + deletes.
+                            $sysPurgeOk = Invoke-SystemPhasePurge -fullPackageName $fullPackageName -packageFamilyName $packageFamilyName -installLocation $installLocation
+                            if ($sysPurgeOk) {
+                                Write-Log '+' "SYSTEM purge completed for '$fullPackageName'"
+                            }
+                            Remove-AllStoreReferences -fullPackageName $fullPackageName -packageFamilyName $packageFamilyName | Out-Null
+                            # Re-check after SYSTEM purge
+                            $leftovers = @($packageRoot, $installLocation) |
+                                Where-Object { $_ -and (Test-Path -LiteralPath $_) }
+                            $stillRegistered = [bool](Get-AppxPackage -AllUsers -Name $pkg.Name -ErrorAction SilentlyContinue)
+                            if ($leftovers -or $stillRegistered) {
+                                Write-Log '-' "Still locked after SYSTEM purge — scheduling reboot deletion for '$fullPackageName'..."
+                                foreach ($p in $leftovers) {
+                                    Add-RebootDeletion -path $p | Out-Null
+                                }
+                            }
+                        }
+                    }
+                    catch {
+                        Write-Log '-' "Reboot-deletion fallback error: $_"
                     }
                 }
 

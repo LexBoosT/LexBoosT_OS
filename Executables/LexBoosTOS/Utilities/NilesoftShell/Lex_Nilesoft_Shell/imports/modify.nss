@@ -6,6 +6,11 @@ modify(mode=mode.multiple
 
 modify(type="recyclebin" where=window.is_desktop and this.id==id.empty_recycle_bin pos=1 sep)
 
+// Move Copy/Cut/Paste/Delete/Rename to the top of the menu (Windows 11 icon-row style)
+modify(where=this.id(id.cut, id.copy, id.paste, id.paste_shortcut, id.rename, id.delete)
+	col=1)
+modify(where=this.id==id.delete sep="bottom")
+
 modify(find="unpin*" pos="bottom" menu="Pin/Unpin")
 modify(find="pin*" pos="top" menu="Pin/Unpin")
 modify(find='Notepad' vis='true')

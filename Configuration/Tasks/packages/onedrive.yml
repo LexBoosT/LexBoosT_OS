@@ -4,6 +4,14 @@ description: Removes OneDrive from the system, including files, folders, and reg
 privilege: TrustedInstaller
 onUpgrade: false
 actions:
+  - !status: {status: 'Killing OneDrive processes', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: '.\Scripts\CLEANUP-ONEDRIVE.CMD'
+      runas: currentUserElevated
+      wait: true
+      onUpgrade: false
+
   - !status: {status: 'Removing OneDrive', onUpgrade: false}
   - !file: {path: '%ProgramData%\Microsoft OneDrive'}
   - !file: {path: '%UserProfile%\OneDrive'}
@@ -15,12 +23,6 @@ actions:
   - !registryKey: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\BannerStore'}
   - !registryKey: {path: 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\BannerStore'}
   - !registryValue: {path: 'HKCU\Environment', value: 'OneDrive', operation: 'delete'}
-  - !run:
-      exeDir: true
-      exe: '.\Scripts\CLEANUP-ONEDRIVE.CMD'
-      runas: currentUserElevated
-      wait: true
-      onUpgrade: false
 
   - !status: {status: 'Removing OneDrive', onUpgrade: false}
   - !cmd: {command: '.\Scripts\ONED.CMD', exeDir: true, runas: currentUserElevated, wait: true}

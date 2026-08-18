@@ -3,10 +3,6 @@ title: Gamebar
 description: Applies Gamebar tweaks via registry values
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
-=======
-  - !status: {status: 'Applying Gamebar Tweaks'}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue: {path: 'HKCU\System\GameConfigStore', value: 'GameDVR_Enabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR', value: 'AppCaptureEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\GameBar', value: 'GamePanelStartupTipIndex', type: REG_DWORD, data: '3'}

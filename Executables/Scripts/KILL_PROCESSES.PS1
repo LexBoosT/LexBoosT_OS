@@ -26,7 +26,8 @@ $phase1 = @(
     'Origin',
     'Battle.net',
     'INSTALLSOFTS',
-    'AutoHideMouseCursor_x64'
+    'AutoHideMouseCursor_x64',
+	'CustomCursorHdrFix'
 )
 
 foreach ($proc in $phase1) {

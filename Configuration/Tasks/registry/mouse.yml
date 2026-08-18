@@ -3,10 +3,6 @@ title: Mouse
 description: Applies mouse/pointer tweaks via MOUSE.PS1
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
   - !powerShell: {command: '.\\Scripts\\MOUSE.PS1', exeDir: true, runas: currentUserElevated, wait: true}
   - !powerShell: {command: '.\\Scripts\\OPTIMIZE-MOUSESMOOTHINGCURVES.PS1', exeDir: true, runas: currentUserElevated, wait: true}
-=======
-  - !status: {status: 'Applying Mouse Tweaks'}
-  - !powerShell: {command: '.\\Scripts\\MOUSE.PS1', exeDir: true, runas: currentUserElevated, wait: true}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+  - !registryValue: {path: 'HKCU\Control Panel\Mouse', value: 'RawMouseThrottleDuration', type: REG_DWORD, data: '14'}

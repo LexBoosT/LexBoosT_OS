@@ -33,29 +33,18 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Control Panel\Accessibility\Keyboard Response'; Name = 'KeyboardDelay'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Accessibility\Keyboard Response'; Name = 'AutoRepeatDelay'; Value = '180'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Accessibility\Keyboard Response'; Name = 'AutoRepeatRate'; Value = '2'; Type = 'REG_SZ' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Accessibility\StickyKeys'; Name = 'Flags'; Value = '506'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\Control Panel\Accessibility\Keyboard Response'; Name = 'Flags'; Value = '122'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Accessibility\StickyKeys'; Name = 'Flags'; Value = '506'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Accessibility\StickyKeys'; Name = 'Flags'; Value = '506'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Accessibility\ToggleKeys'; Name = 'Flags'; Value = '58'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters'; Name = 'MouseDataQueueSize'; Value = '22'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters'; Name = 'KeyboardDataQueueSize'; Value = '22'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseSensitivity'; Value = '10'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseHoverTime'; Value = '200'; Type = 'REG_SZ' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Mouse'; Name = 'MouseHoverTime'; Value = '100'; Type = 'REG_SZ' }
-=======
-    @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Mouse'; Name = 'MouseHoverTime'; Value = '200'; Type = 'REG_SZ' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseSpeed'; Value = '0'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseThreshold1'; Value = '0'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseThreshold2'; Value = '0'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseTrails'; Value = '0'; Type = 'REG_SZ' }
+    # MouseTrails: -1 for HDR (Software rendering)
+    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseTrails'; Value = '-1'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'DoubleClickSpeed'; Value = '350'; Type = 'REG_SZ' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseHoverHeight'; Value = '4'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseHoverWidth'; Value = '4'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseAccel'; Value = '0'; Type = 'REG_SZ' }
@@ -66,25 +55,10 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseDelay'; Value = '0'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleEnabled'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleDuration'; Value = '20'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'SwapMouseButtons'; Value = '0'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawInput'; Value = '1'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'SnapToDefaultButton'; Value = '0'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'MouseDelay'; Value = '0'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'ActiveWindowTracking'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleEnabled'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleForced'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleDuration'; Value = '20'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Mouse'; Name = 'RawMouseThrottleLeeway'; Value = '0'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows'; Name = 'RITdemonTimerPowerSaveElapse'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows'; Name = 'RITdemonTimerPowerSaveElapse'; Value = '10'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows'; Name = 'RITdemonTimerPowerSaveCoalescing'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Keyboard'; Name = 'KeyboardDelay'; Value = '0'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Keyboard'; Name = 'KeyboardSpeed'; Value = '31'; Type = 'REG_SZ' }
-<<<<<<< HEAD
-=======
-    @{ Path = 'Registry::HKCU\Control Panel\Keyboard'; Name = 'InitialKeyboardIndicators'; Value = '2'; Type = 'REG_SZ' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Input\Settings\ControllerProcessor\CursorMagnetism'; Name = 'AttractionRectInsetInDIPS'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Input\Settings\ControllerProcessor\CursorMagnetism'; Name = 'DistanceThresholdInDIPS'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Input\Settings\ControllerProcessor\CursorMagnetism'; Name = 'MagnetismDelayInMilliseconds'; Value = '1'; Type = 'REG_DWORD' }
@@ -109,11 +83,7 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\services\mouclass\Parameters'; Name = 'ThreadPriority'; Value = '15'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\services\kbdclass\Parameters'; Name = 'WppRecorder_TraceGuid'; Value = '{09281f1f-f66e-485a-99a2-91638f782c49}'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Keyboard'; Name = 'Flags'; Value = '27'; Type = 'REG_SZ' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'CursorBlinkRate'; Value = '100'; Type = 'REG_SZ' }
-=======
-    @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'CursorBlinkRate'; Value = '200'; Type = 'REG_SZ' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Services\mouhid\Parameters'; Name = 'TreatAbsolutePointerAsAbsolute'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Services\mouhid\Parameters'; Name = 'TreatAbsoluteAsRelative'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows\Input\DelayZonePalmRejection'; Name = 'RejectionEnabled'; Value = '0'; Type = 'REG_DWORD' }
@@ -174,7 +144,6 @@ foreach ($entry in $regValues) {
 }
 
 Write-Log '+' "$set registry values set"
-<<<<<<< HEAD
 
 # Disable device power-saving (USB selective suspend, D3Cold, etc.)
 Write-Host 'Disabling device power-saving features...'
@@ -196,14 +165,8 @@ try {
     Write-Log '-' "Failed to disable device power-saving: $_"
 }
 
-=======
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 Write-Host '============================================'
 Write-Host '       Done!'
 Write-Host '============================================'
 
-<<<<<<< HEAD
 exit 0
-=======
-exit 0
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

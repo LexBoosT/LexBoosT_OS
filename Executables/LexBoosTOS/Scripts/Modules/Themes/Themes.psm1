@@ -1,4 +1,4 @@
-$windir = [Environment]::GetFolderPath('Windows')
+﻿$windir = [Environment]::GetFolderPath('Windows')
 
 function Stop-ThemeProcesses {
     Get-Process 'SystemSettings', 'control' -EA 0 | Stop-Process -Force -EA 0
@@ -189,7 +189,6 @@ public class ShellRefresh {
     } catch {}
 
     Stop-ThemeProcesses
-    Write-Host "[+] Theme applied successfully!"
 }
 
 function Set-ThemeMRU {

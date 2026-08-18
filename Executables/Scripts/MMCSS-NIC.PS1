@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 
 $MP      = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile'
 $MMCSS   = 'HKLM:\SYSTEM\CurrentControlSet\Services\MMCSS'
@@ -73,30 +73,17 @@ if (-not $primaryType) {
 # ── Apply ─────────────────────────────────────────────────────────────────────
 if ($primaryType -eq 'NetAdapterCx') {
     Set-Reg $MMCSS 'Start' DWord 4
-<<<<<<< HEAD
     Set-Reg $MP 'SystemResponsiveness'      DWord 10
-=======
-    Set-Reg $MP 'SystemResponsiveness' DWord 100
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 } else {
     # NDIS detected — applying custom MMCSS profile
     Set-Reg $MMCSS 'Start' DWord 2
     Set-Reg $MP 'SystemResponsiveness'      DWord 10
-<<<<<<< HEAD
     Set-Reg $MP 'NoLazyMode'                DWord 1
-    Set-Reg $MP 'NetworkThrottlingIndex'    DWord 4294967295
+    Set-Reg $MP 'NetworkThrottlingIndex'    DWord 10
     Set-Reg $MP 'LazyModeTimeout'          DWord 0xFFFFFFFF
     Set-Reg $MP 'SchedulingPeriod'       DWord 10000
     Set-Reg $MP 'IdleDetectionCycles'      DWord 6
     Set-Reg $MP 'SchedulerTimerResolution' DWord 5000
-=======
-    Set-Reg $MP 'NoLazyMode'               DWord 0
-    Set-Reg $MP 'NetworkThrottlingIndex'    DWord 10
-    Set-Reg $MP 'LazyModeTimeout'          DWord 0xFFFFFFFF
-    Set-Reg $MP 'SchedulerPeriod'          DWord 1000000
-    Set-Reg $MP 'IdleDetectionCycles'      DWord 1
-    Set-Reg $MP 'SchedulerTimerResolution' DWord 10000
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
     foreach ($task in 'Audio', 'Pro Audio', 'Playback') {
         Set-Reg "$MP\Tasks\$task" 'Priority'              DWord  1

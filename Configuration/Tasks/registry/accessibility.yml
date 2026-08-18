@@ -1,6 +1,5 @@
 ---
 title: Accessibility
-<<<<<<< HEAD
 description: Applies Accessibility tweaks via registry values
 privilege: TrustedInstaller
 actions:
@@ -14,24 +13,6 @@ actions:
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\SoundSentry', value: 'Flags', type: REG_SZ, data: '0'}
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\SoundSentry', value: 'WindowsEffect', type: REG_SZ, data: '0'}
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'BounceTime', type: REG_SZ, data: '0'}
-=======
-privilege: TrustedInstaller
-actions:
-  - !status: {status: 'Applying Accessibility'}
-  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Ease of Access', value: 'selfscan', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Ease of Access', value: 'selfvoice', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\HighContrast', value: 'Flags', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\MouseKeys', value: 'Flags', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\TimeOut', value: 'Flags', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\SoundSentry', value: 'Flags', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accesibility\SoundSentry', value: 'WindowsEffect', type: REG_SZ, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accesibility', value: 'Warning Sounds', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accesibility', value: 'Sound on Activation', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\MouseKeys', value: 'MaximumSpeed', type: REG_SZ, data: ''}
-  - !registryValue: {path: 'HKCU\Control Panel\Accesibility\MouseKeys', value: 'TimeToMaximumSpeed', type: REG_SZ, data: ''}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'BounceTime', type: REG_SZ, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'Last BounceKey Setting', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'Last Valid Delay', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'Last Valid Repeat', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\Keyboard Response', value: 'Last Valid Wait', type: REG_DWORD, data: '0'}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'ScriptingEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'EchoNavigationKeys', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'OnlineServicesEnabled', type: REG_DWORD, data: '0'}

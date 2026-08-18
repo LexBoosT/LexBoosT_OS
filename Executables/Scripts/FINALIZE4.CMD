@@ -56,11 +56,11 @@ echo [+] Removing Windows installation assistant...
 "%ProgramFiles(x86)%\WindowsInstallationAssistant\Windows10UpgraderApp.exe" /SunValley /ForceUninstall >NUL 2>nul
 rmdir /s /q "%ProgramFiles(x86)%\WindowsInstallationAssistant" >NUL 2>nul
 
-:: Remove default user accounts
+:: Remove default user accounts (check existence first to avoid NET HELPMSG 2221 stderr)
 echo [+] Removing default user accounts...
-net user defaultuser0 /delete 2>nul
-net user defaultuser1 /delete 2>nul
-net user defaultuser100000 /delete 2>nul
+net user defaultuser0 >nul 2>&1 && net user defaultuser0 /delete >nul 2>&1
+net user defaultuser1 >nul 2>&1 && net user defaultuser1 /delete >nul 2>&1
+net user defaultuser100000 >nul 2>&1 && net user defaultuser100000 /delete >nul 2>&1
 
 :: NOTE: RAM compression is handled by gaming.yml (conditional 16GB+)
 :: PageCombining is disabled here for systems that passed the RAM check

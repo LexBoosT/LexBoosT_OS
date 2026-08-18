@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 
 param(
     [switch]$DryRun,
@@ -100,7 +100,10 @@ for ($c = 0; $c -lt $eCoreCount; $c++) {
 if ($CpuInfo.Vendor -match 'AMD') {
     try {
         $l3 = @(Get-CimInstance Win32_CacheMemory -Filter "Level=3" -EA SilentlyContinue)
-        if ($l3.Count -ge 2) {
+        # Single-CCD X3D CPUs (5700X3D/5800X3D/7800X3D/9800X3D) report the 3D
+        # V-Cache as a second L3 cache instance in WMI - only treat as multi-CCD
+        # when physically >8 cores (7900X3D/7950X3D/9900X3D/9950X3D are 12/16C).
+        if ($l3.Count -ge 2 -and $CpuInfo.PhysCores -gt 8) {
             $CpuInfo.MultiCcd = $true
             $CpuInfo.TargetCcd = $l3.Count - 1
             $lpsPerCcd = [Math]::Floor($CpuInfo.Logical / $l3.Count)
@@ -126,6 +129,10 @@ if (-not $CpuInfo.MultiCcd) {
     $CpuInfo.TargetCcd = 0
     0..($CpuInfo.Logical - 1) | ForEach-Object { [void]$CpuInfo.TargetCcdLps.Add($_) }
 }
+
+# AMD 3D V-Cache detection (X3D stability mode: skip IRQ lock / aggressive tweaks)
+$IsAmdX3D = $CpuInfo.Vendor -match 'AMD' -and $CpuInfo.Name -match 'X3D'
+if ($IsAmdX3D) { _log "CPU.X3D: AMD 3D V-Cache detected (stability mode: IRQ lock skipped)" }
 
 _log "CPU.PRIMARY.P: [$($CpuInfo.PrimaryP -join ',')]"
 _log "CPU.PRIMARY.E: [$($CpuInfo.PrimaryE -join ',')]"
@@ -288,7 +295,7 @@ foreach ($d in $Devices | Where-Object Kind -eq AUDIO) {
 _info "=== PHASE 5: CPU Assignment ==="
 
 $orderedDevices = $Devices |
-    Where-Object { -not $WifiIdSet.ContainsKey($_.InstanceId) -and -not $SkipAutoIds.ContainsKey($_.InstanceId) -and -not $MsiOnlyGpuIds.ContainsKey($_.InstanceId) }
+    Where-Object { -not $WifiIdSet.ContainsKey($_.InstanceId) -and -not $SkipAutoIds.ContainsKey($_.InstanceId) -and -not $MsiOnlyGpuIds.ContainsKey($_.InstanceId) -and $_.Kind -ne 'STOR' }
 
 $prioMap = @{ USB = 1; GPU = 2; NET_NDIS = 3; NET_CX = 3; STOR = 4; AUDIO = 5 }
 $orderedDevices = @($orderedDevices | Sort-Object { $prioMap[$_.Kind] })
@@ -325,6 +332,23 @@ function _take([int]$n) {
 }
 
 $Results = [System.Collections.Generic.List[PSCustomObject]]::new()
+# Topology validation (26.08.1): only write AssignmentSetOverride when the mask is sane.
+# A misdetected topology (SMT off at BIOS while script assumed it, >64 LP clamp, hybrid
+# indexing error) produces masks referencing non-existent logical processors, which hangs
+# the device (and cold boot) at the motherboard logo. $script:topologyValid = per-device flag.
+function Test-AffinityMaskValid {
+    param([UInt64]$Mask, [int]$LogicalCount)
+    if ($Mask -eq 0) { return $false }
+    if ($LogicalCount -le 0) { return $false }
+    # Every set bit must reference an existing logical processor (< LogicalCount, < 64)
+    for ($i = 0; $i -lt 64; $i++) {
+        if (($Mask -shr $i) -band 1) {
+            if ($i -ge $LogicalCount) { return $false }
+        }
+    }
+    return $true
+}
+
 foreach ($d in $orderedDevices) {
     $need = if ($d.Kind -eq 'GPU') { 2 } else { 1 }
     if ($useAudioE -and $d.Kind -eq 'AUDIO' -and $aeAssigned -lt $audioECt) {
@@ -337,9 +361,13 @@ foreach ($d in $orderedDevices) {
     # Fix LTT: toutes les classes reçoivent une affinité SpecCPU explicite (NET filaires inclus;
     # le WiFi est déjà exclu via WifiIdSet — l'affinité casse de nombreux drivers WiFi).
     $policy = 'SpecCPU'
+    $affinityValid = Test-AffinityMaskValid -Mask $mask -LogicalCount $CpuInfo.Logical
+    if (-not $affinityValid) {
+        _warn "AUTO.TOPO.INVALID: $($d.Kind) $($d.InstanceId) Mask=0x$($mask.ToString('X')) invalid for Logical=$($CpuInfo.Logical) — falling back to MSI+priority only (no AssignmentSetOverride)"
+    }
 
-    [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$lps; Mask=$mask; Policy=$policy; Prio='High' })
-    _log "AUTO: $($d.Kind) $($d.InstanceId) -> LP=[$($lps -join ',')] Mask=0x$($mask.ToString('X'))"
+    [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$lps; Mask=$mask; Policy=$policy; Prio='High'; AffinityValid=$affinityValid })
+    _log "AUTO: $($d.Kind) $($d.InstanceId) -> LP=[$($lps -join ',')] Mask=0x$($mask.ToString('X')) valid=$affinityValid"
 }
 
 # ──────────────────────────────────────────────
@@ -365,11 +393,20 @@ function _applyDevice($r) {
         $pv = @{Low=1;Normal=2;High=3}[$r.Prio]
         Set-ItemProperty $affP -Name DevicePriority -Value $pv -Type DWord -Force
         # Policy + Mask (toutes classes, NET filaires inclus — fix LTT)
-        $polV = @{MachineDefault=0;All=1;Single=2;AllClose=3;SpecCPU=4;SpreadMessages=5}[$r.Policy]
-        Set-ItemProperty $affP -Name DevicePolicy -Value $polV -Type DWord -Force
-        $bytes = if ([Environment]::Is64BitOperatingSystem) { [BitConverter]::GetBytes([UInt64]$r.Mask) } else { [BitConverter]::GetBytes([UInt32]$r.Mask) }
-        Set-ItemProperty $affP -Name AssignmentSetOverride -Value $bytes -Type Binary -Force
-        _ok "APPLY: $($d.Kind) $($d.InstanceId) LP=[$($r.LPs -join ',')]"
+        # 26.08.1: AssignmentSetOverride only when the mask passed topology validation.
+        # A mask referencing non-existent LPs (misdetected topology) hangs device init
+        # at boot — fall back to MSI+priority only, reset policy to MachineDefault.
+        if ($r.AffinityValid) {
+            $polV = @{MachineDefault=0;All=1;Single=2;AllClose=3;SpecCPU=4;SpreadMessages=5}[$r.Policy]
+            Set-ItemProperty $affP -Name DevicePolicy -Value $polV -Type DWord -Force
+            $bytes = if ([Environment]::Is64BitOperatingSystem) { [BitConverter]::GetBytes([UInt64]$r.Mask) } else { [BitConverter]::GetBytes([UInt32]$r.Mask) }
+            Set-ItemProperty $affP -Name AssignmentSetOverride -Value $bytes -Type Binary -Force
+            _ok "APPLY: $($d.Kind) $($d.InstanceId) LP=[$($r.LPs -join ',')]"
+        } else {
+            Set-ItemProperty $affP -Name DevicePolicy -Value 0 -Type DWord -Force
+            Remove-ItemProperty $affP -Name AssignmentSetOverride -ErrorAction SilentlyContinue
+            _ok "APPLY.TOPO.SAFE: $($d.Kind) $($d.InstanceId) MSI+priority only (affinity skipped)"
+        }
     } catch { _err "APPLY.FAIL: $($d.InstanceId): $_" }
 }
 
@@ -383,6 +420,31 @@ foreach ($d in $Devices | Where-Object { $MsiOnlyGpuIds.ContainsKey($_.InstanceI
             Set-ItemProperty $msiP -Name MessageNumberLimit -Value 0 -Type DWord -Force
             _log "APPLY.MSIONLY.GPU: $($d.InstanceId)"
         } catch { _err "APPLY.MSIONLY.GPU.FAIL: $($d.InstanceId): $_" }
+    }
+}
+
+# Storage controllers: MSI DISABLED (MSISupported=0 → legacy INTx). 26.08.1:
+# MSI forcing (MSISupported=1 / MessageNumberLimit=0) on AHCI/NVMe controllers is a
+# known INACCESSIBLE_BOOT_DEVICE (0x7B) and cold-boot logo-hang trigger on some
+# controllers. Forcing MSI off is the safest storage interrupt mode for boot;
+# devices are excluded from $orderedDevices above so no affinity is ever applied.
+foreach ($d in $Devices | Where-Object { $_.Kind -eq 'STOR' }) {
+    if (-not $DryRun) {
+        try {
+            $msiP = "HKLM:\$($d.RegBase)\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties"
+            $affP = "HKLM:\$($d.RegBase)\Device Parameters\Interrupt Management\Affinity Policy"
+            $null = New-Item $msiP -Force -EA SilentlyContinue
+            Set-ItemProperty $msiP -Name MSISupported -Value 0 -Type DWord -Force
+            Remove-ItemProperty $msiP -Name MessageNumberLimit -ErrorAction SilentlyContinue
+            # Remove any stale affinity/override from previous runs to guarantee INTx boot path
+            if (Test-Path $affP) {
+                Remove-ItemProperty $affP -Name AssignmentSetOverride -ErrorAction SilentlyContinue
+                Remove-ItemProperty $affP -Name DevicePolicy -ErrorAction SilentlyContinue
+            }
+            _log "APPLY.MSIOFF.STOR: $($d.InstanceId) (MSI disabled → INTx, boot safety)"
+        } catch { _err "APPLY.MSIOFF.STOR.FAIL: $($d.InstanceId): $_" }
+    } else {
+        _log "DRYRUN.MSIOFF.STOR: $($d.InstanceId)"
     }
 }
 
@@ -415,7 +477,7 @@ foreach ($r in $Results) { _applyDevice $r }
 # ──────────────────────────────────────────────
 # NVIDIA GPU: RmForceEnableMSI - prerequisite for SpecCPU affinity
 # ──────────────────────────────────────────────
-# Fix 26.08: on Blackwell (RTX 5070 Ti, driver 596.49) the GPU ran on legacy INTx and
+# Fix 26.08.1: on Blackwell (RTX 5070 Ti, driver 596.49) the GPU ran on legacy INTx and
 # ignored AssignmentSetOverride (SpecCPU 1+2) - all ISR/DPC stayed on CPU 0 despite the
 # pinned affinity + locked routing. RmForceEnableMSI=1 (verified read by nvlddmkm via
 # ProcMon, per GPUTweaks source) switches the GPU to active MSI-X; the MSI vectors then
@@ -859,7 +921,9 @@ public static class DeviceTweakerWinIO
 # qui a été observé sur machine de test (GPU épinglé CPUs 1+2 mais ISR sur CPU 0).
 # Mode 4 = "Lock Interrupt Routing" : le routage initial (déterminé au boot par les
 # affinités statiques) est figé, plus aucune redistribution dynamique.
-if (-not $SkipLock -and -not $DryRun) {
+if ($IsAmdX3D) {
+    _info "=== PHASE 7: Lock Interrupt Routing SKIPPED (AMD 3D V-Cache detected) ==="
+} elseif (-not $SkipLock -and -not $DryRun) {
     _info "=== PHASE 7: Lock Interrupt Routing (Interrupt Steering Mode = 4) ==="
     try {
         $steerSub = '48672f38-7a9a-4bb2-8bf8-3d85be19de4e'   # Power subgroup: Interrupt Steering Settings

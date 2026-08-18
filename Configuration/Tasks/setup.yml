@@ -29,12 +29,6 @@ actions:
   - !status: {status: 'Configuring AV Exclusions', onUpgrade: false}
   - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\AVEXCLUDE.PS1"', runas: currentUserElevated, wait: true, weight: 200, onUpgrade: false}
 
-<<<<<<< HEAD
-=======
-  - !status: {status: 'Configuring User Folders'}
-  - !run: {exeDir: true, exe: '.\Scripts\FOLDER_USER.CMD', runas: currentUserElevated, wait: true, weight: 200}
-
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !status: {status: 'Running NGEN'}
   - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NGEN.PS1"', runas: currentUserElevated, wait: true, weight: 200}
 

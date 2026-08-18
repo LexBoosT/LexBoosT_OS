@@ -37,16 +37,53 @@ try {
 
     Write-Log '+' "Using bundled ViVeTool: $exePath"
 
-    # --- 2. Enable features ---
-<<<<<<< HEAD
-    Write-Log '+' "Enabling low-latency features (IDs: 60716524, 61391826, 58989092)..."
-=======
-    Write-Log '+' "Enabling low-latency features (IDs: 60716524, 61391826, 58989092, 36435115)..."
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    $process = Start-Process -FilePath $exePath -ArgumentList '/enable /id:60716524,61391826,58989092' -NoNewWindow -Wait -PassThru
+    # --- 2. CPU / build guards ---
+    # The Low Latency Profile (K2 CPU boost) forces frequency spikes on app
+    # launches. On AMD 3D V-Cache (X3D) this causes intermittent WHEA/BSOD —
+    # the feature IDs 58989092 / 60716524 / 61391826 / 62816659 are skipped
+    # on X3D. They also only exist on 25H2 26200.8728+ — on older builds
+    # (24H2 26100) activating unknown feature IDs can bugcheck at boot.
+    $isX3D = $false
+    try {
+        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+        $isX3D = ($cpu.Name -match 'AMD') -and ($cpu.Name -match 'X3D')
+    } catch {
+        Write-Log '-' "CPU detection failed: $_"
+    }
+    $build = 0
+    try {
+        $build = [int](Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name CurrentBuild -ErrorAction Stop).CurrentBuild
+    } catch {
+        Write-Log '-' "Build detection failed: $_"
+    }
+
+    $llpIds = '58989092,60716524,61391826,62816659'
+    $uiIds  = '59213768,61754985,61225604,61596616,61596617,61596618,61596619'
+
+    $enable = @()
+    if ($isX3D) {
+        Write-Log '-' "AMD 3D V-Cache detected: Low Latency Profile (K2 CPU boost) skipped (X3D stability)."
+    } elseif ($build -lt 26200) {
+        Write-Log '-' "Build ${build}: Low Latency Profile not available (26200.8728+ required), skipped."
+    } else {
+        $enable += $llpIds
+        Write-Log '+' "Low Latency Profile (K2 CPU boost) enabled."
+    }
+
+    # UI feature IDs (new Start Menu / Taskbar) also only exist on 26200+;
+    # activating unknown IDs on 24H2 26100 can bugcheck at boot.
+    if ($build -ge 26200) {
+        $enable += $uiIds
+    } else {
+        Write-Log '-' "Build ${build}: UI feature IDs skipped (26200+ required)."
+    }
+
+    # --- 3. Enable features ---
+    Write-Log '+' "Enabling UI features (new Start Menu / Taskbar)..."
+    $process = Start-Process -FilePath $exePath -ArgumentList ("/enable /id:" + ($enable -join ',')) -NoNewWindow -Wait -PassThru
 
     if ($process.ExitCode -eq 0) {
-        Write-Log '+' "Low-latency features enabled successfully!"
+        Write-Log '+' "Features enabled successfully!"
         Write-Log '+' "A reboot is required for changes to take effect."
     } else {
         Write-Log '-' "ViVeTool returned error code: $($process.ExitCode)"

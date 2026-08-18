@@ -13,9 +13,9 @@ try {
 
     if ($ramBytes -ge 17179869184) {
         Disable-MMAgent -MemoryCompression -ErrorAction SilentlyContinue
-        Write-Log '+' "MemoryCompression disabled ({0} GB RAM)" -f $ramGB
+        Write-Log '+' ("MemoryCompression disabled ({0} GB RAM)" -f $ramGB)
     } else {
-        Write-Log '-' "MemoryCompression kept (RAM = {0} GB < 16 GB)" -f $ramGB
+        Write-Log '-' ("MemoryCompression kept (RAM = {0} GB < 16 GB)" -f $ramGB)
     }
 } catch {
     Write-Log '-' "MemoryCompression unchanged (not supported on this build)"

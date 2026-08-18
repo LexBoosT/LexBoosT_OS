@@ -20,100 +20,37 @@ Write-Host '============================================'
 Write-Host '       DWM Registry Tweaks'
 Write-Host '============================================'
 
+# ============================================================
+#  Valeurs DWM par defaut Windows / télémétrie désactivée.
+#
+#  NB: les anciennes valeurs "performance" (DisableAdvancedDirectFlip,
+#  DisallowNonDrawListRendering, DisableDrawListCaching, EnableMegaRects,
+#  EnableDesktopOverlays, HighColor, FrameLatency, etc.) ont ete RETIREES :
+#  elles cassent la composition DWM -> rendu Chromium/CEF en software
+#  (Steam invisible) et crashent les apps WPF (DwmExtendFrameIntoClientArea
+#  0x80263001). La composition est laissee au comportement par defaut.
+# ============================================================
 $regValues = @(
-<<<<<<< HEAD
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OneCoreNoDWMRawGameController'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'MPCInputRouterWaitForDebugger'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'InteractionOutputPredictionDisabled'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'InkGPUAccelOverrideVendorWhitelist'; Value = 1; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableRenderPathTestMode'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableLockingMemory'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableHologramCompositor'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DebugFailFast'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DDisplayTestMode'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'FrameLatency'; Value = '2'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ForceDirectDrawSync'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'RenderThreadWatchdogTimeoutMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'MaxD3DFeatureLevel'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResizeTimeoutModern'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResizeTimeoutGdi'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'AnimationAttributionEnabled'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableProjectedShadowsRendering'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableAdvancedDirectFlip'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableDrawListCaching'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableEffectCaching'; Value = '1'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableAdvancedDirectFlip'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Dwm'; Name = 'DisallowNonDrawListRendering'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableDrawListCaching'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableEffectCaching'; Value = '0'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableImageProcessing'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'UseHWDrawListEntriesOnWARP'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDDisplayScanoutCaching'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DiscardSurfaceOnMinimize'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'FlattenVirtualSurfaceEffectInput'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'IdleTimeout'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'TelemetryFramesSequenceMaximumPeriodMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'TelemetryFramesSequenceIdleIntervalMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'TelemetryFramesReportPeriodMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'RecurringWatchdogTelemetryTimeoutMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'InitialWatchdogTelemetryTimeoutMilliseconds'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnablePrimitiveReordering'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleModeOverride'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleInLinearSpace'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'HighColor'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDesktopOverlays'; Value = '0'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleModeOverride'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ResampleInLinearSpace'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'HighColor'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableDesktopOverlays'; Value = '1'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableFrontBufferRenderChecks'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCommonSuperSets'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OptimizeForDirtyExpressions'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableResizeOptimization'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OverlayQualifyInterval'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OverlayQualifyCount'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OverlayDisqualifyInterval'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'OverlayDisqualifyCount'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\ExtendedComposition'; Name = 'EnableColorSeparation'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\ExtendedComposition'; Name = 'ForwardOnlyOnly'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\ExtendedComposition'; Name = 'SydneyDownsampleFilterKernelSize'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\DWM\Schedule'; Name = 'FrameDisplayBaseNegOffsetNS'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\DWM\Schedule'; Name = 'FrameDisplayResDivValue'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\DWM\Schedule'; Name = 'LingerInterval'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'MaxQueuedPresentBuffers'; Value = '1'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'MaxQueuedPresentBuffers'; Value = '3'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM\ExtendedComposition'; Name = 'ExclusiveModeFramerateAveragingPeriodMs'; Value = '1000'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\ExtendedComposition'; Name = 'ExclusiveModeFramerateThresholdPercent'; Value = '45'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM\ExtendedComposition'; Name = 'ExclusiveModeFramerateThresholdPercent'; Value = '45'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'AlwaysHibernateThumbnails'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'AnimationsShiftKey'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ParallelModePolicy'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm\Scene'; Name = 'EnableBloom'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCpuClipping'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableMegaRects'; Value = '1'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableCpuClipping'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'EnableMegaRects'; Value = '0'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'ForceDesktopTreeFullDirty'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'GammaBlendPencil'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'GammaBlendWithFP16'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'MousewheelAnimationDurationMs'; Value = '100'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableProjectedShadows'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\XAML'; Name = 'DisableGlobalAnimations'; Value = '1'; Type = 'REG_DWORD' }
 )
 
@@ -143,8 +80,4 @@ Write-Host '============================================'
 Write-Host '       Done!'
 Write-Host '============================================'
 
-<<<<<<< HEAD
 exit 0
-=======
-exit 0
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

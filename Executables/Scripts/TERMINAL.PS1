@@ -60,11 +60,7 @@ function Test-WindowsTerminalInstalled {
 function Test-WingetInstalled {
     try {
         $wingetCmd = Get-Command winget -ErrorAction Stop
-<<<<<<< HEAD
         return $null -ne $wingetCmd
-=======
-        return $wingetCmd -ne $null
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     } catch {
         return $false
     }
@@ -140,7 +136,7 @@ $jsonContent = @'
     "copyFormatting": "none",
     "copyOnSelect": false,
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-    "keybindings": 
+    "keybindings":
     [
         {
             "id": "Terminal.CopyToClipboard",
@@ -155,15 +151,15 @@ $jsonContent = @'
             "keys": "alt+shift+d"
         }
     ],
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
             "backgroundImage": "desktopWallpaper",
             "backgroundImageOpacity": 0.2,
@@ -171,7 +167,7 @@ $jsonContent = @'
             "cursorHeight": 25,
             "cursorShape": "bar",
             "experimental.retroTerminalEffect": true,
-            "font": 
+            "font":
             {
                 "face": "Cascadia Mono",
                 "size": 12,
@@ -180,7 +176,7 @@ $jsonContent = @'
             "opacity": 98,
             "useAcrylic": false
         },
-        "list": 
+        "list":
         [
             {
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoLogo",
@@ -226,7 +222,7 @@ $jsonContent = @'
             }
         ]
     },
-    "schemes": 
+    "schemes":
     [
         {
             "background": "#000000",
@@ -296,6 +292,29 @@ $jsonContent = @'
             "selectionBackground": "#FFFFFF",
             "white": "#BAB7B6",
             "yellow": "#DB9C11"
+        },
+        {
+            "background": "#000000",
+            "black": "#000000",
+            "blue": "#0000AA",
+            "brightBlack": "#555555",
+            "brightBlue": "#5555FF",
+            "brightCyan": "#55FFFF",
+            "brightGreen": "#55FF55",
+            "brightPurple": "#FF55FF",
+            "brightRed": "#FF5555",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FFFF55",
+            "cursorColor": "#AAAAAA",
+            "cyan": "#00AAAA",
+            "foreground": "#AAAAAA",
+            "green": "#00AA00",
+            "name": "CGA",
+            "purple": "#AA00AA",
+            "red": "#AA0000",
+            "selectionBackground": "#AA0000",
+            "white": "#AAAAAA",
+            "yellow": "#AA5500"
         }
     ],
     "themes": [],

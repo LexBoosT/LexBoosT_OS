@@ -1,6 +1,5 @@
 $ErrorActionPreference = "Continue"
 
-<<<<<<< HEAD
 function Test-IsIntelCPU {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -15,8 +14,21 @@ function Test-IsIntelCPU {
     }
 }
 
-=======
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+function Test-IsAMD3DVCache {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param()
+    try {
+        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+        if ($cpu.Name -notmatch "AMD") { return $false }
+        if ($cpu.Name -match "X3D") { return $true }
+        $knownX3D = @('5800X3D','7800X3D','7900X3D','7950X3D','9800X3D','9900X3D','9950X3D')
+        foreach ($model in $knownX3D) { if ($cpu.Name -match $model) { return $true } }
+        return $false
+    }
+    catch { return $false }
+}
+
 function Write-Log {
     param([string]$Status, [string]$Message)
     Write-Host "[$Status] $Message"
@@ -25,7 +37,6 @@ function Write-Log {
 Write-Log '+' 'Applying YML system registry tweaks...'
 
 # ================================================
-<<<<<<< HEAD
 # DPC KERNEL TWEAKS
 # ================================================
 
@@ -36,13 +47,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'Ideal
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcQueueDepth' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MinimumDpcRate' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcWatchdogPeriod' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# ================================================
-# INTERRUPT STEERING
-# ================================================
-
-Write-Log '+' 'Disabling interrupt steering...'
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'InterruptSteeringDisabled' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 
 # ================================================
 # SPLIT LARGE CACHES
@@ -63,7 +67,12 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'Threa
 # ================================================
 
 Write-Log '+' 'Applying kernel scheduling tweaks...'
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaxDynamicTickDuration' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
+# MaxDynamicTickDuration: Intel only (26.08.1). The 10-tick cap combined with
+# bcdedit disabledynamictick hangs cold boot at the motherboard logo on AMD
+# (same family as the X3D guard). AMD keeps the scheduler-friendly default.
+if (Test-IsIntelCPU) {
+    reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaxDynamicTickDuration' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
+}
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaximumSharedReadyQueueSize' /t REG_DWORD /d 128 /f 2>&1 | Out-Null
 
 # ================================================
@@ -89,7 +98,7 @@ reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_RESIDENCY_MANAGEMENT_ENABLED
 # ================================================
 # DXGI (DIRECTX GRAPHICS INFRASTRUCTURE)
 # ================================================
-# REMOVED 26.08: the DXGI_* presentation-forcing keys (DXGI_MAX_FRAME_LATENCY,
+# REMOVED 26.08.1: the DXGI_* presentation-forcing keys (DXGI_MAX_FRAME_LATENCY,
 # DXGI_FORCE_FULLSCREEN_FLIP_MODE, DXGI_FORCE_FLIP_SEQUENTIAL, DXGI_DISABLE_DWM_THROTTLING,
 # DXGI_PREEMPTION_MODE, ...) are undocumented tweak-pack values that the system does not
 # read (frame latency is a per-process API: IDXGIDevice1::SetMaximumFrameLatency).
@@ -116,16 +125,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl' /v 'DxgkWaitForVertical
 reg add 'HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl' /v 'SwapChainBackBuffer' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl' /v 'TdrResetFromTimeoutAsync' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 
-
-
-# ================================================
-# TdrDelay (GPU TIMEOUT)
-# ================================================
-Write-Log '+' 'Setting GPU TdrDelay...'
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'TdrDelay' /t REG_DWORD /d 20 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'TdrLevel' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'TdrDdiDelay' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
-
 # ================================================
 # GRAPHICS DRIVERS (GPU SCHEDULING & POWER)
 # ================================================
@@ -133,7 +132,7 @@ Write-Log '+' 'Applying Graphics Drivers tweaks...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'PowerSavingModeEnabled' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'PanelSelfRefresh' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ForceOffScreenTimeout' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-# HwSchMode / HwSchTreatExperimentalAsStable REMOVED 26.08: SYSTEM_TWEAKS was rewriting
+# HwSchMode / HwSchTreatExperimentalAsStable REMOVED 26.08.1: SYSTEM_TWEAKS was rewriting
 # HwSchMode=2 (HAGS ON) on every install, contradicting the "HAGS managed by GPUTweaks"
 # decision and spiking dxgkrnl ISR (582 us at HAGS ON vs 205 us OFF, A/B tested).
 # HAGS state is owned exclusively by GPUTweaks (tri-state DEFAULT/ON/OFF).
@@ -142,14 +141,14 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'WDDM2LockMan
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'DiagnosticsBufferExpansionTime' /t REG_DWORD /d 300 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ExternalDiagnosticsBufferSize' /t REG_DWORD /d 65536 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'DpiMapIommuContiguous' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-# MaxFrameLatency REMOVED 26.08: forced a 1-frame present queue (same family as the DXGI_*
+# MaxFrameLatency REMOVED 26.08.1: forced a 1-frame present queue (same family as the DXGI_*
 # flip stack removed above); A/B: ISR peaks 484->205 us once removed.
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'ModeListCaching' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'EnableVirtualRefreshRateOnExternalMonitor' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'ShortLinkTrainingTimeout' /t REG_DWORD /d 100 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'LongLinkTrainingTimeout' /t REG_DWORD /d 500 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power' /v 'DisableDevicePowerRequired' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-# QueuedPresentLimit / ForceIndependentFlip REMOVED 26.08: forced independent flip with a
+# QueuedPresentLimit / ForceIndependentFlip REMOVED 26.08.1: forced independent flip with a
 # near-empty present queue; when a frame misses VSync, nvlddmkm waits inside the DPC
 # (1890 us peaks measured). Let the driver/DWM manage the flip queue (default).
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler' /v 'EnableFrameBufferCompression' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
@@ -291,16 +290,14 @@ foreach ($ps in $policySets) {
 
 # ================================================
 # KERNEL / SESSION MANAGER (existing)
-=======
-# KERNEL / SESSION MANAGER
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # ================================================
 
 # Timer kernel tweaks
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'TimerCheckFlags' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'SerializeTimerExpiration' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'EnablePerCpuClockTickScheduling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-<<<<<<< HEAD
+if (-not (Test-IsAMD3DVCache)) {
+    reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'EnablePerCpuClockTickScheduling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 # Memory Management
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'DisablePageCombining' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
@@ -314,24 +311,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'Win32C
 
 # DisableDiagnosticTracing
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Diagnostics\Performance' /v 'DisableDiagnosticTracing' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-=======
-# GlobalTimerResolutionRequests laissé à son défaut (non modifié) — requis par TimerControl
-
-# Memory Management
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'DisablePageCombining' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettings' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverride' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverrideMask' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
-
-# Power desktop-only
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'WatchdogResumeTimeout' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'WatchdogSleepTimeout' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'Win32CalloutWatchdogBugcheckEnabled' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'IdleScanInterval' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# DisableDiagnosticTracing
-reg add 'HKLM\SYSTEM\CurrentControlSet001\Control\Diagnostics\Performance' /v 'DisableDiagnosticTracing' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # ================================================
 # WINDOWS / RIT / DESKTOP HEAP
@@ -339,7 +318,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet001\Control\Diagnostics\Performance' /v 'D
 
 reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'RITdemonTimerPowerSaveElapse' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'RITdemonTimerPowerSaveCoalescing' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-<<<<<<< HEAD
 reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'DesktopHeapLogging' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
@@ -350,25 +328,10 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl' /v 'Win32Priorit
 
 # ================================================
 # DIRECTX (existing)
-=======
-reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'ProcessDCEsInUseThreshold' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'DesktopHeapLogging' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# ================================================
-# MULTIMEDIA / SYSTEM PROFILE (YML values)
-# ================================================
-
-# Priority Control
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl' /v 'Win32PrioritySeparation' /t REG_DWORD /d 24 /f 2>&1 | Out-Null
-
-# ================================================
-# DIRECTX
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # ================================================
 
 reg add 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences' /v 'DirectXUserGlobalSettings' /t REG_SZ /d 'SwapEffectUpgradeEnable=1;VRROptimizeEnable=0;' /f 2>&1 | Out-Null
 
-<<<<<<< HEAD
 # ================================================
 # NETWORK / DMA / MISCELLANEOUS (existing)
 # ================================================
@@ -386,36 +349,6 @@ reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' /v '
 reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' /v 'EnabledBlurBehind' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' /f 2>&1 | Out-Null
 reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' /f 2>&1 | Out-Null
-=======
-# DisableBandwidthThrottling — from misc.yml
-reg add 'HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' /v 'DisableBandwidthThrottling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-
-# Kernel DMA Protection DeviceEnumerationPolicy — from misc.yml
-reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Kernel DMA Protection' /v 'DeviceEnumerationPolicy' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# ================================================
-# EXPLORER DESKTOP TWEAKS
-# NOTE: AutoEndTasks, HungAppTimeout, WaitToKillTimeout, WaitToKillServiceTimeout,
-# InfoWindow, transparency, taskbar — kept in explorer.yml / themes.yml (YML only)
-# WaitToKillServiceTimeout — from explorer.yml (no script existed)
-# ================================================
-
-# WaitToKillServiceTimeout — from explorer.yml
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control' /v 'WaitToKillServiceTimeout' /t REG_SZ /d 2000 /f 2>&1 | Out-Null
-
-# InfoWindow color — from explorer.yml
-reg add 'HKCU\Control Panel\Colors' /v 'InfoWindow' /t REG_SZ /d '246 253 255' /f 2>&1 | Out-Null
-
-# Theme personalization — from explorer.yml (SystemUsesLightTheme, AppsUseLightTheme)
-reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' /v 'SystemUsesLightTheme' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' /v 'AppsUseLightTheme' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# Quick Access / Home removal — from explorer.yml
-reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' /f 2>&1 | Out-Null
-reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' /f 2>&1 | Out-Null
-
-# Taskbar / LaunchTo — from explorer.yml
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 reg add 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v 'TaskbarBadges' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v 'TaskbarFlashing' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 

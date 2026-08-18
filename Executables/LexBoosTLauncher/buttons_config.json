@@ -38,7 +38,7 @@
     },
     {
       "name": "LexBoosT Network Optimizer",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_DNS_Congestion.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Network_Optimizer.exe",
       "category": "Performance",
       "tooltip": "Optimize network settings and DNS configuration",
       "tooltipFr": "Optimiser les paramètres réseau et la configuration DNS"
@@ -197,6 +197,13 @@
       "tooltip": "Allows you to make the cursor disappear like in certain video players, but for everything.",
       "tooltipFr": "Permet de faire disparaître le curseur comme dans certains lecteurs vidéo, mais pour tout."
     },
+	{
+      "name": "LexBoosT Custom Cursor HDR Fix",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\CustomCursorHdrFix.exe",
+      "category": "Appearance",
+      "tooltip": "Allows you to display the true color of your mouse cursor when in HDR mode.",
+      "tooltipFr": "Vous permet d'afficher la vraie couleur du curseur de votre souris en mode HDR."
+    },
     {
       "name": "Winaero Tweaker",
       "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\WinaeroTweaker\\WinaeroTweaker.exe",
@@ -338,6 +345,13 @@
       "category": "Games",
       "tooltip": "A Retro classic game make with love for LexBoosT OS users",
       "tooltipFr": "Un jeu rétro classique fait avec amour pour les utilisateurs de LexBoosT OS"
+    },
+	{
+      "name": "Vampire Rage",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Games\\VampireRage\\VR-Launcher.exe",
+      "category": "Games",
+      "tooltip": "A Retro classic shootem'up game make by tricktale for Xbox 360, ported by LexBoosT",
+      "tooltipFr": "Un shootem'up rétro creer par tricktale pour Xbox 360, porté sur pc par LexBoosT"
     }
   ]
 }

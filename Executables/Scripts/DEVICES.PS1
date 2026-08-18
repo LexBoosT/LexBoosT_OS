@@ -449,8 +449,12 @@ function Set-LexBoostPowerScheme {
             $cpuInfo = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
             $coreCount = [int]$cpuInfo.NumberOfCores
             Write-Log '+' "  CPU: $($cpuInfo.Name) ($coreCount cores)"
-            $skipCoreParking = (Test-IsAMD3DVCache) -and ($coreCount -gt 8)
-            if ($skipCoreParking) { Write-Log '+' "  AMD 3D V-Cache dual-CCD detected." }
+            # AMD 3D V-Cache (ALL X3D, 8-core single-CCD included): keep
+            # C-States, core parking and boost at defaults — forced C-States=0,
+            # Aggressive boost and dynamic-tick tweaks cause intermittent
+            # WHEA/BSOD on X3D (stacked V-Cache traps heat).
+            $skipCoreParking = Test-IsAMD3DVCache
+            if ($skipCoreParking) { Write-Log '+' "  AMD 3D V-Cache CPU detected." }
         }
         catch {
             Write-Log '-' "Failed to detect CPU topology: $_"
@@ -468,7 +472,7 @@ function Set-LexBoostPowerScheme {
                 Invoke-PowerCfg "/setacvalueindex $schemeGuid SUB_PROCESSOR CPMINCORES1 80"
             }
             else {
-                Write-Log '-' "AMD 3D V-Cache dual-CCD detected: skipping CPMINCORES (core parking managed by Game Bar)."
+                Write-Log '-' "AMD 3D V-Cache detected: skipping CPMINCORES (core parking left at defaults)."
             }
             # CPU Boost Mode: Enabled AC & DC (laptop only)
             Write-Log '+' "  Enabling CPU Boost Mode AC + DC..."
@@ -482,22 +486,22 @@ function Set-LexBoostPowerScheme {
                 Invoke-PowerCfg "/setacvalueindex $schemeGuid SUB_PROCESSOR CPMINCORES1 100"
             }
             else {
-                Write-Log '-' "AMD 3D V-Cache dual-CCD detected: skipping CPMINCORES (core parking managed by Game Bar)."
+                Write-Log '-' "AMD 3D V-Cache detected: skipping CPMINCORES (core parking left at defaults)."
             }
             Invoke-PowerCfg "/setacvalueindex $schemeGuid SUB_PCIEXPRESS ASPM 0"
             Invoke-PowerCfg "/setdcvalueindex $schemeGuid SUB_PCIEXPRESS ASPM 0"
         }
 
-        # C-States: enabled only on AMD dual-CCD X3D (required for core parking via Game Bar)
+        # C-States: kept ENABLED on all AMD X3D (required for V-Cache stability)
         if ($skipCoreParking) {
-            Write-Log '+' "  Enabling C-States (AMD dual-CCD X3D: required for core parking)..."
+            Write-Log '+' "  Keeping C-States enabled (AMD 3D V-Cache: required for stability)..."
             Set-RegistryValue -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Processor" -Name "Cstates" -Type DWORD -Value 1
 
             Write-Log '+' "  Making deep C-States visible in Power Options..."
             Set-RegistryValue -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\5d76a2ca-e8c0-402f-a133-2158492d58ad" -Name "Attributes" -Type DWORD -Value 0
         }
         else {
-            Write-Log '+' "  Disabling C-States (eliminates latency from state transitions)..."
+            Write-Log '+' "  Disabling C-States (non-X3D: eliminates latency from state transitions)..."
             Set-RegistryValue -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Processor" -Name "Cstates" -Type DWORD -Value 0
         }
 
@@ -521,7 +525,7 @@ function Set-LexBoostPowerScheme {
         }
 
         if ($skipCoreParking) {
-            Write-Log '+' "AMD dual-CCD X3D detected: activating Balanced power plan (core parking preserved)..."
+            Write-Log '+' "AMD 3D V-Cache detected: activating Balanced power plan (parking/boost left at defaults)..."
             $balancedGuid = '381b4222-f694-41f0-9685-ff5bb260df2e'
             if (-not (Invoke-PowerCfg "/setactive $balancedGuid")) {
                 throw "Failed to activate Balanced power plan"
@@ -694,306 +698,13 @@ function Set-NetConfig {
     [CmdletBinding()]
     param()
 
-    Write-Log '+' "Configuring network adapters..."
-
-    $adapterKeys = Get-NetworkAdapterKeys
-    $adapterVendors = Get-NetworkAdapterVendors
-    $isLaptop = Get-CachedLaptopStatus
-
-    if ($adapterVendors -contains 'Intel') {
-        Write-Log '+' "Applying Intel network optimizations..."
-        Set-IntelNetworkSettings -AdapterKeys $adapterKeys -IsLaptop $isLaptop
-    }
-
-    if ($adapterVendors -contains 'Realtek') {
-        Write-Log '+' "Applying Realtek network optimizations..."
-        Set-RealtekNetworkSettings -AdapterKeys $adapterKeys -IsLaptop $isLaptop
-    }
-
-    Write-Log '+' "Configuring global network offload settings..."
-    Set-NetOffloadGlobalSetting -ReceiveSegmentCoalescing Disabled -ErrorAction SilentlyContinue
-    Set-NetOffloadGlobalSetting -PacketCoalescingFilter Disabled -ErrorAction SilentlyContinue
-
-    Write-Log '+' "Network configuration completed successfully."
-}
-
-function Get-NetworkAdapterKeys {
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param()
-
-    $networkClassGuid = '{4D36E972-E325-11CE-BFC1-08002bE10318}'
-    $basePath = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\$networkClassGuid"
-
-    Get-ChildItem -Path $basePath -ErrorAction SilentlyContinue |
-    Where-Object { $_.Property -like '*SpeedDuplex*' } |
-    ForEach-Object { "$basePath\$($_.PSChildName)" }
-}
-
-function Get-NetworkAdapterVendors {
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param()
-
+    Write-Log '+' "Applying per-adapter NIC presets (Intel/Realtek, Ethernet/WiFi)..."
     try {
-        Get-CimInstance -ClassName Win32_NetworkAdapter -ErrorAction Stop |
-        Where-Object { $_.Manufacturer } |
-        ForEach-Object {
-            if ($_.Manufacturer -match 'Realtek') { 'Realtek' }
-            elseif ($_.Manufacturer -match 'Intel') { 'Intel' }
-        } |
-        Where-Object { $_ } |
-        Sort-Object -Unique
+        & "$PSScriptRoot\NIC-TWEAKS.PS1"
     }
     catch {
-        Write-Log '-' "Failed to detect network adapter vendors: $_"
-        @()
+        Write-Log '-' "NIC-TWEAKS.PS1 failed: $_"
     }
-}
-
-function Get-CommonNetworkPerformanceSettings {
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param()
-
-    return @{
-        "*EncapsulatedPacketTaskOffloadNvgre" = "0"
-        "*EncapsulatedPacketTaskOffloadVxlan" = "0"
-        "*EncapsulatedPacketTaskOffload"      = "0"
-        "*IPChecksumOffloadIPv4"              = "3"
-        "*LsoV1IPv4"                          = "1"
-        "*LsoV2IPv4"                          = "1"
-        "*LsoV2IPv6"                          = "1"
-        "*TCPChecksumOffloadIPv4"             = "3"
-        "*TCPChecksumOffloadIPv6"             = "3"
-        "*UDPChecksumOffloadIPv4"             = "3"
-        "*UDPChecksumOffloadIPv6"             = "3"
-        "*IPsecOffloadV1IPv4"                 = "3"
-        "*IPsecOffloadV2"                     = "3"
-        "*IPsecOffloadV2IPv4"                 = "3"
-        "*TCPConnectionOffloadIPv4"           = "1"
-        "*TCPConnectionOffloadIPv6"           = "1"
-        "*TCPUDPChecksumOffloadIPv4"          = "3"
-        "*TCPUDPChecksumOffloadIPv6"          = "3"
-        "*UsoIPv4"                            = "1"
-        "*UsoIPv6"                            = "1"
-        "*RscIPv4"                            = "1"
-        "*RscIPv6"                            = "1"
-        "*UdpRsc"                             = "1"
-        "ForceRscEnabled"                     = "1"
-        "*PMARPOffload"                       = "1"
-        "*PMNSOffload"                        = "1"
-        "*PMWiFiRekeyOffload"                 = "1"
-        "*ReceiveBuffers"                     = "1024"
-        "EnableAdaptiveQueuing"               = "0"
-        "StoreBadPackets"                     = "0"
-        "DynamicLTR"                          = "0"
-        "*TransmitBuffers"                    = "1024"
-        "RecvCompletionMethod"                = "4"
-        "SendCompletionMethod"                = "2"
-        "DropHighlyFragmentedPacket"          = "1"
-        "EnableCoalesce"                      = "0"
-        "*PacketDirect"                       = "1"
-        "AllowFlowControlFrames"              = "0"
-        "EnableTss"                           = "1"
-        "*PriorityVLANTag"                    = "0"
-        "TeredoOffload"                       = "1"
-        "*QoSOffload"                         = "1"
-    }
-}
-
-function Set-NetworkAdapterSettings {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$AdapterKeys,
-
-        [Parameter(Mandatory = $true)]
-        [hashtable]$PerformanceSettings,
-
-        [Parameter(Mandatory = $false)]
-        [hashtable]$PowerSettings = @{},
-
-        [Parameter(Mandatory = $true)]
-        [bool]$IsLaptop
-    )
-
-    Write-Log '+' "  Applying performance settings..."
-    Set-RegistrySettings -Paths $AdapterKeys -Settings $PerformanceSettings -Type String
-    # PnPCapabilities=24 — blocks PCIe power management on NIC (must be DWORD)
-    foreach ($key in $AdapterKeys) {
-        Set-RegistryValue -Path $key -Name "PnPCapabilities" -Type DWORD -Value 24
-    }
-
-    if (-not $IsLaptop -and $PowerSettings.Count -gt 0) {
-        Write-Log '+' "  Applying power management settings..."
-        Set-RegistrySettings -Paths $AdapterKeys -Settings $PowerSettings -Type String
-    }
-}
-
-function Set-IntelNetworkSettings {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$AdapterKeys,
-
-        [Parameter(Mandatory = $true)]
-        [bool]$IsLaptop
-    )
-
-    $performanceSettings = Get-CommonNetworkPerformanceSettings
-
-    # Intel-specific performance optimizations applied regardless of laptop/desktop
-    $intelPerformanceSettings = @{
-        # Interrupt & Latency
-        "*InterruptModeration"         = "0"   # Disabled: lowest latency (standardized NDIS)
-        "ITR"                          = "0"   # Interrupt Throttling Rate: adaptive/off
-
-        # Receive Side Scaling
-        "*RSS"                         = "1"   # Enabled: distribute processing across CPU cores (standardized)
-        "*NumRssQueues"                = "1"
-        "*RSSProfile"                  = "2"
-        "RssV2"                        = "1"
-        "ValidateRssV2"                = "2"
-        "*RssBaseProcNumber"           = "2"
-
-        # Flow Control & DMA
-        "*FlowControl"                 = "0"   # Disabled: prevents pause-frame network flooding (standardized)
-        "*DMACoalescing"               = "0"   # Disabled: lower latency
-
-        # Packet Coalescing
-        "*PacketCoalescing"            = "0"   # Disabled: prevents latency from packet batching (standardized)
-
-        # Intel-specific IPv6 offload (some Intel adapters expose this)
-        "*IPChecksumOffloadIPv6"       = "3"   # Rx & Tx Enabled
-
-        # Logging
-        "LogLinkStateEvent"            = "0"   # Disable link-state event logging
-    }
-
-    foreach ($key in $intelPerformanceSettings.Keys) {
-        $performanceSettings[$key] = $intelPerformanceSettings[$key]
-    }
-
-    # Power management: Wake, EEE, and power-saving — disabled on desktop for maximum stability & performance
-    $powerSettings = @{
-        # Wake-on-LAN: all disabled
-        "*ModernStandbyWoLMagicPacket" = "0"   # Standardized: S0ix WoL
-        "*WakeOnMagicPacket"           = "0"   # Standardized
-        "*WakeOnPattern"               = "0"   # Standardized
-        "WakeOnMagicPacketFromS5"      = "0"   # Intel: S5 WoL
-        "S5WakeOnLan"                  = "0"   # Intel: S5 WoL
-        "WakeOnLink"                   = "0"   # Intel: wake on link change
-        "EnablePME"                    = "0"   # PCI Power Management Event
-        "WolShutdownLinkSpeed"         = "2"   # 100 Mbps (moot: WoL disabled above)
-
-        # Energy Efficient Ethernet: disabled
-        "*EEE"                         = "0"   # Standardized: 802.3az
-        "AdvancedEEE"                  = "0"   # Intel
-        "EEELinkAdvertisement"         = "0"   # Intel
-        "EnableGreenEthernet"          = "0"   # Intel/Realtek
-        "GigaLite"                     = "0"   # Intel/Realtek
-        "PowerSavingMode"              = "0"   # Intel/Realtek
-        "ReduceSpeedOnPowerDown"       = "0"   # Intel
-
-        # Power saving features: disabled
-        "*NicAutoPowerSaver"           = "0"   # Intel
-        "AutoPowerSaveModeEnabled"     = "0"   # Intel
-        "EnableSavePowerNow"           = "0"   # Intel
-        "*SelectiveSuspend"            = "0"   # Standardized NDIS selective suspend
-        "*DeviceSleepOnDisconnect"     = "0"   # Standardized: sleep on media disconnect
-        "*EnableDynamicPowerGating"    = "0"   # Intel
-        "EnableConnectedStandby"       = "0"   # Intel: connected standby / modern standby
-        "OBFFEnabled"                  = "0"   # Intel: Optimized Buffer Flush/Fill
-
-        # Protocol offloads during sleep: disabled (WoL is disabled, so no benefit)
-        "*PMARPOffload"                = "0"   # Standardized: ARP offload during sleep
-        "*PMNSOffload"                 = "0"   # Standardized: NS offload during sleep
-    }
-
-    Set-NetworkAdapterSettings -AdapterKeys $AdapterKeys -PerformanceSettings $performanceSettings -PowerSettings $powerSettings -IsLaptop $IsLaptop
-}
-
-function Set-RealtekNetworkSettings {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$AdapterKeys,
-
-        [Parameter(Mandatory = $true)]
-        [bool]$IsLaptop
-    )
-
-    $performanceSettings = Get-CommonNetworkPerformanceSettings
-
-    # Realtek-specific performance optimizations applied regardless of laptop/desktop
-    $realtekPerformanceSettings = @{
-        # Idle restriction: only allow idle power-down when user isn't present (standardized NetAdapterCx)
-        "*IdleRestriction"             = "1"
-
-        # Interrupt & Latency
-        "*InterruptModeration"         = "0"   # Disabled: lowest latency (standardized NDIS)
-        "ITR"                          = "0"   # Interrupt Throttling Rate: adaptive/off
-
-        # Receive Side Scaling
-        "*RSS"                         = "1"   # Enabled: distribute interrupts across cores (standardized)
-        "*NumRssQueues"                = "4"   # 4 RSS queues (Realtek typically supports 2-4)
-
-        # Flow Control & DMA
-        "*FlowControl"                 = "0"   # Disabled: prevents pause-frame network flooding (standardized)
-        "*DMACoalescing"               = "0"   # Disabled: lower latency
-
-        # Packet Coalescing
-        "*PacketCoalescing"            = "0"   # Disabled: prevents latency from packet batching (standardized)
-    }
-
-    foreach ($key in $realtekPerformanceSettings.Keys) {
-        $performanceSettings[$key] = $realtekPerformanceSettings[$key]
-    }
-
-    # Power management & PCIe link power saving — disabled on desktop for max stability & performance
-    $powerSettings = @{
-        # Wake-on-LAN: all disabled
-        "*WakeOnMagicPacket"           = "0"   # Standardized
-        "*WakeOnPattern"               = "0"   # Standardized
-        "*ModernStandbyWoLMagicPacket" = "0"   # Standardized: S0ix WoL
-        "EnableWakeOnSlot"             = "0"   # Realtek: wake on PCIe slot event
-        "WakeOnSlot"                   = "0"   # Realtek: wake on PCIe slot
-        "WolShutdownLinkSpeed"         = "2"   # 100 Mbps (moot: WoL disabled above)
-
-        # Energy Efficient Ethernet: disabled
-        "*EEE"                         = "0"   # Standardized: 802.3az
-        "AdvancedEEE"                  = "0"   # Realtek
-        "EEEPlus"                      = "0"   # Realtek enhanced EEE
-        "EnableGreenEthernet"          = "0"   # Realtek/Intel
-
-        # Selective Suspend: disabled
-        "*SelectiveSuspend"            = "0"   # Standardized NDIS selective suspend
-        "*DeviceSleepOnDisconnect"     = "0"   # Standardized: sleep on media disconnect
-
-        # Power saving features: disabled
-        "PowerSavingMode"              = "0"   # Realtek/Intel
-        "AutoPowerSaveMode"            = "0"   # Realtek
-        "EnableSavePower"              = "0"   # Realtek
-        "EnablePowerManagement"        = "0"   # Realtek
-        "GPPSW"                        = "0"   # Green Power PHY SW
-        "EPSDRT"                       = "0"   # Energy saving for low traffic
-        "GigaLite"                     = "0"   # Realtek/Intel: reduce speed to 100M
-        "ULPMode"                      = "0"   # Ultra Low Power Mode
-        "DeepSleep"                    = "0"   # Realtek deep sleep
-        "ReduceSpeedOnPowerDown"       = "0"   # Reduce link speed on power down
-
-        # PCIe link power management: disabled for lowest latency
-        "ASPM"                         = "0"   # Active State Power Management
-        "EnableAspm"                   = "0"   # Alternative ASPM toggle
-        "CLKREQ"                       = "0"   # Clock request / clock gating
-        "EnableL1"                     = "0"   # PCIe L1 sub-state
-        "EnableL0s"                    = "0"   # PCIe L0s sub-state
-        "PowerDownPll"                 = "0"   # PLL power down
-        "LTROBF"                       = "0"   # LTR OBFF (affects latency)
-    }
-
-    Set-NetworkAdapterSettings -AdapterKeys $AdapterKeys -PerformanceSettings $performanceSettings -PowerSettings $powerSettings -IsLaptop $IsLaptop
 }
 
 function Set-DrivesConfiguration {
@@ -1075,11 +786,7 @@ function Set-DrivesConfiguration {
         $ntfsSettings = @(
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsMemoryUsage'; Value = 2 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'LongPathsEnabled'; Value = 1 },
-<<<<<<< HEAD
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableCompression'; Value = 1 },
-=======
-            @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableCompression'; Value = 0 },
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsDisableEncryption'; Value = 1 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NtfsEncryptPagingFile'; Value = 0 },
             @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'; Name = 'NTFSDisableLastAccessUpdate'; Value = 0x80000001 },
@@ -1094,44 +801,6 @@ function Set-DrivesConfiguration {
         Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' -Name 'Enable' -Type String -Value 'N'
         Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OptimalLayout' -Name 'EnableAutoLayout' -Type DWORD -Value 0
 
-<<<<<<< HEAD
-=======
-        Write-Log '+' "Disabling StorageD3 in Modern Standby..."
-        Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Storage' -Name 'StorageD3InModernStandby' -Type DWORD -Value 0
-
-        Write-Log '+' "Disabling IoLatencyCap on all storage services..."
-        try {
-            $serviceKeys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "IoLatencyCap" 2>$null |
-                Select-String 'HKEY_' |
-                ForEach-Object { $_.Line.Trim() }
-            foreach ($key in $serviceKeys) {
-                reg add "$key" /v "IoLatencyCap" /t REG_DWORD /d 0 /f 2>$null | Out-Null
-            }
-            Write-Log '+' "  IoLatencyCap disabled on all services"
-        }
-        catch {
-            Write-Log '-' "Failed to disable IoLatencyCap: $_"
-        }
-
-        Write-Log '+' "Enabling disk write cache on all drives..."
-        try {
-            $diskGuid = '{4d36e967-e325-11ce-bfc1-08002be10318}'
-            $enumPath = "HKLM:\SYSTEM\CurrentControlSet\Enum"
-            $diskKeys = reg query $enumPath /f $diskGuid /d /s 2>$null |
-                Select-String 'HKEY_' |
-                ForEach-Object { $_.Line.Trim() }
-            foreach ($key in $diskKeys) {
-                $diskParamPath = "$key\Device Parameters\Disk"
-                Set-ItemProperty -Path $diskParamPath -Name 'UserWriteCacheSetting' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
-                Set-ItemProperty -Path $diskParamPath -Name 'CacheIsPowerProtected' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
-            }
-            Write-Log '+' "[+] Disk write cache enabled (power-protected)"
-        }
-        catch {
-            Write-Log '-' "Failed to enable disk write cache: $_"
-        }
-
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         Write-Log '+' "Drive configuration completed successfully."
     }
     catch {
@@ -1238,17 +907,6 @@ function Set-IRQAffinity {
         }
         else {
             Write-Log '+' "No GPU found for IRQ pinning."
-        }
-
-        Write-Log '+' "Pinning NVMe interrupts to E-Cores (mask 0xF0)..."
-        $nvmes = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
-            Where-Object { $_.PSPath -match "CC_0108" }
-
-        if ($nvmes) {
-            foreach ($nvme in $nvmes) {
-                Set-RegistryValue -Path $nvme.PSPath -Name "AssignmentSetOverride" -Type Binary -Value ([byte[]](0xF0, 0x00, 0x00, 0x00))
-            }
-            Write-Log '+' "NVMe interrupts pinned to E-Cores."
         }
 
         Write-Log '+' "Pinning network adapter interrupts to E-Cores (mask 0xF0)..."
@@ -1397,12 +1055,7 @@ function Set-DesktopPowerOptimizations {
         Set-CoreParkingDisabled -CpuType "Intel"
     }
     elseif (Test-IsAMD3DVCache) {
-        if ($coreCount -gt 8) {
-            Write-Log '-' "AMD 3D V-Cache dual-CCD detected ($coreCount cores): core parking preserved (required for 3D V-Cache scheduling via Game Bar)."
-        }
-        else {
-            Set-CoreParkingDisabled -CpuType "AMD 3D V-Cache single-CCD"
-        }
+        Write-Log '-' "AMD 3D V-Cache detected ($coreCount cores): core parking preserved (X3D stability — parking left to Windows/Game Bar)."
     }
     else {
         Set-CoreParkingDisabled -CpuType "AMD"
@@ -1413,14 +1066,14 @@ function Set-DesktopPowerOptimizations {
         Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' -Name 'HeteroMultiClassParkingEnabled' -Type DWORD -Value 0
     }
 
-    $isAMDDualCCDX3D = (Test-IsAMD3DVCache) -and ($coreCount -gt 8)
-    if (-not $isAMDDualCCDX3D) {
+    $isAMD3DVCache = Test-IsAMD3DVCache
+    if (-not $isAMD3DVCache) {
         Write-Log '+' "Disabling per-CPU clock tick scheduling and forced parking..."
         Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' -Name 'EnablePerCpuClockTickScheduling' -Type DWORD -Value 1
         Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' -Name 'ForceParkingRequested' -Type DWORD -Value 0
     }
     else {
-        Write-Log '-' "AMD 3D V-Cache dual-CCD detected: preserving per-CPU scheduling and parking request (required for proper CCD coordination)."
+        Write-Log '-' "AMD 3D V-Cache detected: preserving per-CPU scheduling and parking request (X3D stability)."
     }
 
     $desktopPowerSettings = @(
@@ -1434,12 +1087,12 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HibernateEnabledDefault'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'AllowHibernate'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HibernateChecksummingEnabled'; Value = 0 },
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'EnableMinimalHiberFile'; Value = 0 },
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HiberFileSizePercent'; Value = 0 },
-<<<<<<< HEAD
-=======
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableIdleStatesAtBoot'; Value = 2 },
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+        # REMOVED 26.08.1: EnableMinimalHiberFile=0 + HiberFileSizePercent=0 conflicted with
+        # HiberbootEnabled=1 (Fast Startup) set in Set-HibernationSettings. The hiberfil.sys
+        # was sized to ~0 while Fast Startup still tried to resume from it, hanging the
+        # system at the motherboard/boot logo after the first shutdown. Fast Startup stays ON
+        # (HiberbootEnabled=1), so hiberfil.sys keeps its default sizing. Hibernation remains
+        # enabled (CUDA/TensorRT memory reservation).
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IdleProcessorsRequireQosManagement'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableInboxPepGeneratedConstraints'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IgnoreCsComplianceCheck'; Value = 1 },
@@ -1448,10 +1101,6 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'FxAccountingTelemetryDisabled'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'ThermalTelemetryVerbosity'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'CoalescingFlushInterval'; Value = 0 },
-<<<<<<< HEAD
-=======
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power\ForceHibernateDisabled'; Name = 'Policy'; Value = 1 },
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'PowerSettingProfile'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'Win32CalloutWatchdogBugcheckEnabled'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel'; Name = 'SerializeTimerExpiration'; Value = 1 },
@@ -1594,32 +1243,20 @@ function Set-BcdOptimizations {
 
     Write-Log '+' "Configuring BCD boot optimizations..."
 
-    $skipOptimizations = $false
-    try {
-        $cpuInfo = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
-        $coreCount = [int]$cpuInfo.NumberOfCores
-        $skipOptimizations = (Test-IsAMD3DVCache) -and ($coreCount -gt 8)
-    }
-    catch {
-        Write-Log '-' "Failed to detect CPU topology: $_"
-    }
+    # Skipped on ALL AMD CPUs (not just 3D V-Cache, 26.08.1): disabledynamictick on AMD is
+    # linked to intermittent boot-time BSODs and cold-boot hangs at the motherboard logo.
+    # Intel only gets the dynamic-tick disable for timer precision.
+    $skipOptimizations = Test-IsAMDCPU
 
-    # The dynamic tick tweak is skipped on AMD 3D V-Cache dual-CCD CPUs
-    # to avoid scheduler/CCD routing regressions.
     if (-not $skipOptimizations) {
         Write-Log '+' "Disabling dynamic tick for maximum timer precision..."
         bcdedit /deletevalue useplatformclock 2>$null | Out-Null
-<<<<<<< HEAD
         bcdedit /deletevalue useplatformtick  2>$null | Out-Null
         bcdedit /set disabledynamictick yes 2>$null | Out-Null
         bcdedit /deletevalue tscsyncpolicy 2>$null | Out-Null
-=======
-        bcdedit /deletevalue useplatformtick 2>$null | Out-Null
-        bcdedit /set disabledynamictick yes 2>$null | Out-Null
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     }
     else {
-        Write-Log '-' "AMD 3D V-Cache dual-CCD detected: skipping disabledynamictick (scheduler-friendly default)."
+        Write-Log '-' "AMD CPU detected: skipping disabledynamictick (boot-hang risk)."
     }
 
     # === BCD tweaks migrated from registry/bcdedit.yml ===
@@ -1887,6 +1524,26 @@ function Set-RegistryPowerTweaks {
         }
     }
 
+    # === Interrupt steering (forced, locked routing) ===
+    # Force Windows interrupt steering (InterruptSteeringFlags bit 2 = force
+    # enabled) so the kernel scores and assigns interrupt targets at boot.
+    # Routing mode stays Locked (4) — DEVICES-TWEAKER-AUTO.PS1 PHASE 7 also
+    # enforces it, keeping the static SpecCPU affinities in effect.
+    # Removes the legacy InterruptSteeringDisabled=1 from SYSTEM_TWEAKS.PS1:
+    # both values in the same key would leave steering undefined.
+    $kernelPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel'
+    Remove-ItemProperty -Path $kernelPath -Name 'InterruptSteeringDisabled' -ErrorAction SilentlyContinue
+    if (Test-IsAMD3DVCache) {
+        Write-Log '-' "AMD 3D V-Cache detected: interrupt steering left at Windows defaults (X3D stability)."
+    }
+    else {
+        Set-RegistryValue -Path $kernelPath -Name 'InterruptSteeringFlags' -Type DWORD -Value 2
+        Invoke-PowerCfg "/setacvalueindex SCHEME_CURRENT SUB_INTSTEER MODE 4"
+        Invoke-PowerCfg "/setdcvalueindex SCHEME_CURRENT SUB_INTSTEER MODE 4"
+        Invoke-PowerCfg "/setactive SCHEME_CURRENT"
+        Write-Log '+' "Interrupt steering forced enabled (flags=2), routing mode locked (4)."
+    }
+
     # === USB selective suspend / LPM ===
     Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags' -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName.Length -eq 12 } | ForEach-Object {
         Set-RegistryValue -Path $_.PSPath -Name 'DisableLPM' -Type DWORD -Value 1
@@ -1901,33 +1558,15 @@ function Set-RegistryPowerTweaks {
     # === HKLM\SYSTEM\CurrentControlSet\Control\Power ===
     $powerBase = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'
     if ($isDesktop) {
-<<<<<<< HEAD
-=======
-        Set-RegistryValue -Path $powerBase -Name 'DisableIdleStatesAtBoot' -Type DWORD -Value 2
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
         Set-RegistryValue -Path $powerBase -Name 'CoalescingTimerInterval' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'DeepIoCoalescingEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'EnergyEstimationEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'IgnoreCsComplianceCheck' -Type DWORD -Value 1
         Set-RegistryValue -Path $powerBase -Name 'MSDisabled' -Type DWORD -Value 1
         Set-RegistryValue -Path $powerBase -Name 'StandbyConnectivityGracePeriod' -Type DWORD -Value 0
-<<<<<<< HEAD
         Set-RegistryValue -Path $powerBase -Name 'SleepstudyAccountingEnabled' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'PlatformAoAcOverride' -Type DWORD -Value 0
         Set-RegistryValue -Path $powerBase -Name 'PlatformRoleOverride' -Type DWORD -Value 0
-=======
-        Set-RegistryValue -Path $powerBase -Name 'AllowHibernate' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'HibernateEnabled' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'HiberbootEnabled' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'HibernateEnabledDefault' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'HibernateChecksummingEnabled' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'SkipHibernateMemoryMapValidation' -Type DWORD -Value 1
-        Set-RegistryValue -Path $powerBase -Name 'HiberFileSizePercent' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'SleepstudyAccountingEnabled' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'PlatformAoAcOverride' -Type DWORD -Value 0
-        Set-RegistryValue -Path $powerBase -Name 'PlatformRoleOverride' -Type DWORD -Value 0
-        Set-RegistryValue -Path "$powerBase\ForceHibernateDisabled" -Name 'Policy' -Type DWORD -Value 1
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     }
     Set-RegistryValue -Path $powerBase -Name 'DisableInboxPepGeneratedConstraints' -Type DWORD -Value 1
     Set-RegistryValue -Path $powerBase -Name 'EnforceAusterityMode' -Type DWORD -Value 0
@@ -1942,7 +1581,6 @@ function Set-RegistryPowerTweaks {
     if (-not (Test-Path $taggedEnergy)) { New-Item -Path $taggedEnergy -Force | Out-Null }
     Set-RegistryValue -Path $taggedEnergy -Name 'DisableTaggedEnergyLogging' -Type DWORD -Value 1
     Set-RegistryValue -Path $taggedEnergy -Name 'TelemetryMaxApplication' -Type DWORD -Value 0
-<<<<<<< HEAD
     Set-RegistryValue -Path $taggedEnergy -Name 'TelemetryMaxTagPerApplication' -Type DWORD -Value 0
 
     # === Session Manager\Throttle ===
@@ -1963,8 +1601,6 @@ function Set-RegistryPowerTweaks {
 
     # === Schedule (RPC over scheduler) ===
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule' -Name 'DisableRpcOver' -Type DWORD -Value 1
-=======
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
     # === Misc policies ===
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Control Panel\International' -Name 'BlockCleanupOfUnusedPreinstalledLangPacks' -Type DWORD -Value 1
@@ -2003,33 +1639,16 @@ function Set-RegistryPowerTweaks {
     $stornvme = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'
     if (-not (Test-Path $stornvme)) { New-Item -Path $stornvme -Force | Out-Null }
     Set-RegistryValue -Path $stornvme -Name 'DisableDSTThrottle' -Type DWORD -Value 1
-<<<<<<< HEAD
     if (-not $isDesktop) {
         # Laptop: keep NVMe idle power management (battery). Desktop: 0 (perf) set by Set-DesktopPowerOptimizations.
         Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 1
     }
-    Set-RegistryValue -Path $stornvme -Name 'QueueDepth' -Type DWORD -Value 254
+    # QueueDepth=254 and MSI=1 REMOVED: forcing these on stornvme is a known trigger of
+    # INACCESSIBLE_BOOT_DEVICE (0x7B) on some NVMe controllers/drives at next boot.
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Classpnp' -Name 'NVMeDisablePerfThrottling' -Type DWORD -Value 1
-    Set-RegistryValue -Path $stornvme -Name 'MSI' -Type DWORD -Value 1
 
     # === Session Manager\Executive ===
     $exec = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Executive'
-=======
-    Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 0
-    Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Classpnp' -Name 'NVMeDisablePerfThrottling' -Type DWORD -Value 1
-
-    # === Graphics drivers (TDR / HwSch) ===
-    $gfx = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
-    Set-RegistryValue -Path $gfx -Name 'HwSchMode' -Type DWORD -Value 2
-    Set-RegistryValue -Path 'HKLM:\SYSTEM\ControlSet001\Control\GraphicsDrivers' -Name 'HwSchTreatExperimentalAsStable' -Type DWORD -Value 1
-    Set-RegistryValue -Path $gfx -Name 'TdrLevel'      -Type DWORD -Value 0
-    Set-RegistryValue -Path $gfx -Name 'TdrDebugMode'  -Type DWORD -Value 1
-
-    # === Session Manager\Executive ===
-    $exec = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Executive'
-    Set-RegistryValue -Path $exec -Name 'AdditionalCriticalWorkerThreads' -Type DWORD -Value 0
-    Set-RegistryValue -Path $exec -Name 'AdditionalDelayedWorkerThreads' -Type DWORD -Value 0
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     Set-RegistryValue -Path $exec -Name 'TickcountRolloverDelay' -Type DWORD -Value 0
 }
 

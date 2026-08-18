@@ -3,10 +3,6 @@ title: Remote and BitLocker
 description: Enables Remote Desktop, disables Remote Assistance, and prevents BitLocker device encryption via registry values
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
-=======
-  - !status: {status: 'Applying Remote'}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server', value: 'fDenyTSConnections', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp', value: 'SecurityLayer', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp', value: 'UserAuthentication', type: REG_DWORD, data: '0'}

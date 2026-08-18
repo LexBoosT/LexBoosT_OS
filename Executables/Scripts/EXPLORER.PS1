@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
@@ -21,12 +21,9 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager'; Name = 'EnthusiastMode'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'ActiveWndTrkTimeout'; Value = '10'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Desktop'; Name = 'ActiveWndTrkTimeout'; Value = '10'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
     # Deliberate (Noverse cross-check, kept): AutoEndTasks=1 auto-kills hung apps without the
     # "program not responding" dialog; HungAppTimeout=1000ms is aggressive vs the 5000ms default —
     # intentional for max responsiveness (may kill slow apps during heavy load).
-=======
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'AutoEndTasks'; Value = '1'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Desktop'; Name = 'AutoEndTasks'; Value = '1'; Type = 'REG_SZ' }
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'HungAppTimeout'; Value = '1000'; Type = 'REG_SZ' }
@@ -41,10 +38,6 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'ForegroundLockTimeout'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Control Panel\Desktop'; Name = 'ForegroundLockTimeout'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'EnableXamlStartMenu'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
-=======
-    @{ Path = 'Registry::HKCU\SYSTEM\Control Panel\Desktop'; Name = 'WaitToKillServiceTimeout'; Value = '2000'; Type = 'REG_SZ' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_AccountNotifications'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_AccountNotifications'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings'; Name = 'TaskbarEndTask'; Value = '1'; Type = 'REG_DWORD' }
@@ -68,11 +61,7 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowSuperHidden'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'PersistBrowsers'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowEncryptCompressedColor'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowStatusBar'; Value = '0'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowStatusBar'; Value = '1'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'AutoCheckSelect'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'SharingWizardOn'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TypeAhead'; Value = '0'; Type = 'REG_DWORD' }
@@ -101,10 +90,6 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'NoNetCrawling'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarFlashOverrideBreatheCount'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowCortanaButton'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
-=======
-    @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'CursorBlinkRate'; Value = '200'; Type = 'REG_SZ' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowNotificationIcon'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'DstNotification'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_IrisRecommendations'; Value = '0'; Type = 'REG_DWORD' }
@@ -120,11 +105,7 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarFlashing'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarEnabled'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarMode'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSn'; Value = '0'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSn'; Value = '1'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarSd'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarGlomLevel'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarGlomLevel'; Value = '0'; Type = 'REG_DWORD' }
@@ -146,17 +127,10 @@ $regValues = @(
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowSyncProviderNotifications'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'SignInMode'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'TabletMode'; Value = '0'; Type = 'REG_DWORD' }
-<<<<<<< HEAD
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'ConvertibleSlateModePromptPreference'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'SignInMode'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'TabletMode'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'ConvertibleSlateModePromptPreference'; Value = '0'; Type = 'REG_DWORD' }
-=======
-    @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'ConvertibleSlateModePromptPreference'; Value = '2'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'SignInMode'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'TabletMode'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell'; Name = 'ConvertibleSlateModePromptPreference'; Value = '2'; Type = 'REG_DWORD' }
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarAppsVisibleInTabletMode'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarAppsVisibleInTabletMode'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarAutoHideInTabletMode'; Value = '0'; Type = 'REG_DWORD' }
@@ -184,8 +158,4 @@ foreach ($entry in $regValues) {
 
 Write-Log '+' "$set registry values set"
 
-<<<<<<< HEAD
 exit 0
-=======
-exit 0
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434

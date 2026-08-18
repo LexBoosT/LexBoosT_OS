@@ -37,7 +37,6 @@ echo ================================================
 echo EVENT LOGS CONFIGURATION
 echo ================================================
 echo [+] Configuring event logs...
-<<<<<<< HEAD
 wevtutil sl Microsoft-Windows-SleepStudy/Diagnostic /e:false >NUL 2>nul
 wevtutil sl Microsoft-Windows-Kernel-Processor-Power/Diagnostic /e:false >NUL 2>nul
 wevtutil sl Microsoft-Windows-UserModePowerService/Diagnostic /e:false >NUL 2>nul
@@ -47,13 +46,6 @@ wevtutil sl Microsoft-Windows-UserModePowerService/Diagnostic /e:false >NUL 2>nu
 ::: aggressive than Noverse's targeted Sleep-Study channels. Accepted trade-off: some operational
 ::: (diagnostic) channels get disabled too. The classic Security/System/Application channels are
 ::: not defined under WINEVT\Channels and are NOT affected.
-=======
-wevtutil sl Microsoft-Windows-SleepStudy/Diagnostic /q:false >NUL 2>nul
-wevtutil sl Microsoft-Windows-Kernel-Processor-Power/Diagnostic /q:false >NUL 2>nul
-wevtutil sl Microsoft-Windows-UserModePowerService/Diagnostic /q:false >NUL 2>nul
-
-:: Disable all WINEVT analytic/debug channels (reduces disk I/O and CPU from event logging)
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 echo [+] Disabling WINEVT channels...
 powershell -NoProfile -Command ^
   "try { " ^
@@ -92,11 +84,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrat
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\UScheduler\OutlookUpdate" /v "workCompleted" /t REG_DWORD /d "1" /f >NUL 2>nul
 reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate" /f >NUL 2>nul
 reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\DevHomeUpdate" /f >NUL 2>nul
-<<<<<<< HEAD
 :: Driver Install kept enabled required for CUDA/TensorRT driver updates
-=======
-:: Driver Install kept enabled — required for CUDA/TensorRT driver updates
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\Driver Install" /Enable >NUL 2>nul
 echo [OK] Registry cleanup complete
 goto :eof

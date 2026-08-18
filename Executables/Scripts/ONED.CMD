@@ -169,15 +169,8 @@ Get-ChildItem -Path "$env:SystemDrive\Users" -Directory | ForEach-Object {
     }
 }
 
-<<<<<<< HEAD
-# 6. Remove OneDrive scheduled tasks — search ALL task paths
+# 6. Remove OneDrive scheduled tasks - search ALL task paths
 Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "OneDrive*" } | ForEach-Object {
     Write-Host "Removing scheduled task: $($_.TaskName) (from $($_.TaskPath))"
     Unregister-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath -Confirm:$false -ErrorAction SilentlyContinue
-=======
-# 6. Remove OneDrive scheduled tasks
-Get-ScheduledTask -TaskPath "\" -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "OneDrive*" } | ForEach-Object {
-    Write-Host "Removing scheduled task: $($_.TaskName)"
-    Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false -ErrorAction SilentlyContinue
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 }

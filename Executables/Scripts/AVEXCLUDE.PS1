@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 
 function Write-Log {
     param([string]$Status, [string]$Message)
@@ -6,7 +6,11 @@ function Write-Log {
 }
 
 $Folders = @(
-    "$env:windir\LexBoosTOS"
+    "$env:windir\LexBoosTOS",
+    # AppX staging/install locations — Defender real-time scanning of these
+    # makes Store app installs take minutes per app (download stays fast).
+    "$env:ProgramFiles\WindowsApps",
+    "$env:ProgramData\Microsoft\Windows\AppRepository"
 )
 $Processes = @(
     "MsMpEng.exe",
@@ -560,7 +564,7 @@ if ($clamwin) {
 
 # === End of script - Final display ===
 Clear-Host
-if ($SuccessCount -gt 0) {
+if ($global:SuccessCount -gt 0) {
     Write-Log '+' "LexBoosTOS exclusion added successfully!"
 } else {
     Write-Log '-' "No exclusions could be added."

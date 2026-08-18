@@ -1,14 +1,5 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
-<<<<<<< HEAD
-=======
-# =============================================================================
-# LexBoosT OS — CEIP / SQM / FTH / Error Reporting disable
-# Each step is wrapped with a timeout so a single blocked reg.exe cannot
-# freeze the whole playbook (previous version would hang indefinitely on
-# certain Shell Extension / CrashControl keys).
-# =============================================================================
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 [CmdletBinding()]
 param()
@@ -34,12 +25,7 @@ function Invoke-Reg {
         [Parameter(Mandatory = $true)][string]$Key,
         [Parameter(Mandatory = $true)][string]$ValueName,
         [Parameter(Mandatory = $true)][string]$ValueKind,    # REG_DWORD | REG_SZ | REG_BINARY
-<<<<<<< HEAD
         [Parameter(Mandatory = $true)]$Data
-=======
-        [Parameter(Mandatory = $true)]$Data,
-        [int]$TimeoutSec = 10
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
     )
     $cmd = "reg add `"$Key`" /v `"$ValueName`" /t $ValueKind /d `"$Data`" /f"
     try {
@@ -72,7 +58,6 @@ Write-Log '+' 'Disabling CEIP and SQM client...'
 
 # === CEIP + SQM ===
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer' 'AllowOnlineTips' 'REG_DWORD' '0'
-<<<<<<< HEAD
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\SQMClient\Windows'                 'CEIPEnable'    'REG_DWORD' '0'
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows'        'CEIPEnable'    'REG_DWORD' '0'
 Invoke-Reg 'HKLM\SOFTWARE\Wow6432Node\Microsoft\VSCommon\15.0\SQM'     'OptIn'         'REG_DWORD' '0'
@@ -80,30 +65,17 @@ Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\14.0\SQM'                 'OptIn'  
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\15.0\SQM'                 'OptIn'         'REG_DWORD' '0'
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\16.0\SQM'                 'OptIn'         'REG_DWORD' '0'
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\17.0\SQM'                 'OptIn'         'REG_DWORD' '0'
-=======
-Invoke-Reg 'HKLM\SOFTWARE\Microsoft\SQMClient\Windows'                  'CEIPEnable'    'REG_DWORD' '0'
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows'        'CEIPEnable'    'REG_DWORD' '0'
-Invoke-Reg 'HKLM\SOFTWARE\Wow6432Node\Microsoft\VSCommon\15.0\SQM'      'OptIn'         'REG_DWORD' '0'
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # === Fault Tolerant Heap ===
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\FTH'                                 'Enabled'       'REG_DWORD' '0'
 
 # === Error Reporting ===
-<<<<<<< HEAD
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\PCHealth\ErrorReporting'                      'DoReport'               'REG_DWORD' '0'
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'Disabled'               'REG_DWORD' '1'
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent'      'value'                  'REG_SZ'    '0'
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'DontSendAdditionalData' 'REG_DWORD' '1'
 Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'LoggingDisabled'        'REG_DWORD' '1'
 Invoke-Reg 'HKCU\Software\Microsoft\Windows\Windows Error Reporting'                       'LoggingDisabled'        'REG_DWORD' '1'
-=======
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\PCHealth\ErrorReporting'                       'DoReport'              'REG_DWORD' '0'
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'Disabled'              'REG_DWORD' '1'
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent'      'value'                 'REG_SZ'    '0'
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'DontSendAdditionalData' 'REG_DWORD' '1'
-Invoke-Reg 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'              'LoggingDisabled'       'REG_DWORD' '1'
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # === Crash control ===
 Invoke-Reg 'HKLM\SYSTEM\CurrentControlSet\Control\CrashControl'                            'AutoReboot'           'REG_DWORD' '0'

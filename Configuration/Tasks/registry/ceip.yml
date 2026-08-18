@@ -3,14 +3,6 @@ title: CEIP / FTH / Error Reporting
 description: CEIP + SQM + FTH + Error Reporting — all migrated to CEIP.PS1
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
-=======
-  - !status: {status: 'Applying CEIP'}
-
-  # ============================================
-  # CEIP + SQM + FTH + Error Reporting (was ceip.yml + fth.yml + errorreporting.yml)
-  # ============================================
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - !run:
       exeDir: true
       exe: 'powershell.exe'

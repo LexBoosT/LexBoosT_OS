@@ -3,7 +3,6 @@ title: Audio
 description: Applies audio tweaks via AUDIO.PS1
 privilege: TrustedInstaller
 actions:
-<<<<<<< HEAD
   - !powerShell: {command: '.\\Scripts\\AUDIO.PS1', exeDir: true, runas: currentUserElevated, wait: true}
 
   # ============================================
@@ -17,7 +16,4 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Priority', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'Scheduling Category', type: REG_SZ, data: 'High'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Pro Audio', value: 'SFIO Priority', type: REG_SZ, data: 'Normal'}
-=======
-  - !status: {status: 'Applying Audio Tweaks'}
-  - !powerShell: {command: '.\\Scripts\\AUDIO.PS1', exeDir: true, runas: currentUserElevated, wait: true}
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Multimedia\Audio', value: 'UserDuckingPreference', type: REG_DWORD, data: '3'}

@@ -1,21 +1,24 @@
 ---
-<<<<<<< HEAD
-title: LexBoosT OS™ 26.08
-description: Applies LexBoosT OS™ 26.08 configuration tasks, including registry tweaks, service tweaks, and system tweaks
-=======
-title: LexBoosT OS™ 26.07
-description: Applies LexBoosT OS™ 26.07 configuration tasks, including registry tweaks, service tweaks, and system tweaks
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+title: LexBoosT OS™ 26.08.1
+description: Applies LexBoosT OS™ 26.08.1 configuration tasks, including registry tweaks, service tweaks, and system tweaks
 privilege: TrustedInstaller
 actions:
   - !status: {status: 'Starting Playbook Setup'}
 
   - !status: {
-<<<<<<< HEAD
-      status: "LexBoosT OS™ 26.08",
-=======
-      status: "LexBoosT OS™ 26.07",
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
+      status: "LexBoosT OS™ 26.08.1",
+    }
+
+  # ============================================
+  # INSTALL OVERLAY: black screen + animated logo + AME phases
+  # ============================================
+  - !run: {
+      exeDir: true,
+      exe: 'powershell.exe',
+      args: '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ".\Scripts\INSTALL-OVERLAY.PS1"',
+      runas: currentUserElevated,
+      wait: false,
+      weight: 1,
     }
 
   # ============================================
@@ -53,7 +56,6 @@ tasks:
   # Phase 1: Pre-setup / initialization
   - Tasks\setup.yml
 
-<<<<<<< HEAD
   # Phase 2: AppX, features, scheduled tasks, OneDrive, Edge removal
   - Tasks\packages.yml
 
@@ -67,22 +69,4 @@ tasks:
   - Tasks\final.yml
 
   # Phase 6: Utilities (HKCU hive propagation, rollback, max refresh, network extras, power extras)
-=======
-  # Phase 2: Security hardening / debloat
-  - Tasks\registry\security.yml
-
-  # Phase 3: AppX, features, scheduled tasks, OneDrive, Edge removal
-  - Tasks\packages.yml
-
-  # Phase 4: Service configuration
-  - Tasks\services.yml
-
-  # Phase 5: Registry tweaks by category
-  - Tasks\registry.yml
-
-  # Phase 6: Final cleanup
-  - Tasks\final.yml
-
-  # Phase 7: Utilities (HKCU hive propagation, rollback, max refresh, network extras, power extras)
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   - Tasks\utilities.yml

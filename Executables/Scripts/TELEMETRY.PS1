@@ -12,13 +12,7 @@ Write-Log '+' "Applying telemetry and data-collection disabling..."
 # 1. Core telemetry policies
 # =============================================================================
 # HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components is owned by
-<<<<<<< HEAD
 # TrustedInstaller - "Acces refuse" via reg add even when elevated.
-=======
-# TrustedInstaller - "Acces refuse" via reg add even when elevated. Use MinSudo.
-$minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
-$hasMinSudo = Test-Path $minSudo
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 # WTDS\Components\ServiceEnabled. The value lives in 'HKLM\...\WTDS\Components"'
 # (note the trailing double-quote in the subkey name - a Windows quirk).
@@ -86,37 +80,7 @@ foreach ($name in $autologgers) {
 }
 
 # =============================================================================
-<<<<<<< HEAD
 # 3. Disable StorPort idle power management
-=======
-# 3. Disable DMA remapping compatible bit (security hardening)
-# =============================================================================
-try {
-    $root = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
-        [Microsoft.Win32.RegistryHive]::LocalMachine, $env:COMPUTERNAME)
-    $servicesKey = $root.OpenSubKey('SYSTEM\CurrentControlSet\Services')
-    if ($servicesKey) {
-        foreach ($subName in $servicesKey.GetSubKeyNames()) {
-            $sub = $servicesKey.OpenSubKey($subName)
-            if ($sub) {
-                try {
-                    if ($sub.GetValue('DmaRemappingCompatible') -ne $null) {
-                        $sub.SetValue('DmaRemappingCompatible', 0, [Microsoft.Win32.RegistryValueKind]::DWord)
-                    }
-                } catch { }
-                $sub.Close()
-            }
-        }
-        $servicesKey.Close()
-    }
-} catch {
-    Write-Log '-' "DMA remapping sweep failed: $_"
-}
-$root = $null
-
-# =============================================================================
-# 4. Disable StorPort idle power management
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # =============================================================================
 try {
     $root = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
@@ -130,11 +94,7 @@ try {
                 $dev = $bus.OpenSubKey($devName)
                 if (-not $dev) { continue }
                 try {
-<<<<<<< HEAD
                     if ($null -ne $dev.GetValue('StorPort')) {
-=======
-                    if ($dev.GetValue('StorPort') -ne $null) {
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
                         $dev.SetValue('EnableIdlePowerManagement', 0, [Microsoft.Win32.RegistryValueKind]::DWord)
                     }
                 } catch { }
@@ -150,11 +110,7 @@ try {
 $root = $null
 
 # =============================================================================
-<<<<<<< HEAD
 # 4. Cloud / Dev tool telemetry env vars (per-user + system)
-=======
-# 5. Cloud / Dev tool telemetry env vars (per-user + system)
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # =============================================================================
 $envVars = @{
     'CLOUDSDK_CORE_DISABLE_PROMPTS'   = '1'
@@ -173,11 +129,7 @@ foreach ($name in $envVars.Keys) {
 }
 
 # =============================================================================
-<<<<<<< HEAD
 # 5. Settings sync / privacy
-=======
-# 6. Settings sync / privacy
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 # =============================================================================
 Write-Log '+' "Disabling settings sync..."
 

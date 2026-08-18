@@ -13,6 +13,21 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 
 function Write-Log { param([string]$Status, [string]$Message); Write-Host "[$Status] $Message" }
 
+function Test-IsAMD3DVCache {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param()
+    try {
+        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+        if ($cpu.Name -notmatch "AMD") { return $false }
+        if ($cpu.Name -match "X3D") { return $true }
+        $knownX3D = @('5800X3D','7800X3D','7900X3D','7950X3D','9800X3D','9900X3D','9950X3D')
+        foreach ($model in $knownX3D) { if ($cpu.Name -match $model) { return $true } }
+        return $false
+    }
+    catch { return $false }
+}
+
 Write-Host '============================================'
 Write-Host '       BROKER Registry Tweaks'
 Write-Host '============================================'
@@ -72,6 +87,12 @@ $set = 0
 
 # Protected broker keys (require TrustedInstaller)
 Set-RegistryWithFallback -Entries $protectedValues
+
+# AMD 3D V-Cache (X3D): keep TimeBroker dynamic tick at defaults (stability)
+if (Test-IsAMD3DVCache) {
+    $regValues = $regValues | Where-Object { $_.Name -notin @('DisableDynamicTick','DisableDynamicTickOnSpecificCores') }
+    Write-Log '-' 'AMD 3D V-Cache detected: TimeBroker dynamic tick left at defaults (X3D stability).'
+}
 
 # Standard registry keys
 foreach ($entry in $regValues) {

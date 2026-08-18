@@ -1,5 +1,6 @@
-$OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+# Do NOT force Console.OutputEncoding / $OutputEncoding here. The playbook engine (AME)
+# captures this script's stdout in the system code page; forcing UTF-8 output double-encodes
+# accented strings (seen as mojibake in install logs). Keep the native console encoding.
 
 if (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
@@ -43,4 +44,3 @@ catch {
     Write-Log '-' "$_"
     exit 1
 }
-Write-Log '+' "Theme Installed!"

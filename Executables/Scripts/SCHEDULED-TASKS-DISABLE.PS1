@@ -1,13 +1,4 @@
 #Requires -Version 5.1
-<<<<<<< HEAD
-=======
-# ================================================================
-# SCHEDULED-TASKS-DISABLE.PS1
-# Consolidated scheduled task disabler for LexBoosT OS
-# Replaces: FINALIZE5.CMD (task section), NETWORK-EXTRAS.PS1
-#           (TaskScheduler section), DISABLE_OFFICE_TASKS.PS1
-# ================================================================
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 
 $ErrorActionPreference = 'Continue'
 
@@ -16,13 +7,6 @@ function Write-Log {
     Write-Host "[$Status] $Message"
 }
 
-<<<<<<< HEAD
-=======
-# ----------------------------------------------------------------
-# Master task list M-bM-^@M-^T all tasks to disable
-# Query-before-disable: no errors logged for absent tasks
-# ----------------------------------------------------------------
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
 $tasksToDisable = @(
     # --- Application Experience & Telemetry ---
     '\Microsoft\Windows\Application Experience\AitAgent'

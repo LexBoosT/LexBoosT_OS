@@ -16,20 +16,13 @@ actions:
   - !run:
       exeDir: true
       exe: 'powershell.exe'
-<<<<<<< HEAD
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPX-REMOVER.PS1" -PackageCsv ".\Scripts\APPX-REMOVE-LIST.TXT" -Force'
-=======
-      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPX-REMOVER.PS1" -PackageCsv ".\Scripts\APPX-REMOVE-LIST.TXT" -AppxOnly -Force'
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
       runas: currentUserElevated
       wait: true
       weight: 100
 
-<<<<<<< HEAD
   - !file: {path: '%windir%\SystemApps\Microsoft.BioEnrollment_cw5n1h2txyewy'}
   - !file: {path: '%windir%\SystemApps\Windows.CBSPreview_cw5n1h2txyewy'}
-=======
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
   # Disable CrossDeviceResume scheduled task (specific to that feature)
   - !status: {status: 'Disabling CrossDevice'}
   - !run:

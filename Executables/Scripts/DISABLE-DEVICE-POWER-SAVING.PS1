@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 # =============================================================================
 # LexBoosT OS — Disable Device Power Saving (PnP devices)
 # Iterates every PnP device that has DevicePowerManagement keys and forces
@@ -73,7 +73,6 @@ try {
 }
 
 foreach ($p in $enumDirs) {
-<<<<<<< HEAD
     $label = Resolve-DeviceLabel (Split-Path $p -Leaf)
     # Values live under "<instance>\Device Parameters" (and sometimes directly under the instance)
     $locations = @($p)
@@ -88,21 +87,6 @@ foreach ($p in $enumDirs) {
                 } catch {
                     Add-Result 'DevicePowerManagement' $label $false "Skip: $($_.Exception.Message)"
                 }
-=======
-    foreach ($key in $usbSuspendKeys) {
-        $regPath = Join-Path $p $key
-        if (Test-Path $regPath) {
-            $label = Resolve-DeviceLabel (Split-Path $p -Leaf)
-            try {
-                # Only force-disable power-saving bits; preserve user-set timeouts when possible
-                if ($key -match 'Enabled$|Suspend$|Save') {
-                    Set-ItemProperty -Path $regPath -Name 'DevicePowerManagement' -Value 0 -Type DWord -ErrorAction Stop -Force
-                    Set-ItemProperty -Path $regPath -Name 'DeviceIdleEnabled' -Value 0 -Type DWord -ErrorAction Stop -Force
-                }
-                Add-Result 'DevicePowerManagement' $label $true "Disabled: $p"
-            } catch {
-                Add-Result 'DevicePowerManagement' $label $false "Skip: $($_.Exception.Message)"
->>>>>>> 0251bba90259c7b88ee0ce71c429e5c6fb1b4434
             }
         }
     }
