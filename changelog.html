@@ -103,6 +103,28 @@
             transition: border-color 0.2s;
         }
         .changelog-list li:hover { border-color: rgba(139, 92, 246, 0.3); }
+        li.changelog-group {
+            background: transparent !important;
+            border: none !important;
+            padding: 2px 0 0 !important;
+        }
+        .changelog-group .changelog-group-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
+        }
+        ul.changelog-sublist {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 0 0 18px;
+            margin: 0;
+            border-left: 3px solid var(--border);
+        }
         .changelog-list li .tag {
             display: inline-block;
             padding: 2px 8px;
@@ -163,9 +185,9 @@
     <h1>LexBoosT OS&#8482; V26.09</h1>
 
     <div class="stats">
-        <div class="stat"><strong>47</strong> changements</div>
+        <div class="stat"><strong>43</strong> changements</div>
         <div class="stat">&#x1FA9B; <strong>19</strong> fixes</div>
-        <div class="stat">&#x2728; <strong>24</strong> improvements</div>
+        <div class="stat">&#x2728; <strong>20</strong> improvements</div>
         <div class="stat">&#x1F185; <strong>2</strong> new features</div>
         <div class="stat">&#x1F4A5; <strong>2</strong> breaking changes</div>
     </div>
@@ -204,20 +226,36 @@
         <li><span class="tag tag-fix">🪛 FIX</span>Removed orphan PRIVILEGED-REGISTRY-TWEAKS.CMD (pointed to a missing .ps1, no caller).</li>
         <li><span class="tag tag-feat">✨ IMPROVEMENT</span>SYSTEM-SCAN.PS1: added CPU detection (brand, model, cores/threads, real turbo clock via perf counter, L2/L3 cache, socket, Intel/AMD/X3D) and the exact Windows build (base + UBR, e.g. 26200.9267).</li>
         <li><span class="tag tag-feat">✨ IMPROVEMENT</span>RUNTIMES.ps1: VC++ Redistributables installation replaced by abbodi1406 VisualCppRedist AIO — single VisualCppRedist_AIO_x86_x64.exe downloaded from the latest GitHub release (github.com/abbodi1406/vcredist/releases) and installed with `/ai /gm2` (replaces the 12 separate 2005–2015+ MS downloads/MSI extractions).</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Packages Manager 2.5:</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Added npm.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Chocolatey self-update now runs in an elevated console (Verb=runas) so &quot;choco upgrade chocolatey&quot; can actually replace choco.exe.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module state is now persisted in %AppData%\INSTALLSOFTS\modules.json - installed modules are no longer re-scanned at every startup; they are only re-verified every 7 days to catch module updates.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module/package checks now run on the real launch (Windows startup in the tray, or a manual launch); opening the app from the notification area no longer re-scans modules and no longer closes the window.</li>
-        <li><span class="tag tag-fix">🪛 FIX</span>Fixed a startup race - the window now hides to the notification area immediately (before the slow start-up checks), so it no longer closes itself right after being reopened from the tray the first time.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme and translation.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT GPU Tweaks:</li>
-        <li><span class="tag tag-new">🆕 NEW</span>A refresh button has been added next to the &quot;Open DLSS GLOM&quot; button to redownload the complete package for updating if needed. (There will be a note in the changelog regarding the DLSS version update).</li>
-        <li><span class="tag tag-new">🆕 NEW</span>Added DDU (Display Driver Uninstaller).</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Pagefile Manager:</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme, fonctionnality and translation.</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Recommended Section Manager:</li>
-        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Renamed to Start Menu Manager and disable Show/Hide Recommended Section. Now just Backup and restore your Start Menu with this App.</li>
+        <li class="changelog-group">
+            <div class="changelog-group-title"><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Packages Manager 2.5:</div>
+            <ul class="changelog-sublist">
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Added npm.</li>
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Chocolatey self-update now runs in an elevated console (Verb=runas) so &quot;choco upgrade chocolatey&quot; can actually replace choco.exe.</li>
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module state is now persisted in %AppData%\INSTALLSOFTS\modules.json - installed modules are no longer re-scanned at every startup; they are only re-verified every 7 days to catch module updates.</li>
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module/package checks now run on the real launch (Windows startup in the tray, or a manual launch); opening the app from the notification area no longer re-scans modules and no longer closes the window.</li>
+                <li><span class="tag tag-fix">🪛 FIX</span>Fixed a startup race - the window now hides to the notification area immediately (before the slow start-up checks), so it no longer closes itself right after being reopened from the tray the first time.</li>
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme and translation.</li>
+            </ul>
+        </li>
+        <li class="changelog-group">
+            <div class="changelog-group-title"><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT GPU Tweaks:</div>
+            <ul class="changelog-sublist">
+                <li><span class="tag tag-new">🆕 NEW</span>A refresh button has been added next to the &quot;Open DLSS GLOM&quot; button to redownload the complete package for updating if needed. (There will be a note in the changelog regarding the DLSS version update).</li>
+                <li><span class="tag tag-new">🆕 NEW</span>Added DDU (Display Driver Uninstaller).</li>
+            </ul>
+        </li>
+        <li class="changelog-group">
+            <div class="changelog-group-title"><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Pagefile Manager:</div>
+            <ul class="changelog-sublist">
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme, fonctionnality and translation.</li>
+            </ul>
+        </li>
+        <li class="changelog-group">
+            <div class="changelog-group-title"><span class="tag tag-feat">✨ IMPROVEMENT</span>Recommended Section Manager:</div>
+            <ul class="changelog-sublist">
+                <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Renamed to Start Menu Manager and disable Show/Hide Recommended Section. Now just Backup and restore your Start Menu with this App.</li>
+            </ul>
+        </li>
     </ul>
 
     <h1>LexBoosT OS&#8482; V26.08.1</h1>
