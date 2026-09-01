@@ -4,11 +4,14 @@
 }
 
 # Activate and start planned tasks
-Get-ScheduledTask -TaskPath "\Microsoft\Windows\.NET Framework\" | ForEach-Object {
-    if ($_.State -eq "Disabled") {
-        Enable-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath
+$ngenTasks = Get-ScheduledTask -TaskPath "\Microsoft\Windows\.NET Framework\" -ErrorAction SilentlyContinue
+if ($ngenTasks) {
+    $ngenTasks | ForEach-Object {
+        if ($_.State -eq "Disabled") {
+            Enable-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath
+        }
+        Start-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath
     }
-    Start-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath
 }
 
 Start-Process PowerShell -Verb RunAs -ArgumentList "-Command `"New-Item -Path '$env:windir\System32\systemlive' -ItemType File -Force`""

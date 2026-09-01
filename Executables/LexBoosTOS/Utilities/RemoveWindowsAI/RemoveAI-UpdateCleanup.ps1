@@ -1,4 +1,4 @@
-# RemoveWindowsAI - Update Cleanup Script
+﻿# RemoveWindowsAI - Update Cleanup Script
 # This script runs after Windows Update to remove reinstalled AI features
 # Log file: C:\ProgramData\RemoveWindowsAI\UpdateCleanup.log
 

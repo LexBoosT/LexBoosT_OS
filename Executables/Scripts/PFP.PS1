@@ -1,4 +1,4 @@
-Add-Type -AssemblyName System.Drawing
+﻿Add-Type -AssemblyName System.Drawing
 
 $img = [System.Drawing.Image]::FromFile((Get-Item (Join-Path (Split-Path -Parent $PSScriptRoot) 'user.png')))
 

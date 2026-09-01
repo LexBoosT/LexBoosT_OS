@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
@@ -145,25 +145,6 @@ foreach ($entry in $regValues) {
 
 Write-Log '+' "$set registry values set"
 
-# Disable device power-saving (USB selective suspend, D3Cold, etc.)
-Write-Host 'Disabling device power-saving features...'
-try {
-    Get-ChildItem -Path 'Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum' -Recurse -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -like '*\Device Parameters' } |
-        ForEach-Object {
-            New-ItemProperty -Path $_.PSPath -Name 'AllowIdleIrpInD3' -PropertyType DWord -Value 0 -Force | Out-Null
-            New-ItemProperty -Path $_.PSPath -Name 'SelectiveSuspendEnabled' -PropertyType DWord -Value 0 -Force | Out-Null
-            New-ItemProperty -Path $_.PSPath -Name 'D3ColdSupported' -PropertyType DWord -Value 0 -Force | Out-Null
-        }
-    Get-ChildItem -Path 'Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum' -Recurse -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -like '*\Device Parameters\WDF' } |
-        ForEach-Object {
-            New-ItemProperty -Path $_.PSPath -Name 'IdleInWorkingState' -PropertyType DWord -Value 0 -Force | Out-Null
-        }
-    Write-Log '+' 'Device power-saving features disabled.'
-} catch {
-    Write-Log '-' "Failed to disable device power-saving: $_"
-}
 
 Write-Host '============================================'
 Write-Host '       Done!'

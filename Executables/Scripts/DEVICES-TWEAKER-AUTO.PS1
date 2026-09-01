@@ -2,9 +2,7 @@
 
 param(
     [switch]$DryRun,
-    [string]$WinioPath = "C:\Windows\LexBoosTOS\Resources\winio.sys",
-    [switch]$SkipImod,
-    [switch]$SkipLock
+    [switch]$SkipImod
 )
 
 $ErrorActionPreference = 'Continue'
@@ -112,14 +110,18 @@ if ($CpuInfo.Vendor -match 'AMD') {
                 $CpuInfo.CcdMap[$i] = $cid
                 if ($cid -eq $CpuInfo.TargetCcd) { [void]$CpuInfo.TargetCcdLps.Add($i) }
             }
-            # Filter to target CCD
-            $fp = [System.Collections.Generic.List[int]]::new()
-            $fe = [System.Collections.Generic.List[int]]::new()
-            foreach ($l in $CpuInfo.PrimaryP) { if ($CpuInfo.TargetCcdLps -contains $l) { [void]$fp.Add($l) } }
-            foreach ($l in $CpuInfo.PrimaryE) { if ($CpuInfo.TargetCcdLps -contains $l) { [void]$fe.Add($l) } }
-            if ($fp.Count -gt 0 -or $fe.Count -gt 0) { $CpuInfo.PrimaryP = $fp; $CpuInfo.PrimaryE = $fe }
-            else { $CpuInfo.PrimaryP = $CpuInfo.TargetCcdLps; $CpuInfo.PrimaryE.Clear() }
-            _log "CPU.CCD: Multi-CCD count=$($l3.Count) target=$($CpuInfo.TargetCcd) LPs=[$($CpuInfo.TargetCcdLps -join ',')]"
+
+            if ($CpuInfo.Name -notmatch 'X3D') {
+                $fp = [System.Collections.Generic.List[int]]::new()
+                $fe = [System.Collections.Generic.List[int]]::new()
+                foreach ($l in $CpuInfo.PrimaryP) { if ($CpuInfo.TargetCcdLps -contains $l) { [void]$fp.Add($l) } }
+                foreach ($l in $CpuInfo.PrimaryE) { if ($CpuInfo.TargetCcdLps -contains $l) { [void]$fe.Add($l) } }
+                if ($fp.Count -gt 0 -or $fe.Count -gt 0) { $CpuInfo.PrimaryP = $fp; $CpuInfo.PrimaryE = $fe }
+                else { $CpuInfo.PrimaryP = $CpuInfo.TargetCcdLps; $CpuInfo.PrimaryE.Clear() }
+                _log "CPU.CCD: Multi-CCD count=$($l3.Count) target=$($CpuInfo.TargetCcd) LPs=[$($CpuInfo.TargetCcdLps -join ',')] (pinning)"
+            } else {
+                _log "CPU.CCD.X3D: manual CCD pinning DISABLED (AMD driver / Xbox Game Bar manage routing)."
+            }
         }
     } catch { _log "CPU.CCD: detection error: $_" }
 }
@@ -302,45 +304,24 @@ $orderedDevices = @($orderedDevices | Sort-Object { $prioMap[$_.Kind] })
 
 _log "AUTO.ORDER: $($orderedDevices.Count) devices for affinity assignment"
 
-$coreOrder = $(if ($CpuInfo.PrimaryP.Count) { $CpuInfo.PrimaryP } else { $CpuInfo.PrimaryE }) | Where-Object { $_ -lt 64 }
-$zeroAvailable = $coreOrder -contains 0
-
-# Audio E-core queue (exclude CPU 0, clamp to < 64)
-$audioQueue = [System.Collections.Generic.Queue[int]]::new()
-foreach ($lp in $CpuInfo.PrimaryE) { if ($lp -ne 0 -and $lp -lt 64) { $audioQueue.Enqueue($lp) } }
-$useAudioE = $CpuInfo.PrimaryP.Count -gt 0 -and $audioQueue.Count -gt 0
-
-# Available pool (avoid CPU 0 initially, clamp to < 64)
-$avail = [System.Collections.Generic.List[int]]::new()
-foreach ($lp in $coreOrder) { if ($lp -ne 0) { [void]$avail.Add($lp) } }
-
-$audioCt = ($orderedDevices | Where-Object Kind -eq AUDIO).Count
-$audioECt = if ($useAudioE) { [Math]::Min($audioCt, $audioQueue.Count) } else { 0 }
-$totalNeeded = (($orderedDevices | ForEach-Object { if ($_.Kind -eq 'GPU') {2} else {1} } | Measure-Object -Sum).Sum) - $audioECt
-if ($totalNeeded -lt 0) { $totalNeeded = 0 }
-if ($avail.Count -lt $totalNeeded -and $zeroAvailable) { [void]$avail.Add(0) }
-$extras = [Math]::Max(0, $avail.Count - $totalNeeded)
-$ai = 0; $aeAssigned = 0
-
-_log "AUTO.CPU: pool=[$($avail -join ',')] needed=$totalNeeded extras=$extras audioE=$audioECt"
-
-function _take([int]$n) {
-    $r = [System.Collections.Generic.List[int]]::new()
-    while ($r.Count -lt $n -and $script:ai -lt $avail.Count) { [void]$r.Add($avail[$script:ai]); $script:ai++ }
-    if ($r.Count -eq $n -and $script:extras -gt 0 -and $script:ai -lt $avail.Count) { $script:ai++; $script:extras-- }
-    return $r
+function Get-PhysicalCores {
+    $groups = [System.Collections.Generic.List[object]]::new()
+    foreach ($key in $CpuInfo.ByCore.Keys) {
+        $lps = @($CpuInfo.ByCore[$key] | Where-Object { $_ -lt 64 })
+        if ($lps.Count) {
+            $isP = ($lps | Where-Object { $CpuInfo.PrimaryP -contains $_ }).Count -gt 0
+            $groups.Add([pscustomobject]@{ P = $isP; LPS = $lps })
+        }
+    }
+    return @($groups | Sort-Object -Property @{Expression='P';Descending=$true}, @{Expression='LPS';Ascending=$true})
 }
 
 $Results = [System.Collections.Generic.List[PSCustomObject]]::new()
-# Topology validation (26.08.1): only write AssignmentSetOverride when the mask is sane.
-# A misdetected topology (SMT off at BIOS while script assumed it, >64 LP clamp, hybrid
-# indexing error) produces masks referencing non-existent logical processors, which hangs
-# the device (and cold boot) at the motherboard logo. $script:topologyValid = per-device flag.
+
 function Test-AffinityMaskValid {
     param([UInt64]$Mask, [int]$LogicalCount)
     if ($Mask -eq 0) { return $false }
     if ($LogicalCount -le 0) { return $false }
-    # Every set bit must reference an existing logical processor (< LogicalCount, < 64)
     for ($i = 0; $i -lt 64; $i++) {
         if (($Mask -shr $i) -band 1) {
             if ($i -ge $LogicalCount) { return $false }
@@ -349,25 +330,34 @@ function Test-AffinityMaskValid {
     return $true
 }
 
-foreach ($d in $orderedDevices) {
-    $need = if ($d.Kind -eq 'GPU') { 2 } else { 1 }
-    if ($useAudioE -and $d.Kind -eq 'AUDIO' -and $aeAssigned -lt $audioECt) {
-        $lps = if ($audioQueue.Count) { @($audioQueue.Dequeue()) } else { @() }
-        if ($lps.Count) { $aeAssigned++ }
-    } else { $lps = _take $need }
-    if (-not $lps.Count) { _warn "AUTO: $($d.Kind) $($d.InstanceId) -> no LP available"; continue }
+$physCores = @(Get-PhysicalCores)
+# Reserver le coeur contenant CPU 0 (systeme/timer) tant qu'il reste assez de coeurs.
+$pool = @($physCores | Where-Object { $_.LPS -notcontains 0 })
+if ($pool.Count -lt 2) { $pool = @($physCores) }
 
-    $mask = [UInt64]0; foreach ($l in $lps) { if ($l -ge 64) { _warn "AUTO: LP $l exceeds 64-bit mask, skipping"; continue }; $mask = $mask -bor ([UInt64]1 -shl $l) }
-    # Fix LTT: toutes les classes reçoivent une affinité SpecCPU explicite (NET filaires inclus;
-    # le WiFi est déjà exclu via WifiIdSet — l'affinité casse de nombreux drivers WiFi).
+$lowThreadCpu = ($CpuInfo.Logical -le 8)
+if ($lowThreadCpu) { _warn "AUTO.LOWTHREADS: $($CpuInfo.Logical) logical processors - interrupt AFFINITY pinning skipped (MSI + priority only)." }
+
+_log "AUTO.CPU: physical cores = [$($pool | ForEach-Object { $_.LPS -join '+' })], SMT=$($CpuInfo.SMT)"
+
+$pi = 0
+foreach ($d in $orderedDevices) {
+    $core = $pool[$pi % $pool.Count]
+    $pi++
+    $lps = @($core.LPS)
+    if (-not $lps.Count) { _warn "AUTO: $($d.Kind) $($d.InstanceId) -> no core available"; continue }
+
+    $mask = [UInt64]0; foreach ($l in $lps) { $mask = $mask -bor ([UInt64]1 -shl $l) }
+    # Fix LTT: toutes les classes recoivent une affinite SpecCPU explicite (NET filaires inclus;
+    # le WiFi est deja exclu via WifiIdSet — l'affinite casse de nombreux drivers WiFi).
     $policy = 'SpecCPU'
-    $affinityValid = Test-AffinityMaskValid -Mask $mask -LogicalCount $CpuInfo.Logical
+    $affinityValid = if ($lowThreadCpu) { $false } else { Test-AffinityMaskValid -Mask $mask -LogicalCount $CpuInfo.Logical }
     if (-not $affinityValid) {
         _warn "AUTO.TOPO.INVALID: $($d.Kind) $($d.InstanceId) Mask=0x$($mask.ToString('X')) invalid for Logical=$($CpuInfo.Logical) — falling back to MSI+priority only (no AssignmentSetOverride)"
     }
 
     [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$lps; Mask=$mask; Policy=$policy; Prio='High'; AffinityValid=$affinityValid })
-    _log "AUTO: $($d.Kind) $($d.InstanceId) -> LP=[$($lps -join ',')] Mask=0x$($mask.ToString('X')) valid=$affinityValid"
+    _log "AUTO: $($d.Kind) $($d.InstanceId) -> Core=$($lps -join '+') Mask=0x$($mask.ToString('X')) valid=$affinityValid"
 }
 
 # ──────────────────────────────────────────────
@@ -392,10 +382,7 @@ function _applyDevice($r) {
         $null = New-Item $affP -Force -EA SilentlyContinue
         $pv = @{Low=1;Normal=2;High=3}[$r.Prio]
         Set-ItemProperty $affP -Name DevicePriority -Value $pv -Type DWord -Force
-        # Policy + Mask (toutes classes, NET filaires inclus — fix LTT)
-        # 26.08.1: AssignmentSetOverride only when the mask passed topology validation.
-        # A mask referencing non-existent LPs (misdetected topology) hangs device init
-        # at boot — fall back to MSI+priority only, reset policy to MachineDefault.
+
         if ($r.AffinityValid) {
             $polV = @{MachineDefault=0;All=1;Single=2;AllClose=3;SpecCPU=4;SpreadMessages=5}[$r.Policy]
             Set-ItemProperty $affP -Name DevicePolicy -Value $polV -Type DWord -Force
@@ -423,11 +410,6 @@ foreach ($d in $Devices | Where-Object { $MsiOnlyGpuIds.ContainsKey($_.InstanceI
     }
 }
 
-# Storage controllers: MSI DISABLED (MSISupported=0 → legacy INTx). 26.08.1:
-# MSI forcing (MSISupported=1 / MessageNumberLimit=0) on AHCI/NVMe controllers is a
-# known INACCESSIBLE_BOOT_DEVICE (0x7B) and cold-boot logo-hang trigger on some
-# controllers. Forcing MSI off is the safest storage interrupt mode for boot;
-# devices are excluded from $orderedDevices above so no affinity is ever applied.
 foreach ($d in $Devices | Where-Object { $_.Kind -eq 'STOR' }) {
     if (-not $DryRun) {
         try {
@@ -477,11 +459,6 @@ foreach ($r in $Results) { _applyDevice $r }
 # ──────────────────────────────────────────────
 # NVIDIA GPU: RmForceEnableMSI - prerequisite for SpecCPU affinity
 # ──────────────────────────────────────────────
-# Fix 26.08.1: on Blackwell (RTX 5070 Ti, driver 596.49) the GPU ran on legacy INTx and
-# ignored AssignmentSetOverride (SpecCPU 1+2) - all ISR/DPC stayed on CPU 0 despite the
-# pinned affinity + locked routing. RmForceEnableMSI=1 (verified read by nvlddmkm via
-# ProcMon, per GPUTweaks source) switches the GPU to active MSI-X; the MSI vectors then
-# honour the Affinity Policy and the GPU moves to its pinned CPUs.
 $nvidiaGpu = $Devices | Where-Object { $_.Kind -eq 'GPU' -and $_.InstanceId -match 'VEN_10DE' -and -not $_.IsIntegratedGpu } | Select-Object -First 1
 if ($nvidiaGpu) {
     if ($DryRun) { _log "DRYRUN: RmForceEnableMSI -> HKLM:\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" }
@@ -497,449 +474,9 @@ if ($nvidiaGpu) {
     _log "NVIDIA GPU not detected - RmForceEnableMSI skipped"
 }
 
-# ──────────────────────────────────────────────
-# PHASE 6 ─ IMOD (xHCI Interrupt Moderation)
-# ──────────────────────────────────────────────
-if (-not $SkipImod) {
-    _info "=== PHASE 7: IMOD (xHCI Interrupt Moderation) ==="
-
-    if ($DryRun) {
-        _warn "DRYRUN: Skipping IMOD hardware writes"
-    } else {
-        $winioSys = $WinioPath
-        if (-not (Test-Path $winioSys)) {
-            _err "winio.sys not found: $winioSys"
-            _err "Skipping IMOD phase. Use -WinioPath to specify correct path, or -SkipImod to skip."
-        } else {
-            # ── Embedded C# for winio/xHCI hardware access ──
-            $csharpCode = @'
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-
-public static class DeviceTweakerWinIO
-{
-    private const uint CM_PROB_DISABLED = 0x00000016;
-    private const uint DIGCF_PRESENT = 0x00000002;
-    private const uint DIGCF_ALLCLASSES = 0x00000004;
-    private const uint SPDRP_SERVICE = 0x00000004;
-    private const uint SPDRP_HARDWAREID = 0x00000001;
-    private const uint SPDRP_COMPATIBLEIDS = 0x00000002;
-    private const uint SPDRP_FRIENDLYNAME = 0x0000000C;
-    private const uint SPDRP_DEVICEDESC = 0x00000000;
-    private const uint REG_SZ = 1;
-    private const uint REG_MULTI_SZ = 7;
-    private const uint ALLOC_LOG_CONF = 0x00000002;
-    private const uint BOOT_LOG_CONF = 0x00000003;
-    private const uint RES_TYPE_MEM = 0x00000001;
-    private const uint RES_TYPE_MEM_LARGE = 0x00000007;
-    private const int CR_SUCCESS = 0x00000000;
-    private const int ERROR_INSUFFICIENT_BUFFER = 122;
-    private const int ERROR_NO_MORE_ITEMS = 259;
-    private const int ERROR_SERVICE_DOES_NOT_EXIST = 1060;
-    private const int ERROR_SERVICE_ALREADY_RUNNING = 1056;
-    private const uint SC_MANAGER_ALL_ACCESS = 0x000F003F;
-    private const uint SERVICE_ALL_ACCESS = 0x000F01FF;
-    private const uint SERVICE_KERNEL_DRIVER = 0x00000001;
-    private const uint SERVICE_DEMAND_START = 0x00000003;
-    private const uint SERVICE_ERROR_NORMAL = 0x00000001;
-    private const uint SERVICE_CONTROL_STOP = 0x00000001;
-    private const uint SERVICE_RUNNING = 0x00000004;
-    private const uint SERVICE_STOPPED = 0x00000001;
-    private const int SC_STATUS_PROCESS_INFO = 0;
-    private const uint GENERIC_READ = 0x80000000;
-    private const uint GENERIC_WRITE = 0x40000000;
-    private const uint FILE_SHARE_READ = 0x00000001;
-    private const uint FILE_SHARE_WRITE = 0x00000002;
-    private const uint OPEN_EXISTING = 3;
-    private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
-    private const uint FILE_DEVICE_WINIO = 0x00008010;
-    private const uint WINIO_IOCTL_INDEX = 0x810;
-    private const uint METHOD_BUFFERED = 0;
-    private const uint FILE_ANY_ACCESS = 0;
-    private const string WINIO_DEVICE_PATH = "\\\\.\\WINIO";
-    private const string WINIO_SERVICE_NAME = "WINIO";
-    private static readonly uint IOCTL_WINIO_MAPPHYSTOLIN = CTL_CODE(FILE_DEVICE_WINIO, WINIO_IOCTL_INDEX, METHOD_BUFFERED, FILE_ANY_ACCESS);
-    private static readonly uint IOCTL_WINIO_UNMAPPHYSADDR = CTL_CODE(FILE_DEVICE_WINIO, WINIO_IOCTL_INDEX + 1, METHOD_BUFFERED, FILE_ANY_ACCESS);
-    private static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
-
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr SetupDiGetClassDevsW(IntPtr classGuid, string enumerator, IntPtr hwndParent, uint flags);
-    [DllImport("setupapi.dll", SetLastError = true)]
-    private static extern bool SetupDiEnumDeviceInfo(IntPtr deviceInfoSet, uint memberIndex, ref SP_DEVINFO_DATA deviceInfoData);
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool SetupDiGetDeviceRegistryPropertyW(IntPtr deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint property, out uint propertyRegDataType, byte[] propertyBuffer, uint propertyBufferSize, out uint requiredSize);
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool SetupDiGetDeviceInstanceIdW(IntPtr deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, StringBuilder deviceInstanceId, int deviceInstanceIdSize, out int requiredSize);
-    [DllImport("setupapi.dll", SetLastError = true)]
-    private static extern bool SetupDiDestroyDeviceInfoList(IntPtr deviceInfoSet);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Get_DevNode_Status(out uint status, out uint problem, uint devInst, uint flags);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Get_First_Log_Conf(out IntPtr logConf, uint devInst, uint flags);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Get_Next_Res_Des(out IntPtr resDes, IntPtr logConfOrResDes, uint forResource, IntPtr resourceId, uint flags);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Get_Res_Des_Data_Size(out uint dataSize, IntPtr resDes, uint flags);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Get_Res_Des_Data(IntPtr resDes, byte[] buffer, uint bufferLen, uint flags);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Free_Res_Des_Handle(IntPtr resDes);
-    [DllImport("cfgmgr32.dll", SetLastError = true)]
-    private static extern int CM_Free_Log_Conf_Handle(IntPtr logConf);
-    [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr OpenSCManager(string machineName, string databaseName, uint desiredAccess);
-    [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr OpenService(IntPtr scm, string serviceName, uint desiredAccess);
-    [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr CreateService(IntPtr scm, string serviceName, string displayName, uint desiredAccess, uint serviceType, uint startType, uint errorControl, string binaryPathName, string loadOrderGroup, IntPtr tagId, string dependencies, string serviceStartName, string password);
-    [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool StartService(IntPtr service, uint numServiceArgs, IntPtr serviceArgVectors);
-    [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool QueryServiceStatusEx(IntPtr service, int infoLevel, ref SERVICE_STATUS_PROCESS buffer, uint bufferSize, out uint bytesNeeded);
-    [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool ControlService(IntPtr service, uint control, ref SERVICE_STATUS serviceStatus);
-    [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool DeleteService(IntPtr service);
-    [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool CloseServiceHandle(IntPtr handle);
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern IntPtr CreateFile(string fileName, uint desiredAccess, uint shareMode, IntPtr securityAttributes, uint creationDisposition, uint flagsAndAttributes, IntPtr templateFile);
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool DeviceIoControl(IntPtr deviceHandle, uint ioControlCode, ref PHYS_STRUCT inBuffer, int inBufferSize, ref PHYS_STRUCT outBuffer, int outBufferSize, out int bytesReturned, IntPtr overlapped);
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool CloseHandle(IntPtr handle);
-
-    private static uint CTL_CODE(uint deviceType, uint function, uint method, uint access) { return (deviceType << 16) | (access << 14) | (function << 2) | method; }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct SP_DEVINFO_DATA { public uint cbSize; public Guid ClassGuid; public uint DevInst; public IntPtr Reserved; }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    private struct PHYS_STRUCT { public ulong physMemSizeInBytes; public ulong physAddress; public ulong physicalMemoryHandle; public ulong physMemLin; public ulong physSection; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MEM_DES { public uint MD_Count; public uint MD_Type; public ulong MD_Alloc_Base; public ulong MD_Alloc_End; public uint MD_Flags; public uint MD_Reserved; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MEM_RANGE { public ulong MR_Align; public uint MR_nBytes; public ulong MR_Min; public ulong MR_Max; public uint MR_Flags; public uint MR_Reserved; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MEM_LARGE_DES { public uint MLD_Count; public uint MLD_Type; public ulong MLD_Alloc_Base; public ulong MLD_Alloc_End; public uint MLD_Flags; public uint MLD_Reserved; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MEM_LARGE_RANGE { public ulong MLR_Align; public ulong MLR_nBytes; public ulong MLR_Min; public ulong MLR_Max; public uint MLR_Flags; public uint MLR_Reserved; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct SERVICE_STATUS_PROCESS { public uint dwServiceType; public uint dwCurrentState; public uint dwControlsAccepted; public uint dwWin32ExitCode; public uint dwServiceSpecificExitCode; public uint dwCheckPoint; public uint dwWaitHint; public uint dwProcessId; public uint dwServiceFlags; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct SERVICE_STATUS { public uint dwServiceType; public uint dwCurrentState; public uint dwControlsAccepted; public uint dwWin32ExitCode; public uint dwServiceSpecificExitCode; public uint dwCheckPoint; public uint dwWaitHint; }
-
-    public class XhciControllerInfo {
-        public string DeviceId; public uint ProblemCode; public ulong BaseAddress; public string BaseError;
-    }
-
-    public class ImodResult {
-        public int ControllersFound;
-        public int ControllersApplied;
-        public int WriteFailures;
-        public int SkippedDisabled;
-        public int MissingBase;
-        public int ReadFailures;
-        public List<string> Log = new List<string>();
-    }
-
-    public static ImodResult ApplyImod(string winioSysPath, uint imodInterval, List<string> psLog) {
-        var result = new ImodResult();
-        Action<string> L = m => { result.Log.Add(m); psLog.Add(m); };
-
-        L(string.Format("IMOD: Starting with winio.sys at {0}, interval=0x{1:X}", winioSysPath, imodInterval));
-
-        // Enumerate xHCI controllers
-        var controllers = new List<XhciControllerInfo>();
-        IntPtr devInfoSet = SetupDiGetClassDevsW(IntPtr.Zero, "PCI", IntPtr.Zero, DIGCF_PRESENT | DIGCF_ALLCLASSES);
-        if (devInfoSet == INVALID_HANDLE_VALUE) { L(string.Format("IMOD.ERR: SetupDiGetClassDevsW failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result; }
-        try {
-            uint index = 0;
-            while (true) {
-                var devInfo = new SP_DEVINFO_DATA { cbSize = (uint)Marshal.SizeOf(typeof(SP_DEVINFO_DATA)) };
-                if (!SetupDiEnumDeviceInfo(devInfoSet, index, ref devInfo)) {
-                    if (Marshal.GetLastWin32Error() == ERROR_NO_MORE_ITEMS) break;
-                    index++; continue;
-                }
-                index++;
-
-                // Check if xHCI
-                bool isXhci = false;
-                string svc;
-                if (TryGetStringProp(devInfoSet, ref devInfo, SPDRP_SERVICE, out svc) && svc.Equals("USBXHCI", StringComparison.OrdinalIgnoreCase)) isXhci = true;
-                else {
-                    List<string> hwIds;
-                    if (TryGetMultiSzProp(devInfoSet, ref devInfo, SPDRP_HARDWAREID, out hwIds)) { foreach (var id in hwIds) if (id.IndexOf("CC_0C0330", StringComparison.OrdinalIgnoreCase) >= 0 || id.IndexOf("CLASS_0C0330", StringComparison.OrdinalIgnoreCase) >= 0) { isXhci = true; break; } }
-                    else {
-                        List<string> cIds;
-                        if (TryGetMultiSzProp(devInfoSet, ref devInfo, SPDRP_COMPATIBLEIDS, out cIds)) { foreach (var id in cIds) if (id.IndexOf("CC_0C0330", StringComparison.OrdinalIgnoreCase) >= 0 || id.IndexOf("CLASS_0C0330", StringComparison.OrdinalIgnoreCase) >= 0) { isXhci = true; break; } }
-                    }
-                }
-                if (!isXhci) continue;
-
-                string instanceId;
-                if (!TryGetDeviceInstanceId(devInfoSet, ref devInfo, out instanceId)) continue;
-                uint problemCode = 0; uint dummyStatus = 0; CM_Get_DevNode_Status(out dummyStatus, out problemCode, devInfo.DevInst, 0);
-
-                ulong baseAddr = 0; string baseErr = "";
-                bool hasBase = TryGetMemoryBase(devInfo.DevInst, out baseAddr, out baseErr);
-                controllers.Add(new XhciControllerInfo { DeviceId = instanceId, ProblemCode = problemCode, BaseAddress = baseAddr, BaseError = (hasBase ? "" : baseErr) });
-            }
-        } finally { SetupDiDestroyDeviceInfoList(devInfoSet); }
-
-        result.ControllersFound = controllers.Count;
-        L(string.Format("IMOD: Found {0} xHCI controllers", controllers.Count));
-
-        if (controllers.Count == 0) { L("IMOD: No xHCI controllers found, skipping"); return result; }
-
-        // WinIO driver handling
-        var winioServiceCreated = false;
-        IntPtr scm = OpenSCManager(null, null, SC_MANAGER_ALL_ACCESS);
-        if (scm == IntPtr.Zero) { L(string.Format("IMOD.ERR: OpenSCManager failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result; }
-        try {
-            IntPtr service = OpenService(scm, WINIO_SERVICE_NAME, SERVICE_ALL_ACCESS);
-            if (service == IntPtr.Zero) {
-                if (Marshal.GetLastWin32Error() != ERROR_SERVICE_DOES_NOT_EXIST) {
-                    L(string.Format("IMOD.ERR: OpenService failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result;
-                }
-                service = CreateService(scm, WINIO_SERVICE_NAME, WINIO_SERVICE_NAME, SERVICE_ALL_ACCESS, SERVICE_KERNEL_DRIVER, SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL, winioSysPath, null, IntPtr.Zero, null, null, null);
-                if (service == IntPtr.Zero) { L(string.Format("IMOD.ERR: CreateService failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result; }
-                winioServiceCreated = true; L("IMOD: Created WINIO service");
-            }
-            try {
-                bool wasRunning = false;
-                SERVICE_STATUS_PROCESS ss = new SERVICE_STATUS_PROCESS();
-                uint bytesNeeded;
-                if (QueryServiceStatusEx(service, SC_STATUS_PROCESS_INFO, ref ss, (uint)Marshal.SizeOf(typeof(SERVICE_STATUS_PROCESS)), out bytesNeeded)) wasRunning = ss.dwCurrentState == SERVICE_RUNNING;
-                if (!wasRunning) {
-                    if (!StartService(service, 0, IntPtr.Zero) && Marshal.GetLastWin32Error() != ERROR_SERVICE_ALREADY_RUNNING) {
-                        L(string.Format("IMOD.ERR: StartService failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result;
-                    }
-                    L("IMOD: Started WINIO service");
-                } else { L("IMOD: WINIO service already running"); }
-
-                // Open driver device
-                IntPtr hDevice = CreateFile(WINIO_DEVICE_PATH, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, IntPtr.Zero, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-                if (hDevice == INVALID_HANDLE_VALUE) { L(string.Format("IMOD.ERR: CreateFile(WINIO) failed: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message)); return result; }
-                try {
-                    foreach (var ctrl in controllers) {
-                        string ctrlId = ctrl.DeviceId;
-                        uint problemCode = ctrl.ProblemCode;
-                        ulong baseAddr = ctrl.BaseAddress;
-                        string baseErr = ctrl.BaseError;
-                        if (problemCode == CM_PROB_DISABLED) { result.SkippedDisabled++; L(string.Format("IMOD.SKIP: {0} (disabled)", ctrlId)); continue; }
-                        if (baseAddr == 0) { result.MissingBase++; L(string.Format("IMOD.SKIP: {0} no base addr: {1}", ctrlId, baseErr)); continue; }
-
-                        ulong capAddr = baseAddr;
-                        // HCSPARAMS (offset 4)
-                        uint hcsparams;
-                        if (!ReadPhys32(hDevice, capAddr + 4, out hcsparams)) { result.ReadFailures++; L(string.Format("IMOD.ERR: {0} read HCSPARAMS failed", ctrlId)); continue; }
-                        // RTSOFF (offset 0x18)
-                        uint rtsoff;
-                        if (!ReadPhys32(hDevice, capAddr + 0x18, out rtsoff)) { result.ReadFailures++; L(string.Format("IMOD.ERR: {0} read RTSOFF failed", ctrlId)); continue; }
-
-                        uint maxIntrs = (hcsparams >> 8) & 0xFF;
-                        ulong runtimeAddr = capAddr + rtsoff;
-                        L(string.Format("IMOD: {0} base=0x{1:X} maxIntrs={2} runtime=0x{3:X}", ctrlId, baseAddr, maxIntrs, runtimeAddr));
-
-                        uint failures = 0;
-                        for (uint i = 0; i < maxIntrs; i++) {
-                            ulong imodAddr = runtimeAddr + 0x24 + (0x20 * i);
-                            if (!WritePhys32(hDevice, imodAddr, imodInterval)) { failures++; L(string.Format("IMOD.ERR: {0} write IMOD[{1}] @ 0x{2:X} failed", ctrlId, i, imodAddr)); }
-                        }
-                        result.ControllersApplied++;
-                        result.WriteFailures += (int)failures;
-                        if (failures == 0) L(string.Format("IMOD.OK: {0} wrote {1} interrupters", ctrlId, maxIntrs));
-                    }
-                } finally { CloseHandle(hDevice); }
-            } finally {
-                // Stop service
-                SERVICE_STATUS stopSs = new SERVICE_STATUS();
-                ControlService(service, SERVICE_CONTROL_STOP, ref stopSs);
-                for (int i = 0; i < 25; i++) {
-                    SERVICE_STATUS_PROCESS check = new SERVICE_STATUS_PROCESS();
-                    uint bytesNeeded2;
-                    if (!QueryServiceStatusEx(service, SC_STATUS_PROCESS_INFO, ref check, (uint)Marshal.SizeOf(typeof(SERVICE_STATUS_PROCESS)), out bytesNeeded2) || check.dwCurrentState == SERVICE_STOPPED) break;
-                    Thread.Sleep(200);
-                }
-                if (winioServiceCreated) DeleteService(service);
-                CloseServiceHandle(service);
-            }
-        } finally { CloseServiceHandle(scm); }
-
-        L(string.Format("IMOD.DONE: applied={0} failures={1} skipped={2} missing={3}", result.ControllersApplied, result.WriteFailures, result.SkippedDisabled, result.MissingBase));
-        return result;
-    }
-
-    private static bool TryGetMemoryBase(uint devInst, out ulong baseAddress, out string error) {
-        baseAddress = 0; error = null;
-        IntPtr logConf;
-        int cr = CM_Get_First_Log_Conf(out logConf, devInst, ALLOC_LOG_CONF);
-        if (cr != CR_SUCCESS) cr = CM_Get_First_Log_Conf(out logConf, devInst, BOOT_LOG_CONF);
-        if (cr != CR_SUCCESS) { error = string.Format("log conf failed (0x{0:X})", cr); return false; }
-        try {
-            ulong minBase = 0; bool found = false;
-            foreach (uint resType in new[] { RES_TYPE_MEM, RES_TYPE_MEM_LARGE }) {
-                IntPtr resDes;
-                int rCr = CM_Get_Next_Res_Des(out resDes, logConf, resType, IntPtr.Zero, 0);
-                while (rCr == CR_SUCCESS) {
-                    uint dataSize;
-                    if (CM_Get_Res_Des_Data_Size(out dataSize, resDes, 0) == CR_SUCCESS && dataSize > 0) {
-                        byte[] buf = new byte[dataSize];
-                        if (CM_Get_Res_Des_Data(resDes, buf, dataSize, 0) == CR_SUCCESS) {
-                            ulong cand = 0;
-                            GCHandle gch = GCHandle.Alloc(buf, GCHandleType.Pinned);
-                            try {
-                                IntPtr p = gch.AddrOfPinnedObject();
-                                if (resType == RES_TYPE_MEM && buf.Length >= Marshal.SizeOf(typeof(MEM_DES))) {
-                                    MEM_DES mem = (MEM_DES)Marshal.PtrToStructure(p, typeof(MEM_DES));
-                                    cand = mem.MD_Alloc_Base;
-                                    if (cand == 0 && mem.MD_Count > 0 && buf.Length >= Marshal.SizeOf(typeof(MEM_DES)) + Marshal.SizeOf(typeof(MEM_RANGE))) {
-                                        MEM_RANGE range = (MEM_RANGE)Marshal.PtrToStructure(p + Marshal.SizeOf(typeof(MEM_DES)), typeof(MEM_RANGE));
-                                        cand = range.MR_Min;
-                                    }
-                                } else if (resType == RES_TYPE_MEM_LARGE && buf.Length >= Marshal.SizeOf(typeof(MEM_LARGE_DES))) {
-                                    MEM_LARGE_DES mem = (MEM_LARGE_DES)Marshal.PtrToStructure(p, typeof(MEM_LARGE_DES));
-                                    cand = mem.MLD_Alloc_Base;
-                                    if (cand == 0 && mem.MLD_Count > 0 && buf.Length >= Marshal.SizeOf(typeof(MEM_LARGE_DES)) + Marshal.SizeOf(typeof(MEM_LARGE_RANGE))) {
-                                        MEM_LARGE_RANGE range = (MEM_LARGE_RANGE)Marshal.PtrToStructure(p + Marshal.SizeOf(typeof(MEM_LARGE_DES)), typeof(MEM_LARGE_RANGE));
-                                        cand = range.MLR_Min;
-                                    }
-                                }
-                            } finally { gch.Free(); }
-                            if (cand != 0 && (!found || cand < minBase)) { minBase = cand; found = true; }
-                        }
-                    }
-                    IntPtr nextDes;
-                    int nextCr = CM_Get_Next_Res_Des(out nextDes, resDes, resType, IntPtr.Zero, 0);
-                    CM_Free_Res_Des_Handle(resDes); resDes = nextDes; rCr = nextCr;
-                }
-            }
-            if (!found) { error = "no memory resource"; return false; }
-            baseAddress = minBase; return true;
-        } finally { CM_Free_Log_Conf_Handle(logConf); }
-    }
-
-    private static bool ReadPhys32(IntPtr hDevice, ulong address, out uint value) {
-        value = 0;
-        var phys = new PHYS_STRUCT { physMemSizeInBytes = 4, physAddress = address };
-        int bytesReturned;
-        if (!DeviceIoControl(hDevice, IOCTL_WINIO_MAPPHYSTOLIN, ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), out bytesReturned, IntPtr.Zero) || phys.physMemLin == 0) return false;
-        try { value = unchecked((uint)Marshal.ReadInt32(new IntPtr(unchecked((long)phys.physMemLin)))); return true; }
-        finally { int bytesReturned2; DeviceIoControl(hDevice, IOCTL_WINIO_UNMAPPHYSADDR, ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), out bytesReturned2, IntPtr.Zero); }
-    }
-
-    private static bool WritePhys32(IntPtr hDevice, ulong address, uint value) {
-        var phys = new PHYS_STRUCT { physMemSizeInBytes = 4, physAddress = address };
-        int bytesReturned3;
-        if (!DeviceIoControl(hDevice, IOCTL_WINIO_MAPPHYSTOLIN, ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), out bytesReturned3, IntPtr.Zero) || phys.physMemLin == 0) return false;
-        try { Marshal.WriteInt32(new IntPtr(unchecked((long)phys.physMemLin)), unchecked((int)value)); return true; }
-        finally { int bytesReturned4; DeviceIoControl(hDevice, IOCTL_WINIO_UNMAPPHYSADDR, ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), ref phys, Marshal.SizeOf(typeof(PHYS_STRUCT)), out bytesReturned4, IntPtr.Zero); }
-    }
-
-    private static bool TryGetStringProp(IntPtr di, ref SP_DEVINFO_DATA dd, uint prop, out string val) {
-        val = ""; List<string> vals; if (!TryGetMultiSzProp(di, ref dd, prop, out vals) || vals.Count == 0) return false; val = vals[0]; return true;
-    }
-
-    private static bool TryGetMultiSzProp(IntPtr di, ref SP_DEVINFO_DATA dd, uint prop, out List<string> vals) {
-        vals = new List<string>();
-        uint req = 0; uint regType = 0;
-        if (!SetupDiGetDeviceRegistryPropertyW(di, ref dd, prop, out regType, null, 0, out req) && Marshal.GetLastWin32Error() != ERROR_INSUFFICIENT_BUFFER) return false;
-        if (req == 0) return false;
-        byte[] data = new byte[req];
-        uint requiredSize;
-        if (!SetupDiGetDeviceRegistryPropertyW(di, ref dd, prop, out regType, data, req, out requiredSize)) return false;
-        if (regType != REG_MULTI_SZ && regType != REG_SZ) return false;
-        string text = Encoding.Unicode.GetString(data);
-        foreach (string part in text.Split(new char[] { '\0' }, StringSplitOptions.RemoveEmptyEntries)) { string t = part.Trim(); if (t.Length > 0) vals.Add(t); }
-        return vals.Count > 0;
-    }
-
-    private static bool TryGetDeviceInstanceId(IntPtr di, ref SP_DEVINFO_DATA dd, out string id) {
-        id = ""; int req = 0;
-        SetupDiGetDeviceInstanceIdW(di, ref dd, null, 0, out req);
-        if (Marshal.GetLastWin32Error() != ERROR_INSUFFICIENT_BUFFER || req <= 0) return false;
-        StringBuilder sb = new StringBuilder(req);
-        int requiredSize2;
-        if (!SetupDiGetDeviceInstanceIdW(di, ref dd, sb, sb.Capacity, out requiredSize2)) return false;
-        id = sb.ToString(); return !string.IsNullOrWhiteSpace(id);
-    }
-}
-'@
-            # ── Compile C# ──
-            try {
-                Add-Type -TypeDefinition $csharpCode -ErrorAction Stop
-                _ok "IMOD C# module compiled"
-            } catch {
-                _err "IMOD C# compilation failed: $_"
-                _err "Skipping IMOD phase."
-            }
-
-            # ── Run IMOD ──
-            if ('DeviceTweakerWinIO' -as [type]) {
-                # IMOD intervals:
-                # 0x0   = disabled (keyboard+mouse combos get this for lowest latency)
-                # 0xC8  = 200 (default moderation for other HID devices)
-                # We apply 0xC8 globally; keyboard+mouse controllers get 0x0
-
-                $globalImodInterval = 0xC8  # 200 = default moderation
-                $kbmImodInterval = 0x0       # disabled for KB+M combos
-
-                # C# ApplyImod does its own xHCI detection via SetupDi independently
-                # of PowerShell $Devices (which requires Interrupt Management key absent on USB)
-                $imodLogList = [System.Collections.Generic.List[string]]::new()
-
-                # First apply global IMOD (0xC8) to ALL xHCI controllers
-                $globalResult = [DeviceTweakerWinIO]::ApplyImod($winioSys, [uint32]$globalImodInterval, $imodLogList)
-                foreach ($line in $globalResult.Log) { _log "IMOD: $line" }
-
-                # Then apply disabled IMOD (0x0) to keyboard+mouse combo controllers
-                $usbControllers = $Devices | Where-Object Kind -eq USB | Where-Object IsXhci
-                $kbmControllers = $usbControllers | Where-Object { $_.UsbRoles -match 'Keyboard' -and $_.UsbRoles -match 'Mouse' }
-                if ($kbmControllers.Count -gt 0) {
-                    _log "IMOD: Found $($kbmControllers.Count) KBM combo controller(s), applying IMOD=0x0"
-                    $kbmResult = [DeviceTweakerWinIO]::ApplyImod($winioSys, [uint32]$kbmImodInterval, $imodLogList)
-                    foreach ($line in $kbmResult.Log) { _log "IMOD: $line" }
-                } else {
-                    _log "IMOD: No KBM combo controllers, using global IMOD=0xC8"
-                }
-            }
-        }
-    }
-} else {
-    _info "=== PHASE 6: IMOD SKIPPED (-SkipImod) ==="
-}
-
-# ──────────────────────────────────────────────
-# PHASE 7 ─ LOCK INTERRUPT ROUTING (fix LTT / Blur Busters)
-# ──────────────────────────────────────────────
-# Sans verrouillage, Windows redistribue dynamiquement les IRQ (Interrupt Steering
-# Mode = Default 0) et contourne les affinités SpecCPU écrites ci-dessus — c'est ce
-# qui a été observé sur machine de test (GPU épinglé CPUs 1+2 mais ISR sur CPU 0).
-# Mode 4 = "Lock Interrupt Routing" : le routage initial (déterminé au boot par les
-# affinités statiques) est figé, plus aucune redistribution dynamique.
-if ($IsAmdX3D) {
-    _info "=== PHASE 7: Lock Interrupt Routing SKIPPED (AMD 3D V-Cache detected) ==="
-} elseif (-not $SkipLock -and -not $DryRun) {
-    _info "=== PHASE 7: Lock Interrupt Routing (Interrupt Steering Mode = 4) ==="
-    try {
-        $steerSub = '48672f38-7a9a-4bb2-8bf8-3d85be19de4e'   # Power subgroup: Interrupt Steering Settings
-        $steerSet = '2bfc24f9-5ea2-4801-8213-3dbae01aa39d'   # Setting: Interrupt Steering Mode
-        $active = (powercfg /getactivescheme | Select-Object -First 1)
-        if ($active -match '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})') {
-            $plan = $Matches[1]
-            powercfg /setacvalueindex $plan $steerSub $steerSet 4 | Out-Null
-            powercfg /setdcvalueindex $plan $steerSub $steerSet 4 | Out-Null
-            powercfg /setactive $plan | Out-Null
-            _ok "Interrupt Steering Mode -> Lock (4) on plan $plan"
-        } else { _warn "Could not parse active power plan GUID; lock skipped" }
-    } catch { _err "Lock Interrupt Routing failed: $_" }
-} elseif ($SkipLock) {
-    _info "=== PHASE 7: Lock Interrupt Routing SKIPPED (-SkipLock) ==="
-}
+# (PHASE 7 — Lock Interrupt Routing — REMOVED: forcing Interrupt Steering
+#  Mode = 4 destabilized boot on some Windows builds / NVMe controllers.
+#  Interrupt routing is left at Windows defaults, no opt-in offered.)
 
 # ──────────────────────────────────────────────
 # PHASE 8 ─ SUMMARY

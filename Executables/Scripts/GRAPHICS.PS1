@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
@@ -23,6 +23,7 @@ Write-Host '============================================'
 $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Microsoft-Windows-Rdp-Graphics-RdpIdd-Trace'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; Name = 'HwSchMode'; Value = '2'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\MonitorDataStore'; Name = 'AutoColorManagementEnabled'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers'; Name = 'DisableVersionMismatchCheck'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'AdjustWorkerThreadPriority'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'AudioDgAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }

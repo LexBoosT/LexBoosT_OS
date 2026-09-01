@@ -65,7 +65,7 @@ if /i "!diskDrive!" == "SSD" (
 
 :: Boot configuration & branding
 echo [+] Boot configuration...
-bcdedit /set {current} description "LexBoosT OS 26.08.1" >nul 2>&1
+bcdedit /set {current} description "LexBoosT OS 26.09" >nul 2>&1
 label LexBoosT_OS >nul 2>&1
 
 :: Disable search indexing on non-system drives (reduces I/O micro-stutters during gaming)

@@ -1,4 +1,4 @@
-function Write-Log {
+﻿function Write-Log {
     param([string]$Status, [string]$Message)
     Write-Host "[$Status] $Message"
 }
@@ -52,29 +52,20 @@ $features = @(
     # Enable (kept for compatibility)
     @{ Name = "DirectPlay"; Bool = $true },
     @{ Name = "LegacyComponents"; Bool = $true },
+    @{ Name = "WindowsMediaPlayer"; Bool = $true },
+    @{ Name = "MediaPlayback"; Bool = $true },
     # Disable (covers all from registry/features.yml)
     @{ Name = "Internet-Explorer-Optional-amd64"; Bool = $false },
     @{ Name = "Printing-Foundation-Features"; Bool = $false },
     @{ Name = "Printing-Foundation-InternetPrinting-Client"; Bool = $false },
     @{ Name = "WorkFolders-Client"; Bool = $false },
     # New from features.yml
-    @{ Name = "WindowsMediaPlayer"; Bool = $false },
-    @{ Name = "MediaPlayback"; Bool = $false },
     @{ Name = "WCF-Services45"; Bool = $false },
     @{ Name = "WCF-TCP-PortSharing45"; Bool = $false },
     @{ Name = "Printing-PrintToPDFServices-Features"; Bool = $false }
 )
 foreach ($feature in $features) {
     Update-Feature -featureName $feature.Name -bool $feature.Bool
-}
-
-# Remove capabilities (Steps Recorder, Windows Media Player legacy, etc.)
-$capabilities = @(
-    "App.StepsRecorder~~~~0.0.1.0",
-    "Media.WindowsMediaPlayer~~~~0.0.12.0"
-)
-foreach ($cap in $capabilities) {
-    Remove-Capability -capabilityName $cap
 }
 
 # Disable Reserved Storage (frees ~7 GB reserved for Windows Update)

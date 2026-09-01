@@ -52,7 +52,7 @@
     },
     {
       "name": "LexBoosT Pagefile Manager",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Pagefile_Manager.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\PagefileManager.exe",
       "category": "Performance",
       "tooltip": "Manage virtual memory pagefile settings",
       "tooltipFr": "Gérer les paramètres du fichier d'échange"
@@ -143,14 +143,14 @@
     },
     {
       "name": "LexBoosT Start Menu Manager",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\StartMenuManager_GUI.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\StartMenuManager.exe",
       "category": "Appearance",
       "tooltip": "Customize the Windows Start Menu appearance and behavior",
       "tooltipFr": "Personnaliser l'apparence et le comportement du menu Démarrer"
     },
     {
       "name": "LexBoosT DWM Effect Manager",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\SetDWMEffect.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\DWMManager.exe",
       "category": "Appearance",
       "tooltip": "Configure Desktop Window Manager visual effects",
       "tooltipFr": "Configurer les effets visuels du Gestionnaire de fenêtres"
@@ -164,7 +164,7 @@
     },
     {
       "name": "LexBoosT Widget Manager",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\WidgetsManager.exe",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Widgets_Manager.exe",
       "category": "Appearance",
       "tooltip": "Manage Windows widgets and their settings",
       "tooltipFr": "Gérer les widgets Windows et leurs paramètres"

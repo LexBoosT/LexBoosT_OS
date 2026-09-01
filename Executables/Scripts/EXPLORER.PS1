@@ -91,7 +91,6 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'TaskbarFlashOverrideBreatheCount'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowCortanaButton'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'ShowNotificationIcon'; Value = '1'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Desktop'; Name = 'DstNotification'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_IrisRecommendations'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_IrisRecommendations'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'Start_TrackDocs'; Value = '0'; Type = 'REG_DWORD' }

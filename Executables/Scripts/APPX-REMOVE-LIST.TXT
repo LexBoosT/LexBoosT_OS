@@ -1,4 +1,4 @@
-*ContentDeliveryManager*
+ContentDeliveryManager*
 *CopilotNudges*
 *CrossDeviceResume*
 *CrossDeviceResumeApp*
@@ -37,7 +37,6 @@
 *Livtop*
 *LogonWebHost*
 *Microsoft.AsyncTextService*
-*Microsoft.BioEnrollment*
 *Microsoft.ECApp*
 *Microsoft.Windows.AssignedAccessLockApp*
 *Microsoft.Windows.CallingShellApp*
@@ -89,7 +88,6 @@ Microsoft.WindowsAlarms*
 Microsoft.WindowsFeedbackHub*
 Microsoft.WindowsMaps*
 Microsoft.WindowsSoundRecorder*
-Microsoft.WindowsTerminal*
 MicrosoftCorporationII.MicrosoftFamily*
 MicrosoftCorporationII.QuickAssist*
 MicrosoftTeams*

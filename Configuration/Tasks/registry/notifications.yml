@@ -9,4 +9,7 @@ actions:
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings', value: 'NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings', value: 'NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings', value: 'NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK', type: REG_DWORD, data: '0'}
+  # Lock screen toasts + Scoobe (suggestions)
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications', value: 'LockScreenToastEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement', value: 'ScoobeSystemSettingEnabled', type: REG_DWORD, data: '0'}
 

@@ -881,6 +881,29 @@ function Disable-PowerThrottling {
     Write-Log '+' "Power Throttling configuration completed."
 }
 
+function Get-EcoreLayout {
+    # Hybrid topology split for Intel (Alder/Raptor/Meteor/Arrow Lake, Core Ultra).
+    # Windows orders hybrid logical processors P-cores (with SMT siblings) first, then E-cores.
+    # NOTE: assumes the common tail layout AND SMT-on-P; otherwise returns EBase=-1 so callers
+    # skip rather than write an invalid affinity mask (which could freeze boot).
+    try {
+        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+        $phys = [int]$cpu.NumberOfCores
+        $log  = [int]$cpu.NumberOfLogicalProcessors
+        $smt  = $log -gt $phys
+        if (-not $smt) { return @{ ECores = 0; EBase = -1; Logical = $log } }
+        $eCores = [Math]::Max(0, $phys * 2 - $log)   # E-cores have no SMT
+        $pCount = $phys - $eCores
+        $eBase  = $pCount * 2                        # first E-core logical id (tail)
+        if ($eCores -le 0 -or $eBase -lt 0 -or $eBase -ge $log) { $eBase = -1 }
+        return @{ ECores = $eCores; EBase = $eBase; Logical = $log }
+    }
+    catch {
+        Write-Log '-' "Get-EcoreLayout failed: $_"
+        return @{ ECores = 0; EBase = -1; Logical = 0 }
+    }
+}
+
 function Set-IRQAffinity {
     [CmdletBinding()]
     param()
@@ -895,29 +918,39 @@ function Set-IRQAffinity {
     $affinityBase = "HKLM:\SYSTEM\CurrentControlSet\Enum\PCI\*\*\Device Parameters\Interrupt Management\Affinity Policy"
 
     try {
-        Write-Log '+' "Pinning GPU interrupts to P-Core 1 (mask 0x02)..."
+        # Masques calculés depuis la topologie réelle (plus de masque codé en dur) :
+        # GPU -> premier P-core (logical 0) ; NIC -> premier E-core logique.
+        $topo = Get-EcoreLayout
+
+        Write-Log '+' "Pinning GPU interrupts to P-Core (bit 0)..."
         $gpus = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
             Where-Object { $_.PSPath -match "VEN_10DE|VEN_1002|VEN_8086" }
 
         if ($gpus) {
             foreach ($gpu in $gpus) {
-                Set-RegistryValue -Path $gpu.PSPath -Name "AssignmentSetOverride" -Type Binary -Value ([byte[]](0x02, 0x00, 0x00, 0x00))
+                Set-RegistryValue -Path $gpu.PSPath -Name "AssignmentSetOverride" -Type Binary -Value ([byte[]](0x01,0x00,0x00,0x00))
             }
-            Write-Log '+' "GPU interrupts pinned to P-Core 1."
+            Write-Log '+' "GPU interrupts pinned to P-Core (affinity 0x01)."
         }
         else {
             Write-Log '+' "No GPU found for IRQ pinning."
         }
 
-        Write-Log '+' "Pinning network adapter interrupts to E-Cores (mask 0xF0)..."
-        $nets = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
-            Where-Object { $_.PSPath -match "CC_0200|CC_0280" }
+        if ($topo.EBase -ge 0) {
+            $eBytes = [System.BitConverter]::GetBytes([uint32](1 -shl $topo.EBase))
+            Write-Log '+' ("Pinning network adapter interrupts to first E-Core (logical {0})..." -f $topo.EBase)
+            $nets = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
+                Where-Object { $_.PSPath -match "CC_0200|CC_0280" }
 
-        if ($nets) {
-            foreach ($net in $nets) {
-                Set-RegistryValue -Path $net.PSPath -Name "AssignmentSetOverride" -Type Binary -Value ([byte[]](0xF0, 0x00, 0x00, 0x00))
+            if ($nets) {
+                foreach ($net in $nets) {
+                    Set-RegistryValue -Path $net.PSPath -Name "AssignmentSetOverride" -Type Binary -Value $eBytes
+                }
+                Write-Log '+' "Network adapter interrupts pinned to first E-Core."
             }
-            Write-Log '+' "Network adapter interrupts pinned to E-Cores."
+        }
+        else {
+            Write-Log '+' "No E-Cores to pin NIC IRQ (skipping)."
         }
 
         Write-Log '+' "IRQ Affinity configuration completed successfully."
@@ -994,25 +1027,18 @@ function Set-NDISOptimizer {
     }
 
     try {
-        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
-        $totalPhysical = [int]$cpu.NumberOfCores
-        $totalLogical  = [int]$cpu.NumberOfLogicalProcessors
-
-        $pCores       = $totalLogical - $totalPhysical
-        $baseProcessor = $pCores * 2
-        $eCores       = $totalLogical - $baseProcessor
-
-        if ($baseProcessor -lt 0 -or $eCores -le 0) {
-            Write-Log '-' "Invalid CPU topology (BaseProcessor=$baseProcessor, ECoreCount=$eCores). Skipping RSS E-Core pinning."
+        $topo = Get-EcoreLayout
+        if ($topo.ECores -le 0 -or $topo.EBase -lt 0 -or $topo.EBase -ge $topo.Logical) {
+            Write-Log '-' ("Invalid hybrid topology (ECores={0}, EBase={1}). Skipping RSS E-Core pinning." -f $topo.ECores, $topo.EBase)
             return
         }
 
-        Write-Log '+' "Detected $pCores P-Cores and $eCores E-Cores. Routing RSS from Core $baseProcessor..."
+        Write-Log '+' ("Detected {0} E-Cores (logical ids from {1}). Routing RSS to them..." -f $topo.ECores, $topo.EBase)
 
         Enable-NetAdapterRss -Name "*" -ErrorAction Stop
-        Set-NetAdapterRss -Name "*" -BaseProcessorGroup 0 -BaseProcessorNumber $baseProcessor -MaxProcessors $eCores -ErrorAction Stop
+        Set-NetAdapterRss -Name "*" -BaseProcessorGroup 0 -BaseProcessorNumber $topo.EBase -MaxProcessors $topo.ECores -ErrorAction Stop
 
-        Write-Log '+' "NDIS RSS pinned to E-Cores (base=$baseProcessor, count=$eCores)."
+        Write-Log '+' ("NDIS RSS pinned to E-Cores (base={0}, count={1})." -f $topo.EBase, $topo.ECores)
         Write-Log '+' "NDIS RSS Optimizer configuration completed successfully."
     }
     catch {
@@ -1087,12 +1113,6 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HibernateEnabledDefault'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'AllowHibernate'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'HibernateChecksummingEnabled'; Value = 0 },
-        # REMOVED 26.08.1: EnableMinimalHiberFile=0 + HiberFileSizePercent=0 conflicted with
-        # HiberbootEnabled=1 (Fast Startup) set in Set-HibernationSettings. The hiberfil.sys
-        # was sized to ~0 while Fast Startup still tried to resume from it, hanging the
-        # system at the motherboard/boot logo after the first shutdown. Fast Startup stays ON
-        # (HiberbootEnabled=1), so hiberfil.sys keeps its default sizing. Hibernation remains
-        # enabled (CUDA/TensorRT memory reservation).
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IdleProcessorsRequireQosManagement'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableInboxPepGeneratedConstraints'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IgnoreCsComplianceCheck'; Value = 1 },
@@ -1152,32 +1172,6 @@ function Set-DesktopPowerOptimizations {
     }
     catch {
         Write-Log '-' "Failed to disable StorPort power management: $_"
-    }
-
-    Write-Log '+' "Disabling device-level power management on all Enum devices..."
-    try {
-        Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Enum' -Recurse -ErrorAction SilentlyContinue |
-            ForEach-Object {
-                $p = $_.PSPath
-                try {
-                    $props = Get-ItemProperty $p -ErrorAction Stop
-                    if ($props) {
-                        $props.PSObject.Properties | ForEach-Object {
-                            if ($_.Name -in 'EnhancedPowerManagementEnabled','AllowIdleIrpInD3','DeviceSelectiveSuspended','DeviceResetNotificationEnabled','EnableSelectiveSuspend','SelectiveSuspendEnabled','SelectiveSuspendOn','SelectiveSuspendTimeout','WaitWakeEnabled','WakeEnabled','D3ColdSupported','DisableD3Cold','WdfDirectedPowerTransitionEnable','EnableIdlePowerManagement','IdleInWorkingState','IdleTimeoutInMS','IdleTimeoutPeriodInMilliSec','MinimumIdleTimeoutInMS','EnableHIPM','EnableHDDParking','EnableDIPM','SuppressInputInCS','SystemInputSuppressionEnabled','WdfDefaultIdleInWorkingState','WdfDirectedPowerTransitionChildrenOptional','WdfUseWdfTimerForPofx','SleepstudyState') {
-                                try { Set-ItemProperty $p $_.Name 0 -Type DWord -Force -ErrorAction Stop } catch {}
-                            }
-                            elseif ($_.Name -in 'DisableIdlePowerManagement','DisableRuntimePowerManagement','EnhancedPowerManagementUseMonitor') {
-                                try { Set-ItemProperty $p $_.Name 1 -Type DWord -Force -ErrorAction Stop } catch {}
-                            }
-                        }
-                    }
-                }
-                catch {}
-            }
-        Write-Log '+' "[+] Device-level power management disabled across all Enum devices"
-    }
-    catch {
-        Write-Log '-' "Failed to disable device power management: $_"
     }
 
     Write-Log '+' "Blocking SleepStudy diagnostic writes..."
@@ -1242,10 +1236,6 @@ function Set-BcdOptimizations {
     param()
 
     Write-Log '+' "Configuring BCD boot optimizations..."
-
-    # Skipped on ALL AMD CPUs (not just 3D V-Cache, 26.08.1): disabledynamictick on AMD is
-    # linked to intermittent boot-time BSODs and cold-boot hangs at the motherboard logo.
-    # Intel only gets the dynamic-tick disable for timer precision.
     $skipOptimizations = Test-IsAMDCPU
 
     if (-not $skipOptimizations) {
@@ -1258,10 +1248,6 @@ function Set-BcdOptimizations {
     else {
         Write-Log '-' "AMD CPU detected: skipping disabledynamictick (boot-hang risk)."
     }
-
-    # === BCD tweaks migrated from registry/bcdedit.yml ===
-    Write-Log '+' "Disabling ELAM drivers..."
-    bcdedit /set {current} disableelamdrivers yes 2>$null | Out-Null
 
     Write-Log '+' "Setting isolated context to No..."
     bcdedit /set {current} isolatedcontext No 2>$null | Out-Null
@@ -1524,25 +1510,6 @@ function Set-RegistryPowerTweaks {
         }
     }
 
-    # === Interrupt steering (forced, locked routing) ===
-    # Force Windows interrupt steering (InterruptSteeringFlags bit 2 = force
-    # enabled) so the kernel scores and assigns interrupt targets at boot.
-    # Routing mode stays Locked (4) — DEVICES-TWEAKER-AUTO.PS1 PHASE 7 also
-    # enforces it, keeping the static SpecCPU affinities in effect.
-    # Removes the legacy InterruptSteeringDisabled=1 from SYSTEM_TWEAKS.PS1:
-    # both values in the same key would leave steering undefined.
-    $kernelPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel'
-    Remove-ItemProperty -Path $kernelPath -Name 'InterruptSteeringDisabled' -ErrorAction SilentlyContinue
-    if (Test-IsAMD3DVCache) {
-        Write-Log '-' "AMD 3D V-Cache detected: interrupt steering left at Windows defaults (X3D stability)."
-    }
-    else {
-        Set-RegistryValue -Path $kernelPath -Name 'InterruptSteeringFlags' -Type DWORD -Value 2
-        Invoke-PowerCfg "/setacvalueindex SCHEME_CURRENT SUB_INTSTEER MODE 4"
-        Invoke-PowerCfg "/setdcvalueindex SCHEME_CURRENT SUB_INTSTEER MODE 4"
-        Invoke-PowerCfg "/setactive SCHEME_CURRENT"
-        Write-Log '+' "Interrupt steering forced enabled (flags=2), routing mode locked (4)."
-    }
 
     # === USB selective suspend / LPM ===
     Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags' -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName.Length -eq 12 } | ForEach-Object {
@@ -1587,8 +1554,9 @@ function Set-RegistryPowerTweaks {
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Throttle' -Name 'PerfEnablePackageIdle' -Type DWORD -Value 0
 
     # === Processor power management ===
-    Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Processor' -Name 'CPPCEnable' -Type DWORD -Value 0
-    Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Processor' -Name 'AllowPepPerfStates' -Type DWORD -Value 0
+    # REMOVED (audit): CPPCEnable=0 + AllowPepPerfStates=0 coupaient la gestion moderne
+    # fréquence/voltage (CPPC/pEP). Contre-productif sur AMD Zen (perte de boost, stutter)
+    # et interférait avec le scheduling prefer-core des X3D. Défaut Windows conservé.
 
     # === I/O System ===
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System' -Name 'CountOperations' -Type DWORD -Value 0

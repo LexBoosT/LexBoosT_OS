@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 $ErrorActionPreference = 'Continue'
 
@@ -46,7 +46,7 @@ $tasksToDisable = @(
     '\Microsoft\Windows\DiskCleanup\SilentCleanup'
     '\Microsoft\Windows\DiskFootprint\Diagnostics'
     '\Microsoft\Windows\DiskFootprint\StorageSense'
-    '\Microsoft\Windows\Defrag\ScheduledDefrag'
+
     '\Microsoft\Windows\Storage Tiers Management\Storage Tiers Management Initialization'
     '\Microsoft\Windows\Sysmain\ResPriStaticDbSync'
     '\Microsoft\Windows\Sysmain\WsSwapAssessmentTask'

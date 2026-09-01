@@ -1,4 +1,4 @@
-﻿#Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 
 function Write-Log {
     param([string]$Status, [string]$Message)
@@ -7,14 +7,25 @@ function Write-Log {
 
 $Folders = @(
     "$env:windir\LexBoosTOS",
-    # AppX staging/install locations — Defender real-time scanning of these
+    # AppX staging/install locations - Defender real-time scanning of these
     # makes Store app installs take minutes per app (download stays fast).
     "$env:ProgramFiles\WindowsApps",
     "$env:ProgramData\Microsoft\Windows\AppRepository"
 )
+
+foreach ($sc in @("${env:ProgramFiles(x86)}\Steam", "$env:ProgramFiles\Steam")) {
+    if (Test-Path $sc) {
+        if ($Folders -notcontains $sc) { $Folders += $sc }
+        $apps = Join-Path $sc 'steamapps'
+        if ((Test-Path $apps) -and ($Folders -notcontains $apps)) { $Folders += $apps }
+    }
+}
+
 $Processes = @(
     "MsMpEng.exe",
-    "SearchIndexer.exe"
+    "SearchIndexer.exe",
+    "Steam.exe",
+    "steamwebhelper.exe"
 )
 $SuccessCount = 0
 

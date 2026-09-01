@@ -1,100 +1,58 @@
 ﻿#Requires -RunAsAdministrator
-# =============================================================================
-# LexBoosT OS — Disable Device Power Saving (PnP devices)
-# Iterates every PnP device that has DevicePowerManagement keys and forces
-# power-saving off (SelectiveSuspend, DeviceIdleEnabled, etc.) for desktop.
-# =============================================================================
 
 $ErrorActionPreference = 'Continue'
-$LogDir  = Join-Path $env:windir 'LexBoosTOS\Logs'
-$LogFile = Join-Path $LogDir 'disable-device-power-saving.log'
 
-if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir -Force | Out-Null }
-
-function Log {
-    param([string]$msg)
-    try { Add-Content -Path $LogFile -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] $msg" } catch {}
+function Test-IsLaptop {
+    try {
+        $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction Stop
+        if ($cs.PCSystemType -eq 2 -or $cs.PCSystemTypeEx -in @(2, 8)) { return $true }
+        try { if (Get-CimInstance Win32_Battery -ErrorAction Stop) { return $true } } catch {}
+    } catch {}
+    try {
+        $ch = Get-CimInstance Win32_SystemEnclosure -ErrorAction Stop
+        if ($ch.ChassisTypes | Where-Object { $_ -in @(8,9,10,11,12,13,14,18,21,30,31,32) }) { return $true }
+    } catch {}
+    return $false
 }
 
-Log 'Starting device power saving disable'
-
-$results = New-Object System.Collections.Generic.List[object]
-function Add-Result {
-    param([string]$Area, [string]$Target, [bool]$Success, [string]$Message)
-    $null = $results.Add([pscustomobject]@{
-        Area    = $Area
-        Target  = $Target
-        Success = $Success
-        Message = $Message
-    })
-    $status = if ($Success) { 'OK' } else { 'FAIL' }
-    Log "$status [$Area] $Target - $Message"
+if (Test-IsLaptop) {
+    Write-Host '[-] Laptop detected - device power saving left enabled (battery).'
+    exit 0
 }
 
-# --- Win32_PnPEntity: build map of name by PnP instance id ---
-$pnpNameMap = @{}
-try {
-    $entities = @(Get-CimInstance -ClassName Win32_PnPEntity -ErrorAction Stop)
-    foreach ($e in $entities) {
-        if ($e.PNPDeviceID -and -not $pnpNameMap.ContainsKey($e.PNPDeviceID)) {
-            $name = if ([string]::IsNullOrWhiteSpace($e.Name)) { $e.PNPDeviceID } else { $e.Name }
-            $pnpNameMap[$e.PNPDeviceID] = $name
-        }
+# --- 1. USB selective suspend OFF (plan actif) ---
+$active = powercfg /getactivescheme 2>$null | Select-Object -First 1
+if ($active -match '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})') {
+    $plan = $Matches[1]
+    $usbSub   = '2a737441-1930-4402-8d77-b2bebba308a3'   # USB Settings
+    $suspend  = '48e6b7a6-50f5-4782-a5d4-53bb8f07e226'   # USB selective suspend
+    $null = powercfg /setacvalueindex $plan $usbSub $suspend 0 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $null = powercfg /setactive $plan 2>$null
+        Write-Host '[+] USB selective suspend disabled (AC).'
+    } else {
+        Write-Host '[-] USB selective suspend setting not present, skipped.'
     }
-} catch {
-    Add-Result 'Environment' 'Win32_PnPEntity' $false $_.Exception.Message
 }
 
-function Resolve-DeviceLabel {
-    param([string]$Id)
-    if ([string]::IsNullOrWhiteSpace($Id)) { return $Id }
-    if ($pnpNameMap.ContainsKey($Id)) { return $pnpNameMap[$Id] }
-    return $Id
-}
-
-# --- Registry: DevicePowerManagement keys (USB selective suspend) ---
-$instancePathRoot = 'HKLM:\SYSTEM\CurrentControlSet\Enum'
-$usbSuspendKeys = @(
-    'DevicePowerManagement',
-    'DeviceIdleEnabled',
-    'DeviceSelectiveSuspendEnabled',
-    'SelectiveSuspendEnabled',
-    'SelectiveSuspendTimeout',
-    'PowerSaveEnabled'
-)
-
-$enumDirs = @()
-try {
-    $enumDirs = @(Get-ChildItem -Path $instancePathRoot -Recurse -ErrorAction Stop |
-        Where-Object { $_.PSChildName -match '^\d+$' } |
-        Select-Object -ExpandProperty PSPath)
-} catch {
-    Add-Result 'Registry' $instancePathRoot $false "Cannot enumerate: $($_.Exception.Message)"
-}
-
-foreach ($p in $enumDirs) {
-    $label = Resolve-DeviceLabel (Split-Path $p -Leaf)
-    # Values live under "<instance>\Device Parameters" (and sometimes directly under the instance)
-    $locations = @($p)
-    $devParams = Join-Path $p 'Device Parameters'
-    if (Test-Path $devParams) { $locations += $devParams }
-    foreach ($loc in $locations) {
-        foreach ($key in $usbSuspendKeys) {
-            if (Test-Path (Join-Path $loc $key)) {
-                try {
-                    Set-ItemProperty -Path $loc -Name $key -Value 0 -Type DWord -ErrorAction Stop -Force
-                    Add-Result 'DevicePowerManagement' $label $true "Disabled: $key"
-                } catch {
-                    Add-Result 'DevicePowerManagement' $label $false "Skip: $($_.Exception.Message)"
-                }
+# --- 2. Economie USB par peripherique (UNIQUEMENT si la cle existe) ---
+$usbRoot = 'HKLM:\SYSTEM\CurrentControlSet\Enum\USB'
+if (Test-Path $usbRoot) {
+    Get-ChildItem $usbRoot -Recurse -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path (Join-Path $_.PSPath 'Device Parameters') -ErrorAction SilentlyContinue } |
+        ForEach-Object {
+            $dp = Join-Path $_.PSPath 'Device Parameters'
+            foreach ($k in @('DeviceSelectiveSuspended','SelectiveSuspendEnabled','EnableSelectiveSuspend')) {
+                if (Test-Path (Join-Path $dp $k)) { Set-ItemProperty $dp $k 0 -Type DWord -Force -ErrorAction SilentlyContinue }
             }
         }
-    }
+    Write-Host '[+] USB per-device power saving disabled (targeted).'
 }
 
-# --- Print results summary ---
-$ok = ($results | Where-Object { $_.Success }).Count
-$ko = ($results | Where-Object { -not $_.Success }).Count
-Log "Summary: $ok OK, $ko FAIL"
-Write-Host "[+] Device power saving disabled: $ok OK, $ko FAIL"
+# --- 3. Modern Standby / Connected Standby OFF (desktop; necessite firmware S3) ---
+# Desactive l'AoAC/Modern Standby -> vrai S3, moins de reveils d'arriere-plan et de latence.
+New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' -Name 'CsEnabled' -Value 0 -PropertyType DWord -Force -ErrorAction SilentlyContinue
+Write-Host '[+] Connected Standby disabled (CsEnabled=0) - utilise le S3 (si supporte par le firmware).'
+
+Write-Host 'Done - USB/device energy saving disabled (desktop, targeted).'
 exit 0

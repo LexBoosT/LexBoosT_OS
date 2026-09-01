@@ -96,8 +96,11 @@ if %AUTO_MODE% equ 1 (
 :: ============================================
 :DOWNLOAD_SILENT
 echo [DLSS] Reading download URL from GitHub...
-powershell -Command "Invoke-WebRequest -Uri '%CONFIG_URL%' -OutFile '%TEMP_FILE%' -UseBasicParsing" 2>nul
-if not %errorLevel% == 0 (
+curl.exe -L --fail --retry 3 --connect-timeout 15 -sS -o "%TEMP_FILE%" "%CONFIG_URL%"
+if %errorLevel% neq 0 (
+    powershell -Command "Invoke-WebRequest -Uri '%CONFIG_URL%' -OutFile '%TEMP_FILE%' -UseBasicParsing" 2>nul
+)
+if %errorLevel% neq 0 (
     echo [DLSS] ERROR: Cannot reach GitHub configuration file.
     echo [DLSS] Check your internet connection.
     exit /b 1
@@ -113,13 +116,17 @@ if "%DOWNLOAD_URL%"=="" (
 
 echo [DLSS] Downloading nvidiaDlssGlom archive...
 
-:: BITS transfer (preferred, shows progress in background)
-powershell -Command "Start-BitsTransfer -Source '%DOWNLOAD_URL%' -Destination '%ZIP_FILE%' -Priority High" 2>nul
-if not %errorLevel% == 0 (
-    echo [DLSS] BITS unavailable, using Invoke-WebRequest...
+:: curl (native, fastest for a one-shot download)
+curl.exe -L --fail --retry 3 --retry-delay 2 --connect-timeout 15 -sS -o "%ZIP_FILE%" "%DOWNLOAD_URL%"
+if %errorLevel% neq 0 (
+    echo [DLSS] curl failed, trying BITS...
+    powershell -Command "Start-BitsTransfer -Source '%DOWNLOAD_URL%' -Destination '%ZIP_FILE%' -Priority High" 2>nul
+)
+if %errorLevel% neq 0 (
+    echo [DLSS] BITS failed, using Invoke-WebRequest...
     powershell -Command "Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%ZIP_FILE%' -UseBasicParsing" 2>nul
 )
-if not %errorLevel% == 0 (
+if %errorLevel% neq 0 (
     echo [DLSS] ERROR: Download failed.
     exit /b 1
 )
@@ -142,6 +149,8 @@ del "%ZIP_FILE%" 2>nul
 if exist "%EXTRACT_DIR%\%EXE_FILE%" (
     echo [DLSS] SUCCESS: %EXE_FILE% ready!
     echo [DLSS] Path: %EXTRACT_DIR%\%EXE_FILE%
+    echo [DLSS] Launching %EXE_FILE%...
+    start "" "%EXTRACT_DIR%\%EXE_FILE%"
     exit /b 0
 ) else (
     echo [DLSS] WARNING: %EXE_FILE% not found after extraction.

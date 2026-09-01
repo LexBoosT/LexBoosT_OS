@@ -1,4 +1,4 @@
-# Script to install Windows Terminal if missing and configure settings.json
+﻿# Script to install Windows Terminal if missing and configure settings.json
 # Path to settings.json file
 $settingsPath = "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 

@@ -52,3 +52,12 @@ actions:
   # Reduce signature update frequency
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'ForceUpdateFromMU', type: REG_DWORD, data: '0', onUpgrade: false}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'SignatureUpdateInterval', type: REG_DWORD, data: '24', onUpgrade: false}
+
+  # ============================================
+  # Windows Security Center Notifications (keep enabled)
+  # ============================================
+  - !registryValue: {path: 'HKLM\Software\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableEnhancedNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
+  - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableEnhancedNotifications', type: REG_DWORD, data: '0', onUpgrade: false}

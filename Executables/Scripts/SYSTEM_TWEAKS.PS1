@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Continue"
+﻿$ErrorActionPreference = "Continue"
 
 function Test-IsIntelCPU {
     [CmdletBinding()]
@@ -41,12 +41,9 @@ Write-Log '+' 'Applying YML system registry tweaks...'
 # ================================================
 
 Write-Log '+' 'Applying DPC kernel tweaks...'
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcWatchdogProfileOffset' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DPCTimeout' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'IdealDpcRate' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcQueueDepth' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MinimumDpcRate' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcWatchdogPeriod' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
 # SPLIT LARGE CACHES
@@ -67,9 +64,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'Threa
 # ================================================
 
 Write-Log '+' 'Applying kernel scheduling tweaks...'
-# MaxDynamicTickDuration: Intel only (26.08.1). The 10-tick cap combined with
-# bcdedit disabledynamictick hangs cold boot at the motherboard logo on AMD
-# (same family as the X3D guard). AMD keeps the scheduler-friendly default.
 if (Test-IsIntelCPU) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaxDynamicTickDuration' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
 }
@@ -94,17 +88,6 @@ reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_CPU_PAGE_TABLE_ENABLED' /t R
 reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_HEAP_SERIALIZATION_ENABLED' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_MAP_HEAP_ALLOCATIONS' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_RESIDENCY_MANAGEMENT_ENABLED' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-
-# ================================================
-# DXGI (DIRECTX GRAPHICS INFRASTRUCTURE)
-# ================================================
-# REMOVED 26.08.1: the DXGI_* presentation-forcing keys (DXGI_MAX_FRAME_LATENCY,
-# DXGI_FORCE_FULLSCREEN_FLIP_MODE, DXGI_FORCE_FLIP_SEQUENTIAL, DXGI_DISABLE_DWM_THROTTLING,
-# DXGI_PREEMPTION_MODE, ...) are undocumented tweak-pack values that the system does not
-# read (frame latency is a per-process API: IDXGIDevice1::SetMaximumFrameLatency).
-# A/B tested on LEXBOOST_OS-PC (RTX 5070 Ti): forcing the 1-frame queue + independent flip
-# produced dxgkrnl ISR spikes (582 us) and nvlddmkm DPC spikes (1890 us). Removing them cut
-# ISR peaks to 205 us and eliminated all ISR > 500 us.
 
 # ================================================
 # DXGKrnl (DIRECTX GRAPHICS KERNEL)
@@ -132,25 +115,19 @@ Write-Log '+' 'Applying Graphics Drivers tweaks...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'PowerSavingModeEnabled' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'PanelSelfRefresh' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ForceOffScreenTimeout' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-# HwSchMode / HwSchTreatExperimentalAsStable REMOVED 26.08.1: SYSTEM_TWEAKS was rewriting
-# HwSchMode=2 (HAGS ON) on every install, contradicting the "HAGS managed by GPUTweaks"
-# decision and spiking dxgkrnl ISR (582 us at HAGS ON vs 205 us OFF, A/B tested).
-# HAGS state is owned exclusively by GPUTweaks (tri-state DEFAULT/ON/OFF).
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'MaximumAdapterCount' /t REG_DWORD /d 4 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ForceDirectFlip' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ForceSecondaryFlipSupport' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'EnableWDDM23Synchronization' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'WDDM2LockManagement' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'DiagnosticsBufferExpansionTime' /t REG_DWORD /d 300 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'ExternalDiagnosticsBufferSize' /t REG_DWORD /d 65536 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' /v 'DpiMapIommuContiguous' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-# MaxFrameLatency REMOVED 26.08.1: forced a 1-frame present queue (same family as the DXGI_*
-# flip stack removed above); A/B: ISR peaks 484->205 us once removed.
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'ModeListCaching' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'EnableVirtualRefreshRateOnExternalMonitor' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'ShortLinkTrainingTimeout' /t REG_DWORD /d 100 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'LongLinkTrainingTimeout' /t REG_DWORD /d 500 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power' /v 'DisableDevicePowerRequired' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-# QueuedPresentLimit / ForceIndependentFlip REMOVED 26.08.1: forced independent flip with a
-# near-empty present queue; when a frame misses VSync, nvlddmkm waits inside the DPC
-# (1890 us peaks measured). Let the driver/DWM manage the flip queue (default).
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler' /v 'EnableFrameBufferCompression' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
@@ -202,93 +179,6 @@ reg add 'HKLM\SOFTWARE\WOW6432Node\Microsoft\DirectDraw' /v 'EmulateStateBlocks'
 reg add 'HKLM\SOFTWARE\WOW6432Node\Microsoft\DirectDraw' /v 'EmulationOnly' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
-# RESOURCE MANAGEMENT (CPU / I/O / FLAGS)
-# ================================================
-
-Write-Log '+' 'Applying Resource Management tweaks...'
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\HardCap0' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\HardCap0' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\Paused' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\Paused' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapFull' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapFull' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapFullAboveNormal' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapFullAboveNormal' /v 'PriorityClass' /t REG_DWORD /d 0x20 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapFullAboveNormal' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapLow' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapLow' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapLowBackgroundBegin' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapLowBackgroundBegin' /v 'PriorityClass' /t REG_DWORD /d 0x20 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\SoftCapLowBackgroundBegin' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\UnmanagedAboveNormal' /v 'CapPercentage' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\UnmanagedAboveNormal' /v 'PriorityClass' /t REG_DWORD /d 0x20 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\CPU\UnmanagedAboveNormal' /v 'SchedulingType' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\IO\NoCap' /v 'IOBandwidth' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System' /v 'IoEnableSessionZeroAccessCheck' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\BackgroundDefault' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\Frozen' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\FrozenDNCS' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\FrozenDNK' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\FrozenPPLE' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\Paused' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\PausedDNK' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\Pausing' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\PrelaunchForeground' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-reg add 'HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\Policies\Flags\ThrottleGPUInterference' /v 'IsLowPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
-
-# ================================================
-# RESOURCE POLICY SETS (Priority overrides)
-# ================================================
-
-Write-Log '+' 'Applying Resource PolicySets (system-wide priority boost)...'
-
-# Helper function to create PolicySet entries
-function Set-PolicySet {
-    param([string]$Name)
-    $base = "Registry::HKLM\SYSTEM\ResourcePolicyStore\ResourceSets\PolicySets\$Name"
-    if (-not (Test-Path $base)) { New-Item -Path $base -Force -ErrorAction SilentlyContinue | Out-Null }
-    @('CPU','ExternalResources','Flags','IO','Memory') | ForEach-Object {
-        $v = switch ($_) {
-            'CPU'    { 'UnmanagedAboveNormal' }
-            'ExternalResources' { 'ResourceIntensive' }
-            'Flags'  { 'Foreground' }
-            'IO'     { 'NoCap' }
-            'Memory' { 'NoCap' }
-        }
-        New-ItemProperty -Path $base -Name $_ -Value $v -PropertyType String -Force -ErrorAction SilentlyContinue | Out-Null
-    }
-    New-ItemProperty -Path $base -Name 'Importance' -Value 'Critical' -PropertyType String -Force -ErrorAction SilentlyContinue | Out-Null
-}
-
-$policySets = @(
-    'ApplicationService','ApplicationServiceElastic','ApplicationServiceHighPriElastic','ApplicationServiceHighPriority',
-    'ApplicationServiceRemote','AppToAppTarget','BackgroundAudioPlayer','BackgroundCachedFileUpdater',
-    'BackgroundTaskCompletion','BackgroundTaskDebug','BackgroundTransfer','BackgroundTransferNetworkState',
-    'Balloon','CalendarProviderAsChild','CallingEvent','CallingEventHighPriority','ChatMessageNotification',
-    'ComponentTarget','ContinuousBackgroundExecution','CortanaSpeechBackground','CreateProcess',
-    'DefaultModernBackgroundTask','DefaultPPLE','DefaultPPLE2','EmCreateProcess','EmCreateProcessNormalPriority',
-    'EmptyHost','EmptyHostHighPriority','EmptyHostPPLE','FileProviderTarget','ForegroundAgent',
-    'ForegroundCachedFileUpdater','ForegroundTaskCompletion','Frozen','GenericExtendedExecution',
-    'GeofenceTask','HighPriorityBackgroundAgent','HighPriorityBackgroundDemoted','HighPriorityBackgroundTransfer',
-    'IoTStartupTask','JumboForegroundAgent','LmaBackgroundTaskCompletion','LmaDefaultModernBackgroundTask',
-    'LmaPrelaunchForeground','LmaUiDebugModeForeground','LmaUiFrozen','LmaUiFrozenDNCS','LmaUiFrozenDNK',
-    'LmaUiFrozenHighPriority','LmaUiModernForeground','LmaUiModernForegroundLarge','LmaUiPaused','LmaUiPausedDNK',
-    'LmaUiPausedHighPriority','LmaUiPausing','LongRunningBluetooth','LongRunningControlChannel','LongRunningSensor',
-    'MediaProcessing','OemBackgroundAgent','OemTask','PendingDefaultPPLE','PiP','PreinstallTask',
-    'PrelaunchForeground','PushTriggerTask','ResourceIntensive','ShareDataPackageHost','ShortRunningBluetooth',
-    'TaskCompletionHighPriority','UiComposer','UiDebugModeForeground','UiForegroundDNK','UiFrozen','UiFrozenDNCS',
-    'UiFrozenDNK','UiFrozenHighPriority','UiLockScreen','UiModernForeground','UiModernForegroundExtended',
-    'UiModernForegroundLarge','UiOverlay','UiPaused','UiPausedDNK','UiPausedHighPriority','UiPausing',
-    'UiPausingLowPriority','UiShellCustom1','UiShellCustom2','UiShellCustom3','UiShellCustom4',
-    'VideoTranscoding','VoipActiveCallBackground','VoipActiveCallBackgroundPriority','VoipActiveCallForeground',
-    'VoipForegroundWorker','VoipSuspendedBackground','VoipWorker','Vpn','WebAuthSignIn'
-)
-
-foreach ($ps in $policySets) {
-    Set-PolicySet -Name $ps
-}
-
-# ================================================
 # KERNEL / SESSION MANAGER (existing)
 # ================================================
 
@@ -307,7 +197,6 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'GlobalTimerResolutionRequests' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power' /v 'Win32CalloutWatchdogBugcheckEnabled' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # DisableDiagnosticTracing
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Diagnostics\Performance' /v 'DisableDiagnosticTracing' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
@@ -330,14 +219,13 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl' /v 'Win32Priorit
 # DIRECTX (existing)
 # ================================================
 
-reg add 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences' /v 'DirectXUserGlobalSettings' /t REG_SZ /d 'SwapEffectUpgradeEnable=1;VRROptimizeEnable=0;' /f 2>&1 | Out-Null
+reg add 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences' /v 'DirectXUserGlobalSettings' /t REG_SZ /d '0' /f 2>&1 | Out-Null
 
 # ================================================
 # NETWORK / DMA / MISCELLANEOUS (existing)
 # ================================================
 
 reg add 'HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' /v 'DisableBandwidthThrottling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Kernel DMA Protection' /v 'DeviceEnumerationPolicy' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
 # EXPLORER DESKTOP TWEAKS (existing)

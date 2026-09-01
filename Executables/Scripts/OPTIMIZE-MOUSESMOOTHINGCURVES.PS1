@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 
 function Write-Log {
     param([string]$Status, [string]$Message)

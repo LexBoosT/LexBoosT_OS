@@ -116,6 +116,44 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Paint', value: 'DisableCocreator', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Paint', value: 'DisableImageCreator', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\WindowsNotepad', value: 'DisableAIFeatures', type: REG_DWORD, data: '1'}
+  # --- Windows AI agents / runtime (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'TurnOffSavingSnapshots', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableSettingsAgent', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableAgentConnectors', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableAgentWorkspaces', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableRemoteAgentConnectors', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'AllowCopilotRuntime', type: REG_DWORD, data: '0'}
+  # --- Copilot availability & eligibility (HKCU + HKLM) ---
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\Shell\Copilot', value: 'IsCopilotAvailable', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\Shell\Copilot\BingChat', value: 'IsUserEligible', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CopilotKey', value: 'SetCopilotHardwareKey', type: REG_SZ, data: ''}
+  # --- Generative AI / system AI models (HKLM consent store + AppPrivacy) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\generativeAI', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy', value: 'LetAppsAccessGenerativeAI', type: REG_DWORD, data: '2'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\systemAIModels', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy', value: 'LetAppsAccessSystemAIModels', type: REG_DWORD, data: '2'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\systemAIModels', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+  # --- Per-app microphone consent for AI packages (HKCU) ---
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone\Microsoft.Copilot_8wekyb3d8bbwe', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe', value: 'Value', type: REG_SZ, data: 'Deny'}
+  # --- Paint AI policies (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableImageCreator', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableCocreator', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableGenerativeFill', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableGenerativeErase', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableRemoveBackground', type: REG_DWORD, data: '1'}
+  # --- Cloud content / consumer account state (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent', value: 'DisableConsumerAccountStateContent', type: REG_DWORD, data: '1'}
+  # --- Office AI policies (HKCU) ---
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\office\16.0\common\ai', value: 'contentsafetyserviceenabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\office\16.0\common\ai\training', value: 'optionalconnectedexperiencesenabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\office\16.0\common\privacy', value: 'controllerconnectedservicesenabled', type: REG_DWORD, data: '2'}
+  - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\office\16.0\common\privacy', value: 'usercontentdisabled', type: REG_DWORD, data: '2'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Office\16.0\Word\Options', value: 'EnableCopilot', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Office\16.0\Excel\Options', value: 'EnableCopilot', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Office\16.0\OneNote\Options\Other', value: 'EnableCopilot', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Office\16.0\OneNote\Options\Other', value: 'EnableCopilotNotebooks', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Office\16.0\OneNote\Options\Other', value: 'EnableCopilotSkittle', type: REG_DWORD, data: '0'}
 
   # ============================================
   # Phone companion / Your Phone Start menu
@@ -146,11 +184,8 @@ actions:
   # ============================================
   - !registryValue: {path: 'HKLM\System\CurrentControlSet\Control\Network\SharedAccessConnection', value: 'EnableControl', type: REG_DWORD, data: '0'}
 
-  # ============================================
-  # Location hard block
-  # ============================================
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableLocation', type: REG_DWORD, data: '1'}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge\WebView2', value: 'DefaultGeolocationSetting', type: REG_DWORD, data: '2'}
+  # (Location hard block removed — see issue report #1: DisableLocation and
+  #  Edge WebView2 DefaultGeolocationSetting locked Windows Location by policy.)
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'accesssolution', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'olksolution', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Office\16.0\OSM\preventedapplications', value: 'onenotesolution', type: REG_DWORD, data: '1'}

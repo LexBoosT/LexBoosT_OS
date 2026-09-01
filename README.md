@@ -1,8 +1,8 @@
-## LexBoosT OS™ 26.08.1
+## LexBoosT OS™ 26.09
 🌍 **Languages**: [🇫🇷 Français](#lexboost-os-2607--documentation-française) | [🇬🇧 English](#lexboost-os-2607--english-documentation)
 
 -----
-## LexBoosT OS™ 26.08.1 — Documentation française
+## LexBoosT OS™ 26.09 — Documentation française
 ### *Libérez des performances supérieures — sans compromis*
 **LexBoosT OS™** est un playbook d'optimisation Windows 11 qui transforme votre système en profondeur. Conçu pour les gamers, power users et professionnels exigeants, il applique **250+ services reconfigurés**, **100+ packages bloatware supprimés** et **60+ familles de tweaks registre** via **7 phases de déploiement** orchestrées avec précision.
 
@@ -96,7 +96,7 @@
 **Compatibilité matérielle** : AMD Ryzen / Intel Core 8+ gén, 8 GB RAM minimum (16 GB recommandé), SSD/NVMe recommandé.
 
 -----
-## LexBoosT OS™ 26.08.1 — English Documentation
+## LexBoosT OS™ 26.09 — English Documentation
 ### *Unleash Superior Performance — Zero Compromise*
 **LexBoosT OS™** is a Windows 11 optimization playbook that deeply transforms your system. Built for gamers, power users, and demanding professionals, it applies **250+ reconfigured services**, **100+ bloatware packages removed**, and **60+ families of registry tweaks** across **7 orchestrated deployment phases**.
 

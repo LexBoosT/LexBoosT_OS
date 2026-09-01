@@ -7,7 +7,7 @@ actions:
   # removed dead/vestigial writes — selfscan/selfvoice (no trace), MaximumSpeed/TimeToMaximumSpeed
   # (empty data), Last-* FilterKeys residues; Warning Sounds / Sound on Activation are owned by
   # AUDIO.PS1 (=1, runs later in registry.yml) — removed the contradicting 0s here.
-  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\HighContrast', value: 'Flags', type: REG_SZ, data: '0'}
+  - !registryValue: {path: 'HKCU\Control Panel\Accessibility\HighContrast', value: 'Flags', type: REG_SZ, data: '4194'}
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\MouseKeys', value: 'Flags', type: REG_SZ, data: '0'}
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\TimeOut', value: 'Flags', type: REG_SZ, data: '0'}
   - !registryValue: {path: 'HKCU\Control Panel\Accessibility\SoundSentry', value: 'Flags', type: REG_SZ, data: '0'}
@@ -16,3 +16,4 @@ actions:
   - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'ScriptingEnabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'EchoNavigationKeys', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'OnlineServicesEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Narrator\NoRoam', value: 'WinEnterLaunchEnabled', type: REG_DWORD, data: '0'}

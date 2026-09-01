@@ -1,13 +1,10 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
 
-begin {
     Write-Verbose "Starting to remove default pinned applications from taskbar"
-}
 
-process {
     try {
         # Method 1: Remove shortcuts from Quick Launch folder
         Write-Verbose "Method 1: Removing shortcuts from Quick Launch folder..."
@@ -58,8 +55,5 @@ process {
     catch {
         Write-Error "An error occurred while removing pinned applications: $_"
     }
-}
 
-end {
     Write-Verbose "Script execution completed"
-}

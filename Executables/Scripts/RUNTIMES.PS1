@@ -240,123 +240,25 @@ Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.DesktopRuntime.10" -
     Test-DotNetDesktopRuntime -MajorVersion 10
 }
 
-# VC++ Redistributables
-function Test-VCRedistInstalled {
-    param([string]$VersionKey)
-
-    $patterns = @{
-        '2005-x64'  = 'Microsoft Visual C\+\+ 2005.*Redistributable.*x64'
-        '2005-x86'  = 'Microsoft Visual C\+\+ 2005.*Redistributable.*x86'
-        '2008-x64'  = 'Microsoft Visual C\+\+ 2008.*Redistributable.*x64'
-        '2008-x86'  = 'Microsoft Visual C\+\+ 2008.*Redistributable.*x86'
-        '2010-x64'  = 'Microsoft Visual C\+\+ 2010.*x64.*Redistributable'
-        '2010-x86'  = 'Microsoft Visual C\+\+ 2010.*x86.*Redistributable'
-        '2012-x64'  = 'Microsoft Visual C\+\+ 2012.*Redistributable.*x64'
-        '2012-x86'  = 'Microsoft Visual C\+\+ 2012.*Redistributable.*x86'
-        '2013-x64'  = 'Microsoft Visual C\+\+ 2013.*Redistributable.*x64'
-        '2013-x86'  = 'Microsoft Visual C\+\+ 2013.*Redistributable.*x86'
-        '2015+-x64' = 'Microsoft Visual C\+\+ 2015.*Redistributable.*x64'
-        '2015+-x86' = 'Microsoft Visual C\+\+ 2015.*Redistributable.*x86'
-    }
-
-    if (-not $patterns.ContainsKey($VersionKey)) { return $false }
-    $pattern = $patterns[$VersionKey]
-
-    $uninstallPaths = @('HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
-    if ([Environment]::Is64BitOperatingSystem) {
-        $uninstallPaths += 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
-    }
-
-    foreach ($uninstallPath in $uninstallPaths) {
-        if (-not (Test-Path $uninstallPath)) { continue }
-        $keys = Get-ChildItem -Path $uninstallPath -ErrorAction SilentlyContinue
-        foreach ($key in $keys) {
-            try {
-                $displayName = (Get-ItemProperty -Path $key.PSPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
-                if ($displayName -and $displayName -match $pattern) { return $true }
-            }
-            catch {}
-        }
-    }
-    return $false
-}
+# VC++ Redistributables (AIO abbodi1406 - latest release)
+$vcAioUrl = 'https://github.com/abbodi1406/vcredist/releases/latest/download/VisualCppRedist_AIO_x86_x64.exe'
 
 $vcTempDir = Join-Path -Path $env:TEMP -ChildPath ([guid]::NewGuid().ToString())
 New-Item -ItemType Directory -Path $vcTempDir -Force | Out-Null
 
 try {
-    function Invoke-VCRedistDownload {
-        param(
-            [Parameter(Mandatory = $true)][string]$Uri,
-            [Parameter(Mandatory = $true)][string]$Destination,
-            [Parameter(Mandatory = $true)][string]$Description
-        )
-        Write-Log '+' "Downloading $Description..."
-        & curl.exe -LSs $Uri -o $Destination --connect-timeout 10 --retry 5 --retry-delay 0 --retry-all-errors
-        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $Destination -PathType Leaf)) {
-            throw "Downloading $Description from '$Uri' failed with exit code $LASTEXITCODE."
-        }
+    $vcAioExe = Join-Path -Path $vcTempDir -ChildPath 'VisualCppRedist_AIO_x86_x64.exe'
+
+    Write-Log '+' "Downloading VisualCppRedist_AIO_x86_x64.exe (latest release)..."
+    & curl.exe -LSsL $vcAioUrl -o $vcAioExe --connect-timeout 10 --retry 5 --retry-delay 0 --retry-all-errors
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $vcAioExe -PathType Leaf)) {
+        throw "Downloading VisualCppRedist_AIO_x86_x64.exe from '$vcAioUrl' failed with exit code $LASTEXITCODE."
     }
 
-    function Invoke-VCRedistInstaller {
-        param(
-            [Parameter(Mandatory = $true)][string]$FilePath,
-            [Parameter(Mandatory = $true)][string]$ArgumentList,
-            [Parameter(Mandatory = $true)][string]$Description,
-            [int[]]$SuccessExitCode = @(0, 1638)
-        )
-        Write-Log '+' "Installing $Description..."
-        $process = Start-Process -FilePath $FilePath -WindowStyle Hidden -ArgumentList $ArgumentList -Wait -PassThru
-        if ($process.ExitCode -notin $SuccessExitCode) {
-            Write-Log '-' "Warning: Installing $Description returned exit code $($process.ExitCode)."
-        }
-    }
-
-    $legacyArgs = '/q /norestart'
-    $modernArgs = '/install /quiet /norestart'
-    $msiArgs = '/qn /quiet /norestart ALLUSERS=1 REBOOT=ReallySuppress'
-
-    $vcredists = [ordered] @{
-        'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.exe'                = @('2005-x64', '/c /q /t:')
-        'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.exe'                = @('2005-x86', '/c /q /t:')
-        'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe'                = @('2008-x64', $legacyArgs)
-        'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe'                = @('2008-x86', $legacyArgs)
-        'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'                = @('2010-x64', $legacyArgs)
-        'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe'                = @('2010-x86', $legacyArgs)
-        'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe'          = @('2012-x64', $modernArgs)
-        'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe'          = @('2012-x86', $modernArgs)
-        'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe' = @('2013-x64', $modernArgs)
-        'https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe' = @('2013-x86', $modernArgs)
-        'https://aka.ms/vs/17/release/vc_redist.x64.exe'                                                                     = @('2015+-x64', $modernArgs)
-        'https://aka.ms/vs/17/release/vc_redist.x86.exe'                                                                     = @('2015+-x86', $modernArgs)
-    }
-
-    foreach ($entry in $vcredists.GetEnumerator()) {
-        $vcName = $entry.Value[0]
-        if (Test-VCRedistInstalled -VersionKey $vcName) {
-            Write-Log '+' "Visual C++ Runtime $vcName is already installed. Skipping."
-            continue
-        }
-        $vcArgs = $entry.Value[1]
-        $vcExePath = Join-Path -Path $vcTempDir -ChildPath "vcredist-$vcName.exe"
-        Invoke-VCRedistDownload -Uri $entry.Name -Destination $vcExePath -Description "Visual C++ Runtime $vcName"
-
-        if ($vcArgs -match ':') {
-            $msiDir = Join-Path -Path $vcTempDir -ChildPath "vcredist-$vcName"
-            Invoke-VCRedistInstaller -FilePath $vcExePath -ArgumentList ($vcArgs + '"' + $msiDir + '"') -Description "Visual C++ Runtime $vcName extractor"
-            $msiPaths = @(Get-ChildItem -LiteralPath $msiDir -Filter '*.msi' -ErrorAction SilentlyContinue)
-            if (-not $msiPaths) {
-                Write-Log '-' "Failed to extract MSI for $vcName, not installing."
-                continue
-            }
-            foreach ($msi in $msiPaths) {
-                $msiArguments = '/log "' + (Join-Path -Path $msiDir -ChildPath 'logfile.log') + '" /i "' + $msi.FullName + '" ' + $msiArgs
-                Invoke-VCRedistInstaller -FilePath 'msiexec.exe' -ArgumentList $msiArguments -Description "Visual C++ Runtime $vcName MSI"
-            }
-        }
-        else {
-            Invoke-VCRedistInstaller -FilePath $vcExePath -ArgumentList $vcArgs -Description "Visual C++ Runtime $vcName"
-        }
+    Write-Log '+' "Installing Visual C++ Redistributables (x86 + x64)..."
+    $process = Start-Process -FilePath $vcAioExe -WindowStyle Hidden -ArgumentList '/ai /gm2' -Wait -PassThru
+    if ($process.ExitCode -ne 0) {
+        Write-Log '-' "Warning: Visual C++ Redistributable installation returned exit code $($process.ExitCode)."
     }
 }
 finally {

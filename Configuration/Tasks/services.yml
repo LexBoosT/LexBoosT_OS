@@ -163,8 +163,6 @@ actions:
   - !service: { name: 'CDPSvc', operation: change, startup: 3 }
   - !service: { name: 'CDPUserSvc', operation: change, startup: 3 }
   - !service: { name: 'GpuEnergyDrv', operation: change, startup: 3 }
-  - !service: { name: 'SysMain', operation: change, startup: 3 }
-  - !run: { exe: 'cmd', args: '/c "sc query SysMain | find "RUNNING" >nul && net stop SysMain >nul 2>&1 || exit /b 0"', weight: 200 }
   - !service: { name: 'VacSvc', operation: change, startup: 3 }
   - !service: { name: 'VSS', operation: change, startup: 3 }
   - !service: { name: 'WpnService', operation: change, startup: 3 }
@@ -207,16 +205,6 @@ actions:
   - !service: { name: 'midisrv', operation: change, startup: 4 }
   - !service: { name: 'perceptionsimulation', operation: change, startup: 3 }
   - !service: { name: 'upnphost', operation: change, startup: 3 }
-
-  # ============================================
-  # ACPI / POWER / DRIVERS
-  # ============================================
-  # REMOVED 26.08.1: kernel driver Start changes. All entries here were boot-start
-  # (Start=0) drivers being forced to manual (3): acpipagr, AcpiPmi, acpitime, acpiex,
-  # intelpmt, PRM, WmiAcpi, bam, dam, iorate, fvevol, rdyboost, CompositeBus, umbus.
-  # fvevol (BitLocker) -> 3 caused INACCESSIBLE_BOOT_DEVICE (0x7B) on encrypted volumes.
-  # CompositeBus/umbus/iorate/bam are PnP/storage boot drivers — disabling at boot can
-  # break device enumeration or storage init on some hardware. Leave Start untouched.
 
   # ============================================
   # OTHER SERVICES
@@ -280,8 +268,13 @@ actions:
   - !service: { name: 'shpamsvc', operation: change, startup: 4 }
   - !service: { name: 'WSAIFabricSvc', operation: change, startup: 4 }
   - !service: { name: 'MicrosoftCopilotElevationService', operation: change, startup: 4 }
-  - !service: { name: 'amdfendr', operation: change, startup: 4 }
-  - !service: { name: 'amdfendrmgr', operation: change, startup: 4 }
+  # ============================================
+  # AMD PPM PROVISIONING DRIVER (chipset) - force en Automatique
+  #   Necessaire a la gestion power/CPPC du chipset AMD et a la repartition
+  #   jeu -> CCD 3D (X3D). Ne pas desactiver (fix lag / boost Ryzen).
+  # ============================================
+  - !service: { name: 'amdfendr', operation: change, startup: 2 }
+  - !service: { name: 'amdfendrmgr', operation: change, startup: 2 }
 
   # ============================================
   # PER-USER SYNC SERVICES (wildcard — disabled for all users)

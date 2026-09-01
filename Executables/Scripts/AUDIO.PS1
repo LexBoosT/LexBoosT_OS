@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
@@ -26,12 +26,12 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio'; Name = 'Affinity'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio'; Name = 'GPU Priority'; Value = '8'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Audio'; Name = 'SFIO Priority'; Value = 'Normal'; Type = 'REG_SZ' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation'; Name = 'DisableStartupSound'; Value = 1; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\EditionOverrides'; Name = 'UserSetting_DisableStartupSound'; Value = 1; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation'; Name = 'DisableStartupSound'; Value = 0; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\EditionOverrides'; Name = 'UserSetting_DisableStartupSound'; Value = 0; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings'; Name = 'AgentActivationEnabled'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings'; Name = 'AgentActivationLastUsed'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Narrator\NoRoam'; Name = 'DuckAudio'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKCU\Control Panel\Accessibility'; Name = 'Sound on Activation'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\Control Panel\Accessibility'; Name = 'Sound on Activation'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\Control Panel\Accessibility'; Name = 'Warning Sounds'; Value = '1'; Type = 'REG_DWORD' }
 )
 

@@ -21,7 +21,9 @@ actions:
       wait: true
       weight: 100
 
-  - !file: {path: '%windir%\SystemApps\Microsoft.BioEnrollment_cw5n1h2txyewy'}
+  # Microsoft.BioEnrollment (Windows Hello Face) must NOT be removed — it is a
+  # required system component (issue report #2). Re-registering cannot restore
+  # deleted files, so the directory deletion and removal-list entry were removed.
   - !file: {path: '%windir%\SystemApps\Windows.CBSPreview_cw5n1h2txyewy'}
   # Disable CrossDeviceResume scheduled task (specific to that feature)
   - !status: {status: 'Disabling CrossDevice'}

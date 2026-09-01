@@ -3,8 +3,11 @@ title: Location and Sensors
 description: Applies Location and Sensors tweaks via registry values
 privilege: TrustedInstaller
 actions:
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableLocationScripting', type: REG_DWORD, data: '1', option: 'desktop-only'}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableSensors', type: REG_DWORD, data: '1', option: 'desktop-only'}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableWindowsLocationProvider', type: REG_DWORD, data: '1', option: 'desktop-only'}
+  # Windows Location Provider must NOT be hard-blocked by policy — doing so locks
+  # the Settings > Location page ("managed by your organization") and breaks
+  # ordinary Location usage. DisableLocationScripting / DisableSensors /
+  # DisableWindowsLocationProvider values were removed (was issue report #1).
+  # Find My Device is a separate feature: kept as a privacy opt-out only, and it
+  # does not block the Windows Location Provider.
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\FindMyDevice', value: 'AllowFindMyDevice', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\FindMyDevice', value: 'LocationSyncEnabled', type: REG_DWORD, data: '0'}

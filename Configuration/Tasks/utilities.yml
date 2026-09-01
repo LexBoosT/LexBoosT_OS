@@ -4,17 +4,6 @@ description: Post-finalization utility scripts for LexBoosT OS NexT
 privilege: TrustedInstaller
 actions:
   # ============================================
-  # APPLY HKCU TO ALL USER PROFILES (Default + offline)
-  # ============================================
-  - !status: {status: 'Applying HKCU Settings'}
-  - !run:
-      exeDir: true
-      exe: 'powershell.exe'
-      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\APPLYDUHIVE.PS1"'
-      runas: currentUserElevated
-      wait: true
-
-  # ============================================
   # DEPLOY ROLLBACK SCRIPT (copies ROLLBACK.PS1 to %ProgramData%\LexBoosTOS\Scripts
   # and registers the desktop context menu entry "Restore LexBoosT OS Backup")
   # ============================================
@@ -78,6 +67,13 @@ actions:
       wait: true,
       weight: 50,
     }
+
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEPLOYWELCOME.PS1"'
+      runas: currentUserElevated
+      wait: true
 
   # ============================================
   # END OF INSTALLATION - completion marker

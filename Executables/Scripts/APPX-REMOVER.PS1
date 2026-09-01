@@ -15,7 +15,6 @@
     [string]$SystemPhase
 )
 
-begin {
     # Admin check with explicit UAC request
     if (-not $SystemPhase -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         $pkgArg = if ($PackageCsv) { "-PackageCsv `"$PackageCsv`"" } else { "-Packages $($Packages -join ',')" }
@@ -27,7 +26,8 @@ begin {
         # Normalize package input: support both -Packages array and -PackageCsv (file path or comma-separated string)
         if (-not $Packages -and $PackageCsv) {
             if (Test-Path $PackageCsv) {
-                $Packages = Get-Content -Path $PackageCsv | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+                # Lines starting with '#' are comments and are skipped.
+                $Packages = Get-Content -Path $PackageCsv | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith('#') }
             } else {
                 $Packages = $PackageCsv -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
             }
@@ -405,9 +405,7 @@ public class TokenManipulator {
             return $false
         }
     }
-}
 
-process {
     try {
         # ===== SYSTEM purge phase (spawned via scheduled task) =====
         if ($SystemPhase) {
@@ -705,9 +703,7 @@ process {
         Write-Log '-' "Fatal error: $_"
         exit 1
     }
-}
 
-end {
     Write-Log '+' "AppX packages removed: $removedCount"
 
     # === POST-SNAPSHOT: save remaining AppX list and generate diff ===
@@ -733,4 +729,3 @@ end {
     catch {
         Write-Log '-' "Failed to generate post-snapshot: $_"
     }
-}

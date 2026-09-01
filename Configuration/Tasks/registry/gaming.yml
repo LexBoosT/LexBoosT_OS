@@ -3,9 +3,9 @@ title: Gaming
 description: Applies Gaming tweaks via registry values and scripts
 privilege: TrustedInstaller
 actions:
-  - !status: {status: 'Disabling Gamemode'}
-  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '0'}
+  - !status: {status: 'Enable Gamemode'}
+  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '1'}
 
   - !registryValue: {path: 'HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games', value: 'BackgroundPriority', type: REG_DWORD, data: '1'}
 

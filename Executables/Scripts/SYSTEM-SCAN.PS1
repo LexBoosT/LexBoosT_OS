@@ -14,12 +14,67 @@ try {
     $caption = $os.Caption
     $version = $os.Version
     $build = [System.Environment]::OSVersion.Version.Build
+    # Build exacte (avec révision UBR, ex. 26200.9267) lue depuis la base de registre
+    $ubr = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name UBR -ErrorAction SilentlyContinue).UBR
+    $exactBuild = if ($ubr) { "$build.$ubr" } else { [string]$build }
     $displayVersion = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name DisplayVersion).DisplayVersion
     Write-Info 'Windows Edition' "$caption"
     Write-Info 'Version' "$version (Display: $displayVersion)"
-    Write-Info 'Build' "$build"
+    Write-Info 'Build' "$exactBuild"
 } catch {
     Write-Info 'Windows Version' "Unable to retrieve"
+}
+
+# --- CPU ---
+try {
+    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
+    $maker = $cpu.Manufacturer
+    $model = $cpu.Name.Trim()
+    $cores  = $cpu.NumberOfCores
+    $threads = $cpu.NumberOfLogicalProcessors
+    $maxMHz = $cpu.MaxClockSpeed
+    # Frequence REELLE (turbo) = base x % of Maximum Frequency  (meme source que Task Manager)
+    $curGHz = 'N/A'
+    # Fréquence réel (turbo) = base x % (même source que Task Manager). Chaîne de repli
+    # sur plusieurs chemins de compteur, puis valeur nominale en dernier recours.
+    $counterPaths = @(
+        '\Processor Information(_Total)\% of Maximum Frequency',
+        '\Processor Information(\_Total)\% of Maximum Frequency',
+        '\Processor(*)\% Processor Performance'
+    )
+    $perfPct = $null
+    foreach ($cp in $counterPaths) {
+        try {
+            $sample = (Get-Counter $cp -ErrorAction Stop).CounterSamples | Select-Object -First 1
+            if ($sample -and $sample.CookedValue -gt 0) { $perfPct = $sample.CookedValue; break }
+        } catch { }
+    }
+    if ($perfPct) {
+        $curMHz = [math]::Round($maxMHz * $perfPct / 100.0)
+        $curGHz = "$([math]::Round($curMHz/1000,2)) GHz"
+    } else {
+        $nomMHz = $cpu.CurrentClockSpeed
+        $curGHz = "$([math]::Round($nomMHz/1000,2)) GHz (nominal)"
+    }
+    $sock = if ($cpu.SocketDesignation -and $cpu.SocketDesignation -notin @('CPU 0','Socket 0','Unknown')) { $cpu.SocketDesignation } else { 'N/A' }
+    $l2 = if ($cpu.L2CacheSize -gt 0) { [math]::Round($cpu.L2CacheSize/1024,1) } else { 0 }
+    $l3 = if ($cpu.L3CacheSize -gt 0) { [math]::Round($cpu.L3CacheSize/1024,1) } else { 0 }
+
+    # Plateforme : Intel / AMD / AMD 3D V-Cache
+    $platform = 'Unknown'
+    if ($maker -match 'Intel') { $platform = 'Intel' }
+    elseif ($maker -match 'AMD') {
+        if ($model -match 'X3D') { $platform = 'AMD (3D V-Cache)' } else { $platform = 'AMD' }
+    }
+
+    Write-Info 'CPU' "$model"
+    Write-Info 'CPU manufacturer' "$maker  ($platform)"
+    Write-Info 'CPU cores' "$cores physical / $threads logical"
+    Write-Info 'CPU clock' "base $([math]::Round($maxMHz/1000,2)) GHz - current $curGHz"
+    Write-Info 'CPU cache' "L2 $l2 MB / L3 $l3 MB"
+    Write-Info 'CPU socket' "$sock"
+} catch {
+    Write-Info 'CPU' "Unable to retrieve"
 }
 
 # --- RAM ---

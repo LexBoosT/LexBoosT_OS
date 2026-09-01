@@ -29,7 +29,7 @@ actions:
   - !scheduledTask: {path: '\Microsoft\Windows\Data Integrity Scan\Data Integrity Check And Scan', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan for Crash Recovery', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan', operation: disable}
-  - !scheduledTask: {path: '\Microsoft\Windows\Defrag\ScheduledDefrag', operation: disable}
+
   - !scheduledTask: {path: '\Microsoft\Windows\Device Setup\Metadata Refresh', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\DeviceDirectoryClient', operation: deleteFolder}
   - !scheduledTask: {path: '\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner', operation: disable}

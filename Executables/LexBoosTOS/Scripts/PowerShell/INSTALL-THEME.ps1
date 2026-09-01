@@ -1,4 +1,4 @@
-# Do NOT force Console.OutputEncoding / $OutputEncoding here. The playbook engine (AME)
+﻿# Do NOT force Console.OutputEncoding / $OutputEncoding here. The playbook engine (AME)
 # captures this script's stdout in the system code page; forcing UTF-8 output double-encodes
 # accented strings (seen as mojibake in install logs). Keep the native console encoding.
 

@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 
 [CmdletBinding()]
 param()
@@ -117,19 +117,37 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupProfile'; Name = 'EnableStartupTelemetry'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\WindowsStore'; Name = 'DisableStoreTelemetry'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\WinSAT'; Name = 'DisableWinSAT'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260'; Name = 'Variant'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260'; Name = 'VariantPayload'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260'; Name = 'VariantPayloadKind'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260'; Name = 'EnabledState'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\8\1694661260'; Name = 'EnabledStateOptions'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\System'; Name = 'EnableSharedPCMode'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'; Name = 'RestrictDriverInstallationToAdministrators'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\SQM'; Name = 'DisableCustomerImprovementProgram'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKCU\SOFTWARE\Policies\Microsoft\Internet Explorer\SQM'; Name = 'DisableCustomerImprovementProgram'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search'; Name = 'AllowCortana'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Policies\Microsoft\Windows\Windows Search'; Name = 'AllowCortana'; Value = '0'; Type = 'REG_DWORD' }
 )
 
-$set = 0
-foreach ($entry in $regValues) {
+function Write-RegValue {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        $Value,
+        [Parameter(Mandatory = $true)]
+        [string]$Type
+    )
+
+    # Attempt 1: native PowerShell registry provider
     try {
-        if (-not (Test-Path $entry.Path)) {
-            New-Item -Path $entry.Path -Force -ErrorAction Stop | Out-Null
+        if (-not (Test-Path $Path)) {
+            New-Item -Path $Path -Force -ErrorAction Stop | Out-Null
         }
-        $propType = switch ($entry.Type) {
+        $propType = switch ($Type) {
             'REG_SZ'        { 'String' }
             'REG_EXPAND_SZ' { 'ExpandString' }
             'REG_DWORD'     { 'DWord' }
@@ -137,10 +155,27 @@ foreach ($entry in $regValues) {
             'REG_NONE'      { 'None' }
             default         { 'String' }
         }
-        New-ItemProperty -Path $entry.Path -Name $entry.Name -Value $entry.Value -PropertyType $propType -Force -ErrorAction Stop | Out-Null
+        New-ItemProperty -Path $Path -Name $Name -Value $Value -PropertyType $propType -Force -ErrorAction Stop | Out-Null
+        return $true
+    }
+    catch {
+        # Attempt 2: reg.exe opens the key with minimal access (KEY_SET_VALUE) and
+        # succeeds on ACL-restricted keys such as ...\Search / ...\SearchSettings
+        # where the PowerShell registry provider is denied broader access.
+        $regPath = $Path -replace '^Registry::', ''
+        $regCmd = 'reg add "' + $regPath + '" /v "' + $Name + '" /t ' + $Type + ' /d "' + $Value + '" /f'
+        Invoke-Expression $regCmd 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) { return $true }
+        return $false
+    }
+}
+
+$set = 0
+foreach ($entry in $regValues) {
+    if (Write-RegValue -Path $entry.Path -Name $entry.Name -Value $entry.Value -Type $entry.Type) {
         $set++
-    } catch {
-        Write-Log '-' "Failed to set $($entry.Path)\$($entry.Name): $_"
+    } else {
+        Write-Log '-' "Failed to set $($entry.Path)\$($entry.Name)"
     }
 }
 

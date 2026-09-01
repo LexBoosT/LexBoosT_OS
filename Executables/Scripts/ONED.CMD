@@ -114,6 +114,11 @@ foreach ($bs in $bannerStorePaths) {
 # 3. Group Policy to disable OneDrive (prevents reinstall)
 New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Force -ErrorAction SilentlyContinue | Out-Null
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Name "DisableFileSyncNGSC" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+# Block Known File Types (KFM) OneDrive opt-in
+New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive" -Force -ErrorAction SilentlyContinue | Out-Null
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive" -Name "KFMBlockOptIn" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+New-Item -Path "HKCU:\SOFTWARE\Policies\Microsoft\OneDrive" -Force -ErrorAction SilentlyContinue | Out-Null
+Set-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\OneDrive" -Name "KFMBlockOptIn" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
 
 # 4. Run uninstallers
 if ($uninstallRegPaths.Count -ne 0) {

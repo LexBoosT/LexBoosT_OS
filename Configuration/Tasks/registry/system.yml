@@ -19,7 +19,7 @@ actions:
   - !run:
     exeDir: true
     exe: 'powershell.exe'
-    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES-TWEAKER-AUTO.PS1" -SkipImod'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES-TWEAKER-AUTO.PS1"'
     weight: 200
     wait: true
 
@@ -27,6 +27,14 @@ actions:
     exeDir: true
     exe: 'powershell.exe'
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\MMCSS-NIC.PS1"'
+    weight: 200
+    wait: true
+
+  # Intel APO (si Intel 12e gen+/Core Ultra) - no-op sur AMD
+  - !run:
+    exeDir: true
+    exe: 'powershell.exe'
+    args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\ENABLE-INTEL-APO.PS1"'
     weight: 200
     wait: true
 
