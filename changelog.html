@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ V26.08.1 / V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.09 / V26.08.1 / V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -160,6 +160,66 @@
 </nav>
 
 <div class="container">
+    <h1>LexBoosT OS&#8482; V26.09</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>47</strong> changements</div>
+        <div class="stat">&#x1FA9B; <strong>19</strong> fixes</div>
+        <div class="stat">&#x2728; <strong>24</strong> improvements</div>
+        <div class="stat">&#x1F185; <strong>2</strong> new features</div>
+        <div class="stat">&#x1F4A5; <strong>2</strong> breaking changes</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Clean per-physical-core IRQ affinity (DEVICES-TWEAKER-AUTO.PS1): each device (USB→GPU→NIC→…→audio on E-cores) gets its own full physical core (both SMT threads if HT on, else one) — no more straddling two cores. CPU 0 reserved, masks validated (no boot freeze), X3D/WiFi/STOR guards kept.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>HAGS unified ON: HwSchMode=2 applied once by GRAPHICS.PS1 (single source); conflicting handling removed from SYSTEM_TWEAKS.PS1.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Intel APO support (ENABLE-INTEL-APO.PS1, wired in system.yml): Intel 12th gen+/Core Ultra only, enables Intel DTT/APO when present, no-op on AMD (up to ~+14% FPS in supported 2025/2026 titles).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>SysMain (Superfetch) back to Automatic (services.yml, net stop removed) — faster app launches, no NVMe gaming impact.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>RSC unified OFF: Intel NIC RSC keys set to 0, consistent with the global rsc=disabled.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>DEVICES.PS1: topology-driven IRQ affinity (Get-EcoreLayout) instead of hardcoded masks; hybrid RSS base fixed + validated.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Updated DLSS files to 310.7.0.0 and Streamline to 2.12.0 in DLSS GLOM.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Force ForceDirectFlip for Nvidia/AMD/Intel Gpus.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Power Profile Changes to Nvidia Profiles for Laptop Maximum Performace &gt; Blanced.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Game Mode restored (AllowAutoGameMode/AutoGameModeEnabled=1) — needed for Game Bar/AMD to route games to the 3D V-Cache CCD; GameDVR recording stays off.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>DEVICES-TWEAKER-AUTO.PS1: manual CCD pinning disabled on AMD 3D V-Cache (AMD chipset driver + Game Bar handle it) — full P/E pool kept.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Kernel DPC/watchdog-off keys removed (DpcWatchdog*/DPCTimeout=0, Win32CalloutWatchdogBugcheckEnabled=0) — DPC guard-fences restored.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Aggressive ResourcePolicyStore block removed (~90 PolicySets set to Critical/Unmanaged/NoCap) — Windows defaults restored.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>bcdedit disableelamdrivers removed — boot anti-malware (ELAM) stays on.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Kernel DMA Protection DeviceEnumerationPolicy=0 removed — DMA protection restored.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>CPPCEnable=0 + AllowPepPerfStates=0 removed — native CPPC/pEP frequency control restored (key for AMD Zen/X3D).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>amdfendr/amdfendrmgr (AMD PPM driver) no longer disabled — AMD power management kept.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span>Removed winio.sys (kernel BYOVD, known CVEs) + the IMOD/xHCI phase and $WinioPath from DEVICES-TWEAKER-AUTO.PS1; dropped the now-useless -SkipImod from system.yml.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>CrossDeviceResume is now fully disabled on EVERY boot (CROSSDEVICERESUME.CMD + CROSSDEVICERESUME-KILL.PS1 + CROSSDEVICERESUME-KILL.exe). The one-shot taskkill was useless because sihost.exe (per-user SYSTEM service) respawns CrossDeviceResume.exe shortly after each user logon, and the binary lives in the NonRemovable MicrosoftWindows.Client.CBS package (cannot be removed; no registry/policy/ViVeTool toggle prevents it starting). The CMD kills the running instance and deploys the killer to persistent C:\ProgramData\LexBoosTOS\Scripts; the PS1 registers a persistent per-user LOGON task (delay PT30S, Hidden, runs-on-battery). The task action is CROSSDEVICERESUME-KILL.exe - a pure-C Win32 GUI-subsystem killer (CROSSDEVICERESUME-KILL.c, gcc -mwindows -static) that runs with NO console (a powershell.exe task action would flash a cmd window at logon) and is self-contained (KERNEL32 + system C runtime only - no .NET runtime, no companion .dll). Its 15x2 s retry loop catches sihost&#x27;s late spawn. Idempotent.</li>
+        <li><span class="tag tag-break">💥 BREAKING</span>Interrupt steering (InterruptSteeringFlags=2 + SUB_INTSTEER MODE=4) fully REMOVED from DEVICES.PS1 and DEVICES-TWEAKER-AUTO.PS1 (PHASE 7 deleted, no opt-in switch). Forcing it destabilized boot on some Windows builds / NVMe controllers; interrupt routing is left at Windows defaults.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Windows Location no longer hard-blocked by policy: DisableLocationScripting / DisableSensors / DisableWindowsLocationProvider removed from location.yml; DisableLocation=1 + Edge WebView2 DefaultGeolocationSetting=2 removed from telemetry.yml. Settings &gt; Location stays usable; Find My Device kept as a separate privacy opt-out.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Microsoft.BioEnrollment (Windows Hello Face) removed from APPX-REMOVE-LIST.TXT and no longer deleted from SystemApps in appx.yml — it is a required system component. APPX-REMOVER.PS1 now skips &#x27;#&#x27; comment lines in the list file.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Built-in AI/Copilot/GenAI disabled (telemetry.yml, SEARCH.PS1, ONED.CMD): WindowsAI + Office AI/Copilot + GenAI keys (~30 total — AllowCortana=0, KFMBlockOptIn=1).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Privacy: Storage Sense off (AllowStorageSenseGlobal=0 HKCU+HKLM), WebView2 Windows-Search index removed, lock-screen toasts off (LockScreenToastEnabled=0), Scoobe suggestions off (ScoobeSystemSettingEnabled=0).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Performance: HAGS (HwSchMode=2), GPU auto-color-management off (AutoColorManagementEnabled=0), prefetcher off (EnablePrefetcher=0), ServicesPipeTimeout=30000.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Windows Update: no auto-restart with logged-on users, drivers excluded from quality updates, driver co-installer disabled, Store auto-download off.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Accessibility &amp; sounds: Narrator Win+Enter launch off, high-contrast hotkey disabled (Flags=4194).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Targeted desktop-only USB/device energy-off (rewritten DISABLE-DEVICE-POWER-SAVING.PS1): USB selective suspend via power plan + existing per-device keys only; laptops skipped.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Modern Standby / Connected Standby disabled (CsEnabled=0, desktop) — uses legacy S3 (firmware S3 required).</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Windows Terminal removed from the AppX debloat list (APPX-REMOVE-LIST.TXT) — deployed/configured by TERMINAL.PS1.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Removed orphan PRIVILEGED-REGISTRY-TWEAKS.CMD (pointed to a missing .ps1, no caller).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>SYSTEM-SCAN.PS1: added CPU detection (brand, model, cores/threads, real turbo clock via perf counter, L2/L3 cache, socket, Intel/AMD/X3D) and the exact Windows build (base + UBR, e.g. 26200.9267).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>RUNTIMES.ps1: VC++ Redistributables installation replaced by abbodi1406 VisualCppRedist AIO — single VisualCppRedist_AIO_x86_x64.exe downloaded from the latest GitHub release (github.com/abbodi1406/vcredist/releases) and installed with `/ai /gm2` (replaces the 12 separate 2005–2015+ MS downloads/MSI extractions).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Packages Manager 2.5:</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Added npm.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Chocolatey self-update now runs in an elevated console (Verb=runas) so &quot;choco upgrade chocolatey&quot; can actually replace choco.exe.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module state is now persisted in %AppData%\INSTALLSOFTS\modules.json - installed modules are no longer re-scanned at every startup; they are only re-verified every 7 days to catch module updates.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Module/package checks now run on the real launch (Windows startup in the tray, or a manual launch); opening the app from the notification area no longer re-scans modules and no longer closes the window.</li>
+        <li><span class="tag tag-fix">🪛 FIX</span>Fixed a startup race - the window now hides to the notification area immediately (before the slow start-up checks), so it no longer closes itself right after being reopened from the tray the first time.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme and translation.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT GPU Tweaks:</li>
+        <li><span class="tag tag-new">🆕 NEW</span>A refresh button has been added next to the &quot;Open DLSS GLOM&quot; button to redownload the complete package for updating if needed. (There will be a note in the changelog regarding the DLSS version update).</li>
+        <li><span class="tag tag-new">🆕 NEW</span>Added DDU (Display Driver Uninstaller).</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>LexBoosT Pagefile Manager:</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Improved theme, fonctionnality and translation.</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Recommended Section Manager:</li>
+        <li><span class="tag tag-feat">✨ IMPROVEMENT</span>Renamed to Start Menu Manager and disable Show/Hide Recommended Section. Now just Backup and restore your Start Menu with this App.</li>
+    </ul>
+
     <h1>LexBoosT OS&#8482; V26.08.1</h1>
 
     <div class="stats">
@@ -591,7 +651,7 @@
 
 <footer>
     <div class="container" style="padding:0;">
-        <p>LexBoosT OS™ v26.08.1 / v26.08 / v26.07 / v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
+        <p>LexBoosT OS™ v26.09 / v26.08.1 / v26.08 / v26.07 / v26.06.2 / v26.06.1 / v26.06 — <a href="./">← Back to site</a></p>
     </div>
 </footer>
 
