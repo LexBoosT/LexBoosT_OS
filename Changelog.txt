@@ -1,3 +1,41 @@
+﻿# LexBoosT OS™ V26.09.1
+
+## Performance & latency (DWM / Kernel)
+- ✨ SYSTEM_TWEAKS.PS1: clock timer kernel keys added (KiClockTimerPerCpu=1, ClockTimerPerCpu=1, KiClockTimerHighLatency=0, ClockTimerHighLatency=0, KiClockTimerAlwaysOnPresent=1, ClockTimerAlwaysOnPresent=1). Potential gain: per-CPU clock timers (each core handles its own timer interrupts — less cross-core overhead), high-latency timer mode disabled (quicker timer responses), timers kept always active (no low-power states) → more consistent frame times and lower input latency.
+- ✨ DWM.PS1: DWM schedule master keys added (FrameRateMin=0xFFFFFFFF (removes the minimum frame rate cap (full uncapped rendering)), LingerInterval=0 (eliminates delay between frame presents (lower latency))).
+- ✨ Updated DLSS files to 310.9.0 and Streamline 2.14 in DLSS GLOM.
+- ✨ DEVICES-TWEAKER-AUTO.PS1: NIC (Ethernet) IRQ pinning upgraded to **2 distinct physical cores** (SMT-aware selection from the free-core pool, adaptive, no hardcoded core numbers) — RSS/DPC load can now genuinely spread across two cores instead of straddling SMT siblings. Multi-queue is left intact (no forced MessageNumberLimit, driver queues unchanged), the ≤8-threads LOWTHREADS guard no longer blocks the NIC pin (it still guards GPU/AUDIO, X3D/laptop guards kept), and a vendor-agnostic RSS probe (`_nicVendorRSS`) scans the PnP + service "Device Parameters" keys for any vendor RSS/queue/interrupt-moderation mask and confines it to the pinned NIC cores when numeric — driver-managed/UI-only knobs are reported, never forced (works on any vendor).
+- ✨ DEVICES-TWEAKER-AUTO.PS1: the **GPU now reserves the best physical P-core** (MSI + High priority + SpecCPU affinity, mask validated) — previously it fell in the generic round-robin and could share a core with a NIC or audio interrupt, a known source of frametime jitter.
+- ✨ DEVICES-TWEAKER-AUTO.PS1: **USB input latency** — the mouse/keyboard HID child has no `Interrupt Management` key; its interrupt is actually serviced by the **xHCI host controller**. The 3 xHCI controllers are now detected language-agnostically (PnPClass=`USB` + IM key present = xHCI, hubs excluded) and pinned to a **dedicated 2nd-best P-core** (MSI + High priority + SpecCPU, mask validated; the GPU keeps the best core, the reserved core is excluded from the NIC/audio round-robin). Reverses the 26.09.1 blanket "xHCI = MSI + priority only" for controllers only: validated masks, X3D/laptop guards kept.
+
+## Stability fixes
+- 🪛 IRQ affinity restricted to GPU + Ethernet classes (DEVICES-TWEAKER-AUTO.PS1): USB (xHCI) controllers and audio codecs are now "MSI + priority only" (no more AssignmentSetOverride) — reduces the boot-freeze risk reported since 26.08; X3D and laptop guards added (no affinity pinning on 3D V-Cache CPUs or portable chassis).
+- 🪛 `SystemApps\Windows.CBSPreview` removal reverted (appx.yml + APPX-REMOVE-LIST.TXT) — deleting a SystemApps component breaks servicing/Windows Update and can destabilize the next boot.
+- 🪛 CrashControl restored (FINALIZE3.CMD): `CrashDumpEnabled=2`, `LogEvent=1`, `AutoReboot=1` — a boot-time bugcheck reboots, dumps and logs again (no more machines frozen with no diagnostic).
+- 🪛 Legacy "delete all power schemes" block removed from DEVICES.PS1 (it only triggered on EN locale and destroyed Balanced/OEM schemes) — CPU-specific and Windows power schemes are preserved.
+- 🪛 LOW-LATENCY-PROFILE.PS1: real **26200.8728+** build guard (UBR value read) — no more unknown ViVeTool feature IDs activated on early 25H2 revisions (boot bugcheck).
+- 🪛 Update finalization tasks re-enabled (SCHEDULED-TASKS-DISABLE.PS1 + tasks.yml): `sih`/`sihboot`/`sihpostreboot`, full UpdateOrchestrator block (`Reboot*`, `Resume On Boot`, `USO_UxBroker*`, `Universal Orchestrator Start`…), `WaaSMedicAgent` + `PerformRemediation`, `InstallService\RestoreDevice`/`WakeUpAnd*` — the first boot "Working on updates" can finalize again (fix for the stall when updates were pending).
+- 🪛 Disk integrity tasks re-enabled: `Autochk\Proxy`, `Chkdsk\ProactiveScan`, `Data Integrity Scan*` — boot-time chkdsk recovery after unclean shutdown.
+- 🪛 APPX-REMOVER.PS1: `PendingFileRenameOperations` mechanism disabled (smss boot-time folder deletion) — `StateRepository` purge confirmed per-package targeted; locked folders stay and are retried on the next run.
+- 🪛 DEVICES.PS1: duplicate functions removed (`Set-NtfsConfiguration` ×2, `Set-MobileSyncOptimizations` ×2); `Set-IRQAffinity`/`Set-IRQPriority` purged (unwired since 26.09; the GPU→CPU0 mask was dangerous if run manually); `Get-EcoreLayout` kept (used by `Set-NDISOptimizer`).
+- 🪛 broker.yml re-wired: TimeBroker keys (X3D-guarded) + WinRT activation blocks (WindowsSearchTask, ValueBanner, GamingAI.Companion) applied again; graphics.yml re-wired (HAGS `HwSchMode=2` effective).
+- 🪛 Kernel DPC/timer tweak keys (`DpcQueueDepth`/`IdealDpcRate`/`MinimumDpcRate`, `SplitLargeCaches`, `ThreadDpcEnable`, `MaximumSharedReadyQueueSize`, `GlobalTimerResolutionRequests`, `KiClockTimer*`/`ClockTimer*`) are applied on ALL CPUs.
+- 🪛 Storage interrupt handling restored to 26.07 behavior (DEVICES-TWEAKER-AUTO.PS1): the 26.09 `APPLY.MSIOFF.STOR` block that forced `MSISupported=0` (INTx) on ALL storage controllers is REMOVED.
+
+## LexBoosT Shell (context menu)
+- 🪛 Context menu: the **Paste** icon no longer appears in the icon row when nothing is on the clipboard. Previously `modify.nss` moved Cut/Copy/Paste/Rename/Delete to the Win11 icon column with no condition, so Paste stayed visible even when there was nothing to paste. It is now shown only when the clipboard actually has content (`modify.where=!this.disabled and this.id(id.paste, id.paste_shortcut)`) — empty clipboard = no Paste entry, filled clipboard = Paste back in the icon row.
+
+## Windows AI
+- 💥 Removed the LexBoosT Windows Remove AI tool. It is now replaced by direct Windows AI removal at first installation of the playbook.
+
+## LexBoosT Launcher
+- ✨ Lex Snake and Vampire Rage are now downloaded by the Launcher on demand instead of being preinstalled in `C:\Windows\LexBoosTOS\Games`: when a game's files are missing, an orange download arrow (↓) is shown next to its name. Clicking the button downloads the game zip (with a live % progress) and extracts it into its folder — the app icon and name are then restored automatically (no need to click the window to refresh the icon).
+- ✨ The button label stays centered in every state; while a download is running the name is hidden and only the download arrow + % are shown, so progress is clearly readable.
+- ✨ The Launcher now always opens elevated: an app manifest (`requireAdministrator`) was added so UAC runs it as Administrator at every launch, giving its launched apps the highest available elevation (no more failed "run as administrator" on some buttons).
+
+## New Programm
+- 🆕 LexBoosT Wallpaper Manager: easily change your wallpaper and lock screen background.
+
 # LexBoosT OS™ V26.09
 
 ## Performance & latency
@@ -217,6 +255,7 @@
 - ✨ explorer.yml: ForegroundLockTimeout=0 (HKCU + .DEFAULT). Prevents background apps from stealing focus while typing in another window.
 - ✨ explorer.yml: AlwaysUnloadDll=1. Explorer frees RAM from unused DLLs instead of keeping them cached.
 - ✨ gaming.yml: Fullscreen Optimizations disabled (GameDVR_FSEBehaviorMode=2, GameDVR_HonorUserDSEBehaviorMode=1). Restores true Fullscreen Exclusive (DWM bypassed) to reduce input lag in games.
+- 🪛 dwm.yml: MaxQueuedPresentBuffers 2->3 (Windows default). Fixes upside-down desktop icons during drag-and-drop. FrameLatency removed (undocumented key interfering with DWM buffer synchronization).
 - 🪛 dwm.yml: MaxQueuedPresentBuffers 2→3 (Windows default). Fixes upside-down desktop icons during drag-and-drop. FrameLatency removed (undocumented key interfering with DWM buffer synchronization).
 - 🪛 explorer.yml: FR regional format block removed (sShortDate, sDecimal, iFirstDayOfWeek, etc.). Was forcing FR format for all users, breaking US, Chinese and other locales.
 - ✨ custom.yml + system.yml: Fast Startup enabled with reduced hiberfil (powercfg /h /type reduced, FastBoot=1). hiberfil.sys at ~20% of RAM instead of 40-75%. Eliminates black screen with spinner before logon, without sacrificing too much disk space.
@@ -257,6 +296,7 @@
 - 🪛 FINALIZE5.CMD: 230 schtasks /Disable lines removed (consolidated into SCHEDULED-TASKS-DISABLE.PS1). Kept WINEVT channel disable, QoS Bufferbloat task creation, Driver Install /Enable, and WU Orchestrator registry cleanup.
 - 🪛 NETWORK-EXTRAS.PS1: TaskScheduler section removed (MaintenanceConfigurator, IdleMaintenance, RegularMaintenance moved to SCHEDULED-TASKS-DISABLE.PS1).
 - 🪛 DISABLE_OFFICE_TASKS.PS1: Deleted. Office wildcard disable moved to SCHEDULED-TASKS-DISABLE.PS1.
+- 🪛 final.yml: DISABLE_OFFICE_TASKS.PS1 reference replaced by SCHEDULED-TASKS-DISABLE.PS1 (weight 50->200).
 - 🪛 final.yml: DISABLE_OFFICE_TASKS.PS1 reference replaced by SCHEDULED-TASKS-DISABLE.PS1 (weight 50→200).
 - ✨ telemetry.yml: 11 additional privacy/telemetry keys — Font Providers, Handwriting Error Reporting, Wi-Fi Sense, NCSI Passive Polling, OneDrive Camera Roll Upload, Startup Telemetry, Store Telemetry, WinSAT, Shared PC Mode, PointAndPrint hardening, IE SQM. No breakage — each key disables a specific telemetry channel.
 - ✨ telemetry.yml: 2 WER extras (DisableWerSendSecondLevelReports, DWEnabled/DrWatson) + 10 Microsoft Edge privacy policies (UsageTracking, MetricsReporting, NetworkPrediction, SwitchToTab sharing, TrackingPrevention=Strict, SearchSuggest, Collections transmission, PersonalizationReporting). No-op if Edge is removed; reinforces privacy if reinstalled.
@@ -331,6 +371,10 @@
 - 🪛 drivers.yml (removed): removed all ExcludeWUDriversInQualityUpdate entries (HKLM Policies, HKLM UX\Settings, HKCU Policies) — delegated to LexBoosT GPU Tweaks. Fixes "Partial" state on  LexBoosT GPU Tweaks System Tweaks button after playbook installation.
 - 🪛 WIPE_STARTMENU.PS1: fixed registry path resolution — replaced $hive.Name (returns bare "HKEY_USERS\S-...") with $hive.PSPath (returns "Microsoft.PowerShell.Core\Registry::HKEY_USERS\S-..."). The bare path caused Get-ItemProperty to silently fail, skipping all user hive processing (CloudStore tilegrid clearing, start.bin deletion, layout file copying). The wipe appeared to do nothing despite exiting cleanly.
 - 🪛 FILE_ASSOCIATIONS.PS1: fixed missing .bat, .cmd, .reg entries in New context menu — added parent extension keys (.bat, .cmd, .reg) to $regKeys before their ShellNew subkeys (were only creating subkeys, silently failing when parent didn't exist). Added default ProgID values (batfile, cmdfile, regfile) and PerceivedType removal for all 5 extensions (.bat, .cmd, .ps1, .reg, .vbs) to prevent Windows 10/11 from suppressing ShellNew entries.
+- 🪛 FINALIZE2.CMD Audio Tweaks: MMCSS Audio/ProAudio tasks deprioritized — Priority 8->1, GPU Priority 8->1, SFIO Priority High->Normal, Background Only True->False. Audio no longer steals CPU/GPU resources from games, fixing FPS drops when sound is active in Overwatch and other competitive FPS titles.
+- 🪛 audio.yml: GPU Priority 8->1, SFIO Priority High->Normal. Aligned with FINALIZE2.CMD to prevent audio/render resource contention.
+- ✨ gaming.yml: Games MMCSS Priority 6->8 (max, beats audio at 1). SystemResponsiveness 14%->10% — more CPU available for games, absolute safe minimum for audio.
+- 🪛 gaming.yml: DisableCoInstallers 1->0 — no longer breaks Realtek/Creative audio drivers. Broken audio drivers were causing CPU overload and FPS drops in games.
 - 🪛 FINALIZE2.CMD Audio Tweaks: MMCSS Audio/ProAudio tasks deprioritized — Priority 8→1, GPU Priority 8→1, SFIO Priority High→Normal, Background Only True→False. Audio no longer steals CPU/GPU resources from games, fixing FPS drops when sound is active in Overwatch and other competitive FPS titles.
 - 🪛 audio.yml: GPU Priority 8→1, SFIO Priority High→Normal. Aligned with FINALIZE2.CMD to prevent audio/render resource contention.
 - ✨ gaming.yml: Games MMCSS Priority 6→8 (max, beats audio at 1). SystemResponsiveness 14%→10% — more CPU available for games, absolute safe minimum for audio.
@@ -345,9 +389,10 @@
 - 🪛 HKCU registry propagation fixed: replaced all `HKEY_CURRENT_USER\` with `HKCU\` in mouse.yml and keyboard.yml (2 occurrences) and explorer.yml (1 occurrence). APPLYDUHIVE.PS1 pattern-matches `HKCU*` — the long form was silently skipped, causing mouse/keyboard settings to be missing from the registry after installation.
 - 🪛 APPLYDUHIVE.PS1 Get-UserProfilesOffline bug fixed: replaced `return` with `continue` inside ForEach-Object pipeline. `return` was terminating the entire pipeline at the first built-in profile (Default/Public), preventing all subsequent user profiles from being discovered and processed.
 - ✨ APPLYDUHIVE.PS1 now scans .CMD and .PS1 scripts for HKCU paths: previously only YAML files were scanned, causing ~45 HKCU values from FINALIZE1-3.CMD (notifications, accessibility, DeviceAccess, ContentDeliveryManager, etc.) and ~10 from VISUAL.PS1/OPTIMIZE-MOUSESMOOTHINGCURVES.PS1/ICONS_DESK.PS1 to be missing from Default User hive. Regex-based extraction covers both `HKCU\` and `HKEY_CURRENT_USER\` formats.
+- 🪛 IFEO priority conflicts fixed: aligned SYSTEM_TWEAKS.PS1 with system.yml — sihost.exe CpuPriority 1->2 (Normal, fixes Win11 taskbar lag), IoPriority 0->2 (Normal), ctfmon.exe CpuPriority 5->2 (Normal), csrss.exe CpuPriority 3->4 (Above Normal).
 - 🪛 IFEO priority conflicts fixed: aligned SYSTEM_TWEAKS.PS1 with system.yml — sihost.exe CpuPriority 1→2 (Normal, fixes Win11 taskbar lag), IoPriority 0→2 (Normal), ctfmon.exe CpuPriority 5→2 (Normal), csrss.exe CpuPriority 3→4 (Above Normal).
 - 🪛 NVIDIA EnableGR535 duplicate removed from gaming.yml: already handled by GPUTweaks (FTS Tweaks). GPUTweaks is now the single source of truth for all GPU driver tweaks (NVIDIA/AMD/Intel).
-- 🪛 Privacy Location conflict fixed: ConsentStore location set to Allow (was Deny→Allow→Deny due to duplicate entries). Apps requiring location access now work correctly.
+- 🪛 Privacy Location conflict fixed: ConsentStore location set to Allow (was Deny->Allow->Deny due to duplicate entries). Apps requiring location access now work correctly.
 - 🪛 InkWorkspace conflict fixed: AllowWindowsInkWorkspace set to 1 in FINALIZE3.CMD (was 0, conflicting with explorer.yml). Preserves stylus/pen compatibility.
 - ✨ BCD x2apicpolicy enable: added to DEVICES.PS1 Set-BcdOptimizations. Improves interrupt routing on modern CPUs (Intel 12th+, AMD Zen 3+).
 - ✨ BCD useplatformtick yes (AMD): added to DEVICES.PS1 Set-BcdOptimizations. Forces TSC as tick source on AMD CPUs for better timer precision.
@@ -371,6 +416,7 @@
 - 🆕 Disable Windows Transparency: New option in AME — "Disable Windows Transparency" under Visual options. Sets EnableTransparency=0 (HKCU\Themes\Personalize) to remove acrylic/blur effects on taskbar, Start menu, and window borders for a clean opaque look.
 - 🆕 Windows Update Granular Policies: AUPowerManagement=0 (no wake for updates), DeferFeatureUpdates=1 + 365 days, AUOptions=2 (notify before download), ExcludeWUDriversInQualityUpdate=1, TargetReleaseVersion=1.
 - ✨ DWM Optimization centralized: 60 registry keys consolidated from 5 files into 1 (registry\system\dwm.yml), sourced from verified community tweaks. Gain: unified DWM tuning, zero redundancy.
+- ✨ DWM Categories: Reorganized from A->K to sequential A->I. New Category B (Buffer & Sync) added; Schedule (E), Flip Model (F), MPO (G), Visual (H), MMCSS (I) renumbered accordingly.
 - ✨ DWM Categories: Reorganized from A→K to sequential A→I. New Category B (Buffer & Sync) added; Schedule (E), Flip Model (F), MPO (G), Visual (H), MMCSS (I) renumbered accordingly.
 - ✨ DWM Rendering Pipeline: disabled legacy rendering modes (DisallowNonDrawListRendering), caching (DisableDrawListCaching, EnableEffectCaching), and image processing (EnableImageProcessing). Enabled copy-on-present, scanout caching, virtual surface flattening, surface discard on minimize, and Advanced Direct Flip. Gain: lighter desktop compositing, ~1-3ms faster frame delivery.
 - ✨ DWM Buffer & Sync: buffer age set to 1 frame (DWM_MAX_BUFFER_AGE/DWM_MAXIMUM_BUFFER_AGE), triple buffering enabled (DWM_TRIPLE_BUFFER). Gain: tear-free desktop on all display types.
@@ -382,6 +428,7 @@
 - ✨ DWM Visual & Animations: thumbnail hibernation turned off (AlwaysHibernateThumbnails=0). Gain: saved GPU memory.
 - 🪛 DWM Corrections: License activation popups (DisableSpecificPopups, DisableExpirationPopups, HideBalloonNotification, DontAskAgain, LicenseInterval) removed from DWM config — these are license-related, not DWM. HighColor set to 1 (30-bit 10bpc HDR preserved). EnableDesktopOverlays set to 1 (Discord/Steam/VLC overlays functional). MegaRects (EnableMegaRects, MegaRectSize, MegaRectSearchCount) removed — Windows manages partial redraw by default.
 - ✨ MMCSS Scheduling consolidated into gaming.yml: SystemProfile root, Games task, and Window Manager task all in one file. Window Manager GPU Priority lowered from 8 to 6 (avoids conflict with Games=8). Window Manager Clock Rate lowered from 10000 to 2000 (avoids CPU overhead). dwm.yml MMCSS section removed.
+- 🪛 AllowTelemetry consolidated: 5 paths -> 1 (HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection only). MaxTelemetryAllowed duplicates removed.
 - 🪛 AllowTelemetry consolidated: 5 paths → 1 (HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection only). MaxTelemetryAllowed duplicates removed.
 - 🪛 Paint AI keys consolidated: nonstandard CurrentVersion\Policies\Paint removed, only GP path Policies\Microsoft\Paint kept.
 - 🪛 AllowUseDirectFlip removed from gaming.yml (redundant with DisableIndependentFlip in dwm.yml).
@@ -396,6 +443,8 @@
 - ✨ Disable ESP padding (potentially reduces latency on some UEFI systems).
 - ✨ Defender Optimization: scheduled scans disabled, catch-up scans disabled, scan only when idle, restore point before scan disabled, IOAV download scanning disabled, scan-on-realtime-enable skipped, signature updates reduced to every 24h, common paths/extensions/processes excluded (exe/dll/sys/log/game formats). Gain: less msmpeng.exe CPU/disk I/O during gaming, fewer hard pagefaults from real-time scanning.
 - ✨ Disable WMI AutoLoggers: 27 additional ETW trace sessions (DefenderApi/Audit, ReadyBoot, Tpm, FaceTel, Holographic, TCPIP, Spooler, WiFiDriver×4, WMI_Traces, Setup, OOBE, FilterMgr, etc.) — 41 total autologgers disabled. Gain: further CPU/disk I/O reduction from stopped kernel trace sessions.
+- 🪛 WMI Autologger ControlSet001 -> CurrentControlSet: all 14 entries in telemetry.yml and 2 in telemetry.yml now use CurrentControlSet (survives boot from alternate control set).
+- ✨ Adjust CPU/I/O priorities: fontdrvhost.exe/lsass.exe/sihost.exe/sppsvc.exe -> Idle, csrss.exe -> Normal/High I/O, ctfmon.exe/SearchIndexer.exe -> High — reduces CPU contention from background services.
 - 🪛 WMI Autologger ControlSet001 → CurrentControlSet: all 14 entries in telemetry.yml and 2 in telemetry.yml now use CurrentControlSet (survives boot from alternate control set).
 - ✨ Adjust CPU/I/O priorities: fontdrvhost.exe/lsass.exe/sihost.exe/sppsvc.exe → Idle, csrss.exe → Normal/High I/O, ctfmon.exe/SearchIndexer.exe → High — reduces CPU contention from background services.
 - ✨ Disable CrossDeviceResume.exe via debugger trick (auto-kill on launch) — prevents cross-device resume overhead.
@@ -441,10 +490,10 @@
 - 🪛 webthreatdefsvc comment clarified: keep Automatic while Defender is active.
 - 🪛 FIX: LexBoosT Easy Move User Folders — AppData folder movement was broken (checkbox display name "⚠ AppData" didn't match the dictionary key "AppData"). Fixed by storing the real folder name in CheckBox.Tag. Fixed Documents folder junction point creation by safely deleting only empty subdirectories. Added same-path protection to prevent data loss when source and destination are identical.
 - ✨ BCD Optimizations refactored: all bcdedit commands consolidated into Set-BcdOptimizations function in DEVICES.ps1 with per-CPU conditional logic. Core optimizations (5-level paging off, firstmegabytepolicy UseAll, stale entry cleanup) applied unconditionally. Timer/scheduling optimizations (disabledynamictick yes, useplatformclock/USEplatformtick no on Intel only, tscsyncpolicy enhanced) skipped on AMD 3D V-Cache dual-CCD (>8 cores) to preserve Windows CCD coordination for proper core scheduling.
-- 🪛 APPX-REMOVER.ps1: TokenManipulator kernel handle leak fixed (Marshal.FreeHGlobal → CloseHandle). 32-bit WOW6432Node registry paths added for AppX cleanup. $removedCount now verified before increment.
+- 🪛 APPX-REMOVER.ps1: TokenManipulator kernel handle leak fixed (Marshal.FreeHGlobal -> CloseHandle). 32-bit WOW6432Node registry paths added for AppX cleanup. $removedCount now verified before increment.
 - 🪛 APPX-REMOVER.ps1: wildcard path protection added — package cleanup skipped if $packageFamilyName is empty/null. SystemApps path check now rejects junction/symlink targets.
 - 🪛 Set-RegistryValue in DEVICES.ps1: all registry types (DWORD, String, QWORD, MultiString, ExpandString, Binary) now explicitly handled; MultiString values properly cast to [string[]].
-- 🪛 RUNTIMES.ps1: VC++ detection refactored — uses registry view (x64→native, x86→WOW6432Node) instead of fragile DisplayName string matching. Winget install now verified via Test-CommandAvailable. DirectX detection expanded to 6 DLLs, logic relaxed (any DLL found = installed).
+- 🪛 RUNTIMES.ps1: VC++ detection refactored — uses registry view (x64->native, x86->WOW6432Node) instead of fragile DisplayName string matching. Winget install now verified via Test-CommandAvailable. DirectX detection expanded to 6 DLLs, logic relaxed (any DLL found = installed).
 - 🪛 EDGE.ps1: $env:windir="" now wrapped in try/finally — windir restored on all code paths (previously commented out restoration line, left windir empty on early returns).
 - 🪛 DisableCoInstallers warning added: documents that it breaks Realtek/Creative audio drivers and specialty hardware.
 - 🪛 SystemResponsiveness raised from 10 to 14 (safe minimum for audio — prevents crackling on DAC/USB devices).
@@ -539,7 +588,7 @@ so all four files were patched to restore connectivity - users can now sign in t
 - 💥 Delete SSD Optimization in playbook install, cause too long install if you have much SSD.
 - ✨ Reactivating clipboard history.
 - 🪛 Fix SaveZoneInformation (value 2): allows third-party software (e.g. Lenovo Legion Toolkit) to run without being blocked by the downloaded file restriction policy.
-- 🪛 LexBoosT Packages Manager: Fixed winget installation: replaced non-functional RegisterByFamilyName command with full dependency chain (VCLibs + UI.Xaml) + dual fallback (aka.ms/getwinget → GitHub latest release) + PATH refresh without restart.
+- 🪛 LexBoosT Packages Manager: Fixed winget installation: replaced non-functional RegisterByFamilyName command with full dependency chain (VCLibs + UI.Xaml) + dual fallback (aka.ms/getwinget -> GitHub latest release) + PATH refresh without restart.
 - 🪛 LexBosT Defender Manager : Certificate EKU validation (1.3.6.1.4.1.311.10.3.6) now blocks installation on invalid cert instead of silently continuing, and ARM64 detection now checks both environment variable and WMI Win32_ComputerSystem.
 - 🪛 Fix agressive DWM Tweaks (when moving the desktop icons, tended to be upside down).
 - 🪛 Disables the desktop in a separate process (tended to move your icons if a file\shortcut appeared).
@@ -633,7 +682,7 @@ so all four files were patched to restore connectivity - users can now sign in t
 	- 🪛 Leaderboard UI not refreshing.
 	- ✨ Reset Leaderboard button.
 	- ✨ Hover effect on Mute and Reset Leaderboard buttons.
-	- ✨ 3-state Mute cycling: The Mute button now cycles through: 🔊 Mute → 🔇 Unmute (all muted) → 🎵 Mute Music → 🔊 Mute SFX.
+	- ✨ 3-state Mute cycling: The Mute button now cycles through: 🔊 Mute -> 🔇 Unmute (all muted) -> 🎵 Mute Music -> 🔊 Mute SFX.
 	- ✨ Separate 2-player leaderboard — The service maintains two independent leaderboards (Single Player and 2 Players), saved in the same JSON file. A label under “LEADERBOARD” shows the active mode.
 	- ✨ "2 Players" and "Retro Mode" checkboxs is now disabled during gameplay.
 	- ✨ Instant score panel update — Checking/unchecking “2 Players” immediately updates the “P2: 0” display and the leaderboard label without starting a game.
@@ -853,7 +902,7 @@ https://ko-fi.com/post/LexBoosT-OS-V6-6-J3J31VT8CY
 - Uses Windows default watchdog thresholds for maximum stability.
 - Prevents large page memory allocation failures.
 - Windows automatically manages memory pools based on your hardware.
-- Prevents memory shortage errors (fixed 192MB → automatic).
+- Prevents memory shortage errors (fixed 192MB -> automatic).
 - Eliminates 64-bit PAE incompatibility BSODs.
 - Enables Control Flow Guard protection against memory corruption.
 - Prevents random system crashes from excessive SystemPages.
@@ -989,7 +1038,7 @@ https://ko-fi.com/post/LexBoosT-OS-V6-4-E1E71V5YFA
 - Internet Optimizations:
 	- Disables Unicast Response Optimization. (Prevents Windows from responding to UDP broadcast packets with a unicast (reduces unnecessary network interruptions)).
 	- Disables Receive Segment Coalescing on UDP (RSC for UDP) (Prevents UDP packet merging, which adds latency (especially visible on CS2, Valorant, Quake-like)).
-	- Disables UDP checksum offload on the network card (sometimes useful) (Forces the CPU to calculate checksums → more stability on certain lousy drivers (Realtek/Killer especially)).
+	- Disables UDP checksum offload on the network card (sometimes useful) (Forces the CPU to calculate checksums -> more stability on certain lousy drivers (Realtek/Killer especially)).
 	- Disable Gro (Generic Receive Offload) on UDP (Very effective on Intel i225/i226 cards and the new Killer which add 2-8 ms of latency with GRO activated).
 	- Force “low latency” mode of the UDP stack (Hidden option since Windows 11 24H2, reduces internal UDP buffering (1-4 ms gain on 240+ Hz games)).
 	- Completely disables UDP flow control (avoids unnecessary pauses).
@@ -1362,4 +1411,3 @@ https://ko-fi.com/post/LexBoosT-OS-V6-4-E1E71V5YFA
 - Collection of Powerplan (in LexBoosT OS Folder in Desktop)
 - Add Winmerge and Godot Engine in LexBoosT Ultimate Toolbox
 - Others little adjustments
-
