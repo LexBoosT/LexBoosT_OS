@@ -68,6 +68,17 @@ if (Test-IsIntelCPU) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaxDynamicTickDuration' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
 }
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaximumSharedReadyQueueSize' /t REG_DWORD /d 128 /f 2>&1 | Out-Null
+# ================================================
+# CLOCK TIMER SETTINGS (KERNEL) - Performance
+# ================================================
+Write-Log '+' 'Applying clock timer kernel tweaks...'
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClockTimerPerCpu' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerPerCpu' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClockTimerHighLatency' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerHighLatency' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClockTimerAlwaysOnPresent' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerAlwaysOnPresent' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+
 
 # ================================================
 # D3D11-D3D12 DIRECTX TWEAKS
@@ -194,9 +205,7 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverride' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverrideMask' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 
-
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'GlobalTimerResolutionRequests' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
-
 
 # DisableDiagnosticTracing
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Diagnostics\Performance' /v 'DisableDiagnosticTracing' /t REG_DWORD /d 1 /f 2>&1 | Out-Null

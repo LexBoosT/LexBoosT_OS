@@ -158,24 +158,8 @@ _log "SCAN: $($rawDevices.Count) present PnP devices"
 
 $physicalDisks = Get-CimInstance Win32_DiskDrive -EA SilentlyContinue
 
-# USB role detection: enumerate children of USB controllers
-function _usbRoles($deviceId) {
-    $roles = [System.Collections.Generic.List[string]]::new()
-    $norm = $deviceId -replace '\\\\','\'
-    foreach ($svc in @('kbdhid','kbdclass','mouhid','mouclass','hidusb')) {
-        try {
-            $found = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Enum\$norm" -Recurse -Depth 2 -EA SilentlyContinue |
-                Where-Object { (Get-ItemProperty $_.PSPath -Name Service -EA SilentlyContinue).Service -eq $svc } | Select-Object -First 1
-            if ($found) {
-                $role = if ($svc -in @('kbdhid','kbdclass')) { 'Keyboard' }
-                        elseif ($svc -in @('mouhid','mouclass')) { 'Mouse' }
-                        else { 'HID' }
-                if ($role -notin $roles) { [void]$roles.Add($role) }
-            }
-        } catch {}
-    }
-    return $roles -join ', '
-}
+# USB role detection REMOVED by policy (USB stock): USB controllers never reach
+# classification, so their child roles (keyboard/mouse/HID) are no longer probed.
 
 # Audio endpoint detection
 function _audioEndpoints($deviceId, $name) {
@@ -210,11 +194,15 @@ foreach ($dev in $rawDevices) {
     if ($dclass -eq 'Display' -and ($dname -match '(?i)VirtualBox' -or $did -match 'VEN_80EE')) { continue }
     if ($dclass -eq 'USB' -and $did -match '(?i)\\VEN_10DE\\') { _log "SCAN.SKIP.NVIDIA.USB: $did"; continue }
     if ($dclass -eq 'Net' -and $dname -match '(?i)(Wi-?Fi|Wireless|802\.11|WLAN)') { _log "SCAN.SKIP.WIFI: $did"; continue }
+    # POLICY 2026 (USB stock): every USB controller/hub is left at Windows defaults:
+    # no MSI forcing, no DevicePriority, no affinity, no IMOD - USB is untouched.
+    if ($dclass -eq 'USB' -and -not (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Enum\$did\Device Parameters\Interrupt Management")) { _log "SCAN.SKIP.USB.POLICY: $did (USB left 100% stock)"; continue }
 
     # Classification
     $kind = 'OTHER'; $isWifi = $false; $isXhci = $false; $isCx = $false
-    if ($dclass -eq 'USB' -or $dname -match '(?i)xHCI|Host Controller') { $kind = 'USB'; $isXhci = $dname -match '(?i)xHCI|Host Controller' }
-    elseif ($dclass -eq 'Display') { $kind = 'GPU' }
+    # USB (xHCI/controllers/hubs) never reaches classification: excluded earlier
+    # via SCAN.SKIP.USB.POLICY - USB is left 100% stock (no MSI/priority/affinity).
+    if ($dclass -eq 'Display') { $kind = 'GPU' }
     elseif ($dclass -eq 'Net') {
         # Detect NetAdapterCx vs NDIS
         try {
@@ -233,6 +221,8 @@ foreach ($dev in $rawDevices) {
     }
     elseif ($dclass -in @('SCSIAdapter','HDC','IDE','Storage')) { $kind = 'STOR' }
     elseif ($dclass -in @('MEDIA','AudioEndpoint') -or $dname -match '(?i)High Definition Audio|HD Audio|Audio Controller') { $kind = 'AUDIO' }
+    elseif ($dclass -eq 'HID' -and $dname -match '(?i)mouse|USB Input Device') { $kind = 'MOUSE' }
+    elseif ($dclass -eq 'USB') { $kind = 'XHCI' }  # IM key present (checked below) -> xHCI host controller
 
     if ($kind -eq 'OTHER') { _log "SCAN.SKIP.OTHER: $did class=$dclass"; continue }
 
@@ -243,10 +233,6 @@ foreach ($dev in $rawDevices) {
 
     $usbRoles = ''; $audioEndpoints = ''; $isIntegratedGpu = $false; $diskTag = ''
 
-    if ($kind -eq 'USB') {
-        $usbRoles = _usbRoles $did
-        if (-not $usbRoles) { _log "SCAN.SKIP.USB.NOROLES: $did"; continue }
-    }
     if ($kind -eq 'AUDIO') { $audioEndpoints = _audioEndpoints $did $dname }
     if ($kind -eq 'GPU') { $isIntegratedGpu = $dname -match '(?i)(Intel.*UHD|Intel.*HD Graphics|AMD Radeon.*Graphics\s*$|AMD Radeon\(TM\) Graphics)' }
     if ($kind -eq 'STOR') {
@@ -266,7 +252,7 @@ foreach ($dev in $rawDevices) {
     _log "SCAN: $kind $did name=$dname usbRoles=$usbRoles audio=$audioEndpoints wifi=$isWifi iGPU=$isIntegratedGpu cx=$isCx"
 }
 
-$Devices = @($Devices | Sort-Object { @{USB=1;GPU=2;AUDIO=3;NET_NDIS=4;NET_CX=4;STOR=5}[$_.Kind] }, 'Name')
+$Devices = @($Devices | Sort-Object { @{MOUSE=1;XHCI=1;GPU=2;AUDIO=3;NET_NDIS=4;NET_CX=4;STOR=5}[$_.Kind] }, 'Name')
 _info "Scanned $($Devices.Count) tunable devices | WiFi=$($WifiIdSet.Count)"
 
 # ──────────────────────────────────────────────
@@ -275,9 +261,8 @@ _info "Scanned $($Devices.Count) tunable devices | WiFi=$($WifiIdSet.Count)"
 _info "=== PHASE 4: Device Filtering ==="
 $SkipAutoIds = @{}; $MsiOnlyGpuIds = @{}
 
-foreach ($d in $Devices | Where-Object Kind -eq USB) {
-    if (-not $d.UsbRoles) { $SkipAutoIds[$d.InstanceId] = $true; _log "AUTO.SKIP.USB: $($d.InstanceId) (no HID)" }
-}
+# USB filtering block removed by policy (2026, USB stock): USB devices never
+# enter $Devices, so no USB controller can reach MSI/priority/affinity paths.
 foreach ($d in $Devices | Where-Object Kind -eq GPU) {
     if ($d.IsIntegratedGpu) { $MsiOnlyGpuIds[$d.InstanceId] = $true; _log "AUTO.MSIONLY.GPU: $($d.InstanceId)" }
 }
@@ -297,9 +282,9 @@ foreach ($d in $Devices | Where-Object Kind -eq AUDIO) {
 _info "=== PHASE 5: CPU Assignment ==="
 
 $orderedDevices = $Devices |
-    Where-Object { -not $WifiIdSet.ContainsKey($_.InstanceId) -and -not $SkipAutoIds.ContainsKey($_.InstanceId) -and -not $MsiOnlyGpuIds.ContainsKey($_.InstanceId) -and $_.Kind -ne 'STOR' }
+    Where-Object { -not $WifiIdSet.ContainsKey($_.InstanceId) -and -not $SkipAutoIds.ContainsKey($_.InstanceId) -and -not $MsiOnlyGpuIds.ContainsKey($_.InstanceId) -and $_.Kind -ne 'STOR' -and $_.Kind -ne 'MOUSE' -and $_.Kind -ne 'GPU' -and $_.Kind -ne 'XHCI' }
 
-$prioMap = @{ USB = 1; GPU = 2; NET_NDIS = 3; NET_CX = 3; STOR = 4; AUDIO = 5 }
+$prioMap = @{ GPU = 2; NET_NDIS = 3; NET_CX = 3; STOR = 4; AUDIO = 5 }
 $orderedDevices = @($orderedDevices | Sort-Object { $prioMap[$_.Kind] })
 
 _log "AUTO.ORDER: $($orderedDevices.Count) devices for affinity assignment"
@@ -330,6 +315,54 @@ function Test-AffinityMaskValid {
     return $true
 }
 
+# NIC vendor RSS confinement (vendor-agnostic): the PnP AssignmentSetOverride bounds the
+# initial MSI-X vector affinity. The DPC RSS (real packet work) targets the processors in the
+# vendor's RSS-enabled list, which by default is ALL cores. This finds that vendor knob (PnP or
+# service Device Parameters) and, if it exists as a numeric mask, confines it to the NIC's pinned
+# cores. Reports only otherwise (some drivers manage RSS in the UI only). Read-only in DryRun.
+function _nicVendorRSS { param($d, $mask)
+      $rb = "HKLM:\$($d.RegBase)"   # RegBase is relative; needs the HKLM:\ prefix
+    $svc = $null
+    try { $svc = (Get-ItemProperty -Path $rb -ErrorAction SilentlyContinue).Service } catch {}
+    $svcDP = if ($svc) { "HKLM:\SYSTEM\CurrentControlSet\Services\$svc\Device Parameters" } else { $null }
+    $bases = @("$rb\Device Parameters", $svcDP) | Where-Object { $_ -and (Test-Path $_) }
+    $found = @(); $candidates = @()
+    foreach ($base in $bases) {
+        $keys = @($base) + @((Get-ChildItem $base -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.PSPath }))
+        foreach ($k in $keys) {
+            $vals = Get-ItemProperty -Path $k -ErrorAction SilentlyContinue
+            if (-not $vals) { continue }
+            foreach ($m in ($vals | Get-Member -ErrorAction SilentlyContinue)) {
+                if ($m.Name -match '^(PSChildName|PSDrive|PSScriptRoot|PSParent|PSPath)$') { continue }
+                if ($m.Name -match 'RSS|Queue|Vendor|Moderation|IntMod|MessageNumber') { $found += ("{0}\{1}" -f (Split-Path $k -Leaf), $m.Name) }
+                if ($m.Name -match 'RSS') {
+                    $v = $vals | Select-Object -ExpandProperty $m.Name -ErrorAction SilentlyContinue
+                    if ($null -ne $v -and ($v -is [int] -or $v -is [long] -or $v -is [uint32] -or $v -is [uint64])) {
+                        $candidates += [ordered]@{ K = $k; N = $m.Name }
+                    }
+                }
+            }
+        }
+    }
+    if ($DryRun) {
+        if ($candidates.Count) { $ct = ($candidates | ForEach-Object { "{0}\{1}" -f (Split-Path $_.K -Leaf), $_.N }) -join '; '; _log "DRYRUN NIC-RSS: $($d.InstanceId) -> would confine RSS mask 0x$($mask.ToString('X')) on: $ct" }
+        elseif ($found.Count) { _log "DRYRUN NIC-RSS: $($d.InstanceId) svc=$svc -> vendor knobs present: $($found -join '; ')" }
+        else { _warn "DRYRUN NIC-RSS: $($d.InstanceId) svc=$svc -> no RSS/queue knob in registry (driver-managed / UI-only). PnP 2-core pin is the registry-level confine." }
+        return
+    }
+    if ($candidates.Count) {
+        foreach ($c in $candidates) {
+            Set-ItemProperty -Path $c.K -Name $c.N -Value ([UInt64]$mask) -Force -ErrorAction SilentlyContinue
+            _log "NIC-RSS: $($d.InstanceId) -> confined {0}\{1} = 0x{2:X}" -f (Split-Path $c.K -Leaf), $c.N, ([UInt64]$mask)
+        }
+    }
+    elseif ($found.Count) {
+        _log "NIC-RSS: $($d.InstanceId) svc=$svc -> vendor knobs present (not a numeric RSS mask, left as-is): $($found -join '; ')"
+    }
+    else {
+        _warn "NIC-RSS: $($d.InstanceId) svc=$svc -> no RSS/queue/moderation knob in registry (driver-managed / UI-only). PnP 2-core pin is the registry-level confine."
+    }
+}
 $physCores = @(Get-PhysicalCores)
 # Reserver le coeur contenant CPU 0 (systeme/timer) tant qu'il reste assez de coeurs.
 $pool = @($physCores | Where-Object { $_.LPS -notcontains 0 })
@@ -338,25 +371,99 @@ if ($pool.Count -lt 2) { $pool = @($physCores) }
 $lowThreadCpu = ($CpuInfo.Logical -le 8)
 if ($lowThreadCpu) { _warn "AUTO.LOWTHREADS: $($CpuInfo.Logical) logical processors - interrupt AFFINITY pinning skipped (MSI + priority only)." }
 
+$isLaptopChassis = $false
+try {
+    $chassis = Get-CimInstance Win32_SystemEnclosure -EA SilentlyContinue | Select-Object -ExpandProperty ChassisTypes
+    $mobileTypes = @(8,9,10,11,12,14,18,21,30,31)
+    if ($chassis -and ($chassis | Where-Object { $mobileTypes -contains $_ })) { $isLaptopChassis = $true }
+} catch { $isLaptopChassis = $false }
+if ($isLaptopChassis) { _warn "AUTO.LAPTOP: portable chassis - interrupt AFFINITY pinning skipped (MSI + priority only)." }
+if ($IsAmdX3D) { _warn "AUTO.X3D: AMD 3D V-Cache - interrupt AFFINITY pinning skipped (MSI + priority only)." }
+$skipAffinity = $lowThreadCpu -or $IsAmdX3D -or $isLaptopChassis
+
 _log "AUTO.CPU: physical cores = [$($pool | ForEach-Object { $_.LPS -join '+' })], SMT=$($CpuInfo.SMT)"
+
+# ---------------------------------------------------------------------------
+# GPU (dedicated core): the graphics driver interrupt/DPC path is the biggest
+# source of frametime jitter. Pin it to the BEST P-core (pool[0]) - the same
+# heuristic AutoGpuAffinity benchmarks for (best single-core perf), without the
+# 20-min PresentMon run. Core 0 is already excluded (system/timers). The GPU core
+# is reserved: no NIC/storage/audio interrupt shares it. Mouse takes pool[1].
+# ---------------------------------------------------------------------------
+$gpuEntries = @($Devices | Where-Object { $_.Kind -eq 'GPU' -and -not $MsiOnlyGpuIds.ContainsKey($_.InstanceId) })
+if ($gpuEntries.Count -and $pool.Count -ge 1) {
+    $gpuCore = $pool[0]
+    $gpuLps = @($gpuCore.LPS)
+    $gpuMask = [UInt64]0
+    foreach ($l in $gpuLps) { $gpuMask = $gpuMask -bor ([UInt64]1 -shl $l) }
+    $gpuValid = (Test-AffinityMaskValid -Mask $gpuMask -LogicalCount $CpuInfo.Logical)
+    foreach ($d in $gpuEntries) {
+        [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$gpuLps; Mask=$gpuMask; Policy='SpecCPU'; Prio='High'; AffinityValid=$gpuValid })
+        _ok "AUTO.GPU: $($d.Name) -> Core=$($gpuLps -join '+') Mask=0x$($gpuMask.ToString('X')) valid=$gpuValid"
+    }
+    if ($pool.Count -ge 2) {
+        $pool = @($pool | Where-Object { ($_.LPS -join '+') -ne ($gpuCore.LPS -join '+') })
+        _log "AUTO.GPU.RESERVE: core [$($gpuCore.LPS -join '+')] reserved - GPU dedicated (best P-core)"
+    } else {
+        _log "AUTO.GPU.SHARE: single-core pool - GPU shares core (no reservation possible)"
+    }
+} elseif ($gpuEntries.Count) {
+    _warn "AUTO.GPU: no core in pool - GPU MSI + priority only"
+}
+# ---------------------------------------------------------------------------
+# INPUT (USB mouse / keyboard): the HID child device has no IM key; its
+# interrupt is serviced by the xHCI host controller (the USB-class device WITH
+# an IM key). Pin that controller's IRQ/DPC to a dedicated physical core (MSI +
+# High priority + affinity). The GPU already owns the best P-core, so the input
+# takes the next best (pool[0] now = 2nd best). That core is reserved: no
+# NIC/storage/audio interrupt is assigned to it, so the input IRQ/DPC path is
+# never preempted by a network burst or a GPU interrupt.
+# ---------------------------------------------------------------------------
+$inputEntries = @($Devices | Where-Object { $_.Kind -eq 'XHCI' })
+if ($inputEntries.Count -and $pool.Count -ge 1) {
+    $inputCore = $pool[0]
+    $inputLps = @($inputCore.LPS)
+    $inputMask = [UInt64]0
+    foreach ($l in $inputLps) { $inputMask = $inputMask -bor ([UInt64]1 -shl $l) }
+    $inputValid = (Test-AffinityMaskValid -Mask $inputMask -LogicalCount $CpuInfo.Logical)
+    foreach ($d in $inputEntries) {
+        [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$inputLps; Mask=$inputMask; Policy='SpecCPU'; Prio='High'; AffinityValid=$inputValid })
+        _ok "AUTO.INPUT: $($d.Name) -> Core=$($inputLps -join '+') Mask=0x$($inputMask.ToString('X')) valid=$inputValid"
+    }
+    if ($pool.Count -ge 2) {
+        $pool = @($pool | Where-Object { ($_.LPS -join '+') -ne ($inputCore.LPS -join '+') })
+        _log "AUTO.INPUT.RESERVE: core [$($inputCore.LPS -join '+')] reserved - USB input dedicated (2nd best P-core)"
+    } else {
+        _log "AUTO.INPUT.SHARE: single-core pool - USB input shares core (no reservation possible)"
+    }
+} elseif ($inputEntries.Count) {
+    _warn "AUTO.INPUT: no core in pool - USB input MSI + priority only"
+}
 
 $pi = 0
 foreach ($d in $orderedDevices) {
-    $core = $pool[$pi % $pool.Count]
-    $pi++
-    $lps = @($core.LPS)
+    $nicCount = if ($d.Kind -match 'NET') { [Math]::Min(2, $pool.Count) } else { 1 }
+    $lps = @()
+    foreach ($k in 0..($nicCount-1)) { $c = $pool[($pi + $k) % $pool.Count]; $lps += @($c.LPS) }
+    $pi += $nicCount
     if (-not $lps.Count) { _warn "AUTO: $($d.Kind) $($d.InstanceId) -> no core available"; continue }
 
     $mask = [UInt64]0; foreach ($l in $lps) { $mask = $mask -bor ([UInt64]1 -shl $l) }
-    # Fix LTT: toutes les classes recoivent une affinite SpecCPU explicite (NET filaires inclus;
-    # le WiFi est deja exclu via WifiIdSet — l'affinite casse de nombreux drivers WiFi).
+
     $policy = 'SpecCPU'
-    $affinityValid = if ($lowThreadCpu) { $false } else { Test-AffinityMaskValid -Mask $mask -LogicalCount $CpuInfo.Logical }
+    $affinityRestricted = $d.Kind -eq 'AUDIO'
+    if ($affinityRestricted) { _log "AUTO.RESTRICT: $($d.Kind) $($d.InstanceId) -> MSI + priority only (affinity restricted in 26.09.1.1)" }
+      # NIC overrides the LOWTHREADS guard: pinning the NIC to 2 cores on an 8-thread CPU is safe
+      # (it is the whole point of RSS/DPC confinement). X3D + laptop guards still apply.
+      $nicOverrideLowThreads = ($d.Kind -match 'NET') -and $lowThreadCpu -and (-not ($IsAmdX3D -or $isLaptopChassis))
+      $skipAffEff = $skipAffinity -and -not $nicOverrideLowThreads
+      $affinityValid = if ($skipAffEff -or $affinityRestricted) { $false } else { Test-AffinityMaskValid -Mask $mask -LogicalCount $CpuInfo.Logical }
     if (-not $affinityValid) {
         _warn "AUTO.TOPO.INVALID: $($d.Kind) $($d.InstanceId) Mask=0x$($mask.ToString('X')) invalid for Logical=$($CpuInfo.Logical) — falling back to MSI+priority only (no AssignmentSetOverride)"
     }
 
     [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$lps; Mask=$mask; Policy=$policy; Prio='High'; AffinityValid=$affinityValid })
+    if ($d.Kind -match 'NET') { _nicVendorRSS -d $d -mask $mask }
     _log "AUTO: $($d.Kind) $($d.InstanceId) -> Core=$($lps -join '+') Mask=0x$($mask.ToString('X')) valid=$affinityValid"
 }
 
@@ -410,29 +517,6 @@ foreach ($d in $Devices | Where-Object { $MsiOnlyGpuIds.ContainsKey($_.InstanceI
     }
 }
 
-foreach ($d in $Devices | Where-Object { $_.Kind -eq 'STOR' }) {
-    if (-not $DryRun) {
-        try {
-            $msiP = "HKLM:\$($d.RegBase)\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties"
-            $affP = "HKLM:\$($d.RegBase)\Device Parameters\Interrupt Management\Affinity Policy"
-            $null = New-Item $msiP -Force -EA SilentlyContinue
-            Set-ItemProperty $msiP -Name MSISupported -Value 0 -Type DWord -Force
-            Remove-ItemProperty $msiP -Name MessageNumberLimit -ErrorAction SilentlyContinue
-            # Remove any stale affinity/override from previous runs to guarantee INTx boot path
-            if (Test-Path $affP) {
-                Remove-ItemProperty $affP -Name AssignmentSetOverride -ErrorAction SilentlyContinue
-                Remove-ItemProperty $affP -Name DevicePolicy -ErrorAction SilentlyContinue
-            }
-            _log "APPLY.MSIOFF.STOR: $($d.InstanceId) (MSI disabled → INTx, boot safety)"
-        } catch { _err "APPLY.MSIOFF.STOR.FAIL: $($d.InstanceId): $_" }
-    } else {
-        _log "DRYRUN.MSIOFF.STOR: $($d.InstanceId)"
-    }
-}
-
-# WiFi: skipped entirely (MSI forcing breaks many WiFi drivers)
-
-# Skipped auto devices: MSI + Normal priority, no affinity
 foreach ($d in $Devices | Where-Object { $SkipAutoIds.ContainsKey($_.InstanceId) }) {
     if ($WifiIdSet.ContainsKey($d.InstanceId) -or $MsiOnlyGpuIds.ContainsKey($d.InstanceId)) { continue }
     if (-not $DryRun) {
@@ -506,7 +590,6 @@ Write-Host ""
 Write-Host "Log: $Script:LogPath" -F DarkGray
 Write-Host ""
 if ($DryRun) { Write-Host "*** DRY RUN - No changes written ***" -F Magenta }
-else { Write-Host "IMPORTANT: Reboot required for changes to take effect." -F Yellow }
 Write-Host ""
 Write-Host "============================================" -F Green
 

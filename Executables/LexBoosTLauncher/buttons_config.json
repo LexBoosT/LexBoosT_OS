@@ -1,4 +1,4 @@
-{
+﻿{
   "categoryOrder": [
     "Utilities",
     "Performance",
@@ -121,13 +121,6 @@
       "tooltipFr": "Voir et gérer les programmes et services qui démarrent automatiquement"
     },
     {
-      "name": "LexBoosT Remove Windows AI",
-      "executablePath": "C:\\Windows\\LexBoosTOS\\Utilities\\RemoveWindowsAI\\RemoveWindowsAI.exe",
-      "category": "System",
-      "tooltip": "Remove Windows AI features and components",
-      "tooltipFr": "Supprimer les fonctionnalités et composants IA de Windows"
-    },
-    {
       "name": "LexBoosT Language Bar Manager",
       "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\Remove_Langbar_Shortcut.exe",
       "category": "System",
@@ -147,6 +140,13 @@
       "category": "Appearance",
       "tooltip": "Customize the Windows Start Menu appearance and behavior",
       "tooltipFr": "Personnaliser l'apparence et le comportement du menu Démarrer"
+    },
+	{
+      "name": "LexBoosT Wallpaper Manager",
+      "executablePath": "C:\\Windows\\LexBoosTOS\\Scripts\\Programs\\LexBoosT_Wallpaper_Manager.exe",
+      "category": "Appearance",
+      "tooltip": "Customize the Windows Lockscreen/Desktop wallpaper, easily",
+      "tooltipFr": "Personnaliser le fond d'ecran Bureau/Ecran de verouillage, facilement"
     },
     {
       "name": "LexBoosT DWM Effect Manager",
@@ -343,6 +343,7 @@
       "name": "Lex Snake",
       "executablePath": "C:\\Windows\\LexBoosTOS\\Games\\LexSnake\\SnakeGame.exe",
       "category": "Games",
+      "downloadUrl": "https://drive.usercontent.google.com/download?id=1lWwrMmLNRqvpMdkVgukbxZvPTSIcJ7uL&export=download&authuser=0&confirm=t&uuid=97a50f05-08ae-4995-b0fd-6a174126e09a&at=AMrWOn1vmWL31_cbnRGKiKPfccid:1788732244941",
       "tooltip": "A Retro classic game make with love for LexBoosT OS users",
       "tooltipFr": "Un jeu rétro classique fait avec amour pour les utilisateurs de LexBoosT OS"
     },
@@ -350,6 +351,7 @@
       "name": "Vampire Rage",
       "executablePath": "C:\\Windows\\LexBoosTOS\\Games\\VampireRage\\VR-Launcher.exe",
       "category": "Games",
+      "downloadUrl": "https://drive.usercontent.google.com/download?id=1a0zRBytyq0mnr4kdok38ALbIi43MikbO&export=download&authuser=0&confirm=t&uuid=3ac421c6-bb5a-46b6-883a-59e2ce415427&at=AMrWOn15Kx7u-zL0DiWOHzA6btSC:1788732184099",
       "tooltip": "A Retro classic shootem'up game make by tricktale for Xbox 360, ported by LexBoosT",
       "tooltipFr": "Un shootem'up rétro creer par tricktale pour Xbox 360, porté sur pc par LexBoosT"
     }

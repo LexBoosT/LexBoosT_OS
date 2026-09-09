@@ -11,8 +11,6 @@ $script:ValidDevices = @(
     "Configure-Adapters",
     "Configure-Drives",
     "Configure-PowerThrottling",
-    "Configure-IRQAffinity",
-    "Configure-IRQPriority",
     "Configure-NDISOptimizer",
     "Configure-DesktopPowerOptimizations",
     "Configure-TSX",
@@ -70,25 +68,6 @@ function Get-CachedVMStatus {
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
-
-function Test-IsIntelHybridCPU {
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param()
-
-    try {
-        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop
-        $name = $cpu.Name
-        if ($name -notmatch "Intel") { return $false }
-        return ($name -match "i[3579]-1[2-9]\d{3}") -or
-               ($name -match "Core Ultra [2-9]") -or
-               ($name -match "Core Ultra [1-9]\d{2}")
-    }
-    catch {
-        Write-Log '-' "Failed to detect CPU type: $_"
-        return $false
-    }
-}
 
 function Test-IsIntelCPU {
     [CmdletBinding()]
@@ -304,27 +283,6 @@ function Set-RegistryValue {
     }
     catch {
         Write-Log '-' "Failed to set registry value '$Path\$Name': $_"
-    }
-}
-
-function Set-RegistrySettings {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string[]]$Paths,
-
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Settings,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateSet("DWORD", "String", "QWORD", "MultiString", "ExpandString", "Binary")]
-        [string]$Type = "String"
-    )
-
-    foreach ($path in $Paths) {
-        foreach ($setting in $Settings.GetEnumerator()) {
-            Set-RegistryValue -Path $path -Name $setting.Key -Type $Type -Value $setting.Value
-        }
     }
 }
 
@@ -653,19 +611,9 @@ function Set-OptimizedPowerSettings {
             SubGuid     = "fc7372b6-ab2d-43ee-8797-15e9841f2cca"
             Value       = 1
             Description = "NVMe NOPPME"
-        },
-        @{
-            Guid        = "2a737441-1930-4402-8d77-b2bebba308a3"
-            SubGuid     = "0853a681-27c8-4100-a2fd-82013e970683"
-            Value       = 1
-            Description = "Hub Selective Suspend Timeout"
-        },
-        @{
-            Guid        = "2a737441-1930-4402-8d77-b2bebba308a3"
-            SubGuid     = "48e6b7a6-50f5-4782-a5d4-53bb8f07e226"
-            Value       = 0
-            Description = "USB Selective Suspend Setting"
         }
+        # POLICY 2026 (USB stock): USB power-plan settings (Hub Selective Suspend
+        # Timeout + USB Selective Suspend Setting) removed - USB left at Windows defaults.
     )
 
     foreach ($setting in $powerSettings) {
@@ -904,91 +852,6 @@ function Get-EcoreLayout {
     }
 }
 
-function Set-IRQAffinity {
-    [CmdletBinding()]
-    param()
-
-    Write-Log '+' "Configuring IRQ Affinity..."
-
-    if (-not (Test-IsIntelHybridCPU)) {
-        Write-Log '+' "Non-hybrid CPU detected. Skipping IRQ affinity pinning."
-        return
-    }
-
-    $affinityBase = "HKLM:\SYSTEM\CurrentControlSet\Enum\PCI\*\*\Device Parameters\Interrupt Management\Affinity Policy"
-
-    try {
-        # Masques calculés depuis la topologie réelle (plus de masque codé en dur) :
-        # GPU -> premier P-core (logical 0) ; NIC -> premier E-core logique.
-        $topo = Get-EcoreLayout
-
-        Write-Log '+' "Pinning GPU interrupts to P-Core (bit 0)..."
-        $gpus = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
-            Where-Object { $_.PSPath -match "VEN_10DE|VEN_1002|VEN_8086" }
-
-        if ($gpus) {
-            foreach ($gpu in $gpus) {
-                Set-RegistryValue -Path $gpu.PSPath -Name "AssignmentSetOverride" -Type Binary -Value ([byte[]](0x01,0x00,0x00,0x00))
-            }
-            Write-Log '+' "GPU interrupts pinned to P-Core (affinity 0x01)."
-        }
-        else {
-            Write-Log '+' "No GPU found for IRQ pinning."
-        }
-
-        if ($topo.EBase -ge 0) {
-            $eBytes = [System.BitConverter]::GetBytes([uint32](1 -shl $topo.EBase))
-            Write-Log '+' ("Pinning network adapter interrupts to first E-Core (logical {0})..." -f $topo.EBase)
-            $nets = Get-ItemProperty -Path $affinityBase -ErrorAction SilentlyContinue |
-                Where-Object { $_.PSPath -match "CC_0200|CC_0280" }
-
-            if ($nets) {
-                foreach ($net in $nets) {
-                    Set-RegistryValue -Path $net.PSPath -Name "AssignmentSetOverride" -Type Binary -Value $eBytes
-                }
-                Write-Log '+' "Network adapter interrupts pinned to first E-Core."
-            }
-        }
-        else {
-            Write-Log '+' "No E-Cores to pin NIC IRQ (skipping)."
-        }
-
-        Write-Log '+' "IRQ Affinity configuration completed successfully."
-    }
-    catch {
-        Write-Log '-' "Failed to configure IRQ Affinity: $_"
-    }
-}
-
-function Set-IRQPriority {
-    [CmdletBinding()]
-    param()
-
-    Write-Log '+' "Configuring IRQ Priority..."
-
-    try {
-        $deviceId = '*' + (Get-PnpDevice -PresentOnly | Where-Object { ($_.InstanceId -like 'PCI*') -and ($_.Class -like 'Display') }).PNPDeviceID.Replace('\', '\\') + '*'
-        $gpuIrq = (Get-WmiObject -Query 'SELECT * FROM Win32_PnPAllocatedResource' |
-            Where-Object { $_.__RELPATH -like '*Win32_IRQResource*' } |
-            Where-Object { $_.Dependent -like $deviceId } |
-            Select-Object -ExpandProperty Antecedent).Split('=')[1]
-
-        if ($gpuIrq) {
-            Write-Log '+' "GPU IRQ detected: $gpuIrq — setting high priority..."
-            Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl' -Name "IRQ${gpuIrq}Priority" -Type DWORD -Value 1
-            Write-Log '+' "GPU IRQ $gpuIrq priority set to high."
-        }
-        else {
-            Write-Log '-' "No GPU IRQ detected via dynamic detection. Static IRQ priorities from registry will apply."
-        }
-    }
-    catch {
-        Write-Log '-' "Failed to detect GPU IRQ dynamically: $_"
-    }
-
-    Write-Log '+' "IRQ Priority configuration completed."
-}
-
 function Set-NDISOptimizer {
     [CmdletBinding()]
     param()
@@ -1130,8 +993,7 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'; Name = 'ContiguousMemoryFromAnyNode'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'; Name = 'LogSize'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'; Name = 'DiagnosticFlags'; Value = 0 },
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags'; Name = 'DisableHCS0Idle'; Value = 1 },
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags'; Name = 'Allow64KLowOrFullSpeedControlTransfers'; Value = 1 },
+        # POLICY 2026 (USB stock): usbflags keys (DisableHCS0Idle / Allow64KLowOrFullSpeedControlTransfers) removed.
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'NoPauseOnSuspend'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'EnableNicAutoPowerSaverInSleepStudy'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'DisableNaps'; Value = 1 }
@@ -1148,16 +1010,7 @@ function Set-DesktopPowerOptimizations {
         Set-RegistryValue -Path $setting.Path -Name $setting.Name -Type DWORD -Value $setting.Value
     }
 
-    Write-Log '+' "Disabling USB LPM on all USB hubs..."
-    try {
-        Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags' -ErrorAction SilentlyContinue |
-            Where-Object { $_.PSChildName.Length -eq 12 } |
-            ForEach-Object { Set-ItemProperty $_.PSPath -Name 'DisableLPM' -Value 1 -Type DWord -Force }
-        Write-Log '+' "[+] USB LPM disabled on all hubs"
-    }
-    catch {
-        Write-Log '-' "Failed to disable USB LPM: $_"
-    }
+    # POLICY 2026 (USB stock): USB LPM / hub LPM disabling removed - USB left stock.
 
     Write-Log '+' "Disabling StorPort NVMe power management..."
     try {
@@ -1187,18 +1040,27 @@ function Set-DesktopPowerOptimizations {
         Write-Log '-' "Failed to block SleepStudy permissions: $_"
     }
 
-    Write-Log '+' "Disabling DMA remapping on all services..."
-    try {
-        $dmaKeys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "DmaRemappingCompatible" 2>$null |
-            Select-String 'HKEY_.*\\Services\\' |
-            ForEach-Object { $_.Line.Trim() }
-        foreach ($key in $dmaKeys) {
-            reg add "$key" /v "DmaRemappingCompatible" /t REG_DWORD /d 0 /f 2>$null | Out-Null
+    # AMD GUARD (2026-09-04): disabling DMA remapping (AMD-Vi/IOMMU) destabilizes AMD
+    # DMA routing (NVMe/PCIe/GPU) and triggers DPC_WATCHDOG_VIOLATION (0x133) at boot
+    # on AMD platforms (R5 5600 + RX 6600). Skipped on AMD.
+    $isAMDForDma = $false
+    try { $isAMDForDma = ((Get-CimInstance Win32_Processor -ErrorAction Stop | Select-Object -First 1).Name) -match 'AMD' } catch { }
+    if ($isAMDForDma) {
+        Write-Log '-' "AMD CPU detected: skipping DMA remapping disable (AMD-Vi/IOMMU critical - 0x133 boot crash risk)."
+    } else {
+        Write-Log ''+'' "Disabling DMA remapping on all services..."
+        try {
+            $dmaKeys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "DmaRemappingCompatible" 2>$null |
+                Select-String 'HKEY_.*\\Services\\' |
+                ForEach-Object { $_.Line.Trim() }
+            foreach ($key in $dmaKeys) {
+                reg add "$key" /v "DmaRemappingCompatible" /t REG_DWORD /d 0 /f 2>$null | Out-Null
+            }
+            Write-Log ''+'' "[+] DMA remapping disabled (desktop only)"
         }
-        Write-Log '+' "[+] DMA remapping disabled (desktop only)"
-    }
-    catch {
-        Write-Log '-' "Failed to disable DMA remapping: $_"
+        catch {
+            Write-Log '-' "Failed to disable DMA remapping: $_"
+        }
     }
 
     Write-Log '+' "Desktop power optimizations completed."
@@ -1249,14 +1111,20 @@ function Set-BcdOptimizations {
         Write-Log '-' "AMD CPU detected: skipping disabledynamictick (boot-hang risk)."
     }
 
-    Write-Log '+' "Setting isolated context to No..."
-    bcdedit /set {current} isolatedcontext No 2>$null | Out-Null
-
-    Write-Log '+' "Enabling NX (DEP) opt-in..."
-    bcdedit /set {current} nx optin 2>$null | Out-Null
-
-    Write-Log '+' "Setting legacy boot menu policy..."
-    bcdedit /set bootmenupolicy Legacy 2>$null | Out-Null
+    # AMD GUARD (2026-09-04): isolatedcontext No / nx optin disable VBS isolation + DEP;
+    # destabilizes AMD boot. Skipped on AMD.
+    $isAMDForBcd = $false
+    try { $isAMDForBcd = ((Get-CimInstance Win32_Processor -ErrorAction Stop | Select-Object -First 1).Name) -match 'AMD' } catch { }
+    if ($isAMDForBcd) {
+        Write-Log '-' "AMD CPU: skipping isolatedcontext/nx/bootmenupolicy (boot-crash risk on AMD)."
+    } else {
+        Write-Log '+' "Setting isolated context to No..."
+        bcdedit /set {current} isolatedcontext No 2>$null | Out-Null
+        Write-Log '+' "Enabling NX (DEP) opt-in..."
+        bcdedit /set {current} nx optin 2>$null | Out-Null
+        Write-Log '+' "Setting legacy boot menu policy..."
+        bcdedit /set bootmenupolicy Legacy 2>$null | Out-Null
+    }
 }
 function Set-NtfsConfiguration {
     [CmdletBinding()]
@@ -1266,101 +1134,6 @@ function Set-NtfsConfiguration {
 
     # === NTFS behavior ===
     fsutil behavior set disable8dot3 1           | Out-Null
-    fsutil behavior set disablecompression 1      | Out-Null
-    fsutil behavior set disabledeletenotify 0     | Out-Null
-    fsutil behavior set disableencryption 1       | Out-Null
-    fsutil behavior set encryptpagingfile 0       | Out-Null
-    fsutil behavior set memoryusage 2             | Out-Null
-    fsutil behavior set mftzone 4                 | Out-Null
-    fsutil behavior set disablelastaccess 1       | Out-Null
-    fsutil behavior set quotanotify 86400         | Out-Null
-
-    # === Disk power ===
-    # Only apply power settings for GUIDs that exist in the current scheme
-    $diskSubSettings = @(
-        '0b2d69d7-a2a1-449c-9680-f91c70521c60',
-        'dab60367-53fe-4f59-828b-ccb42464c0ad',
-        'd639518a-e56d-4345-8af2-b9f32fb26109',
-        'd3d55efd-c1bd-4242-8af08-3362b6389142',
-        '25dfa149-5dd1-4736-b5ab-e8a37b5b8187'
-    )
-    foreach ($guid in $diskSubSettings) {
-        $queryResult = powercfg -query SCHEME_CURRENT SUB_DISK $guid 2>&1 | Out-String
-        if ($queryResult -match 'Power Setting GUID') {
-            powercfg -setacvalueindex SCHEME_CURRENT SUB_DISK $guid 0 2>$null | Out-Null
-        }
-    }
-
-    Write-Log '+' "NTFS and disk power configuration completed."
-}
-
-function Set-MobileSyncOptimizations {
-    [CmdletBinding()]
-    param()
-
-    Write-Log '+' "Configuring mobile sync / disk HIPM-DIPM and write cache..."
-
-    foreach ($prop in @('EnableHIPM', 'EnableDIPM', 'EnableHDDParking')) {
-        $keys = reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "$prop" 2>$null |
-            Select-String -Pattern '^HKEY'
-        foreach ($key in $keys) {
-            $keyPath = $key.Line.Trim()
-            reg add "$keyPath" /v "$prop" /t REG_DWORD /d "0" /f | Out-Null
-        }
-    }
-
-    taskkill /im mobsync.exe /f 2>$null | Out-Null
-    Start-Sleep -Milliseconds 500
-
-    try {
-        $mobsync = "$env:windir\system32\mobsync.exe"
-        $mobsyncOld = "$env:windir\system32\mobsync.old"
-        if (Test-Path $mobsync) {
-            # mobsync.exe is owned by TrustedInstaller — need MinSudo to rename.
-            $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
-            if (Test-Path $minSudo) {
-                # Use cmd `ren` under TrustedInstaller (handles both fresh rename and replace-existing).
-                $renCmd = "if exist `"$mobsyncOld`" del /f /q `"$mobsyncOld`" & ren `"$mobsync`" mobsync.old"
-                $proc = Start-Process -FilePath $minSudo -ArgumentList "--NoLogo --TrustedInstaller --Privileged cmd.exe /c `"$renCmd`"" -Wait -PassThru -WindowStyle Hidden
-                if ($proc.ExitCode -eq 0 -and (Test-Path $mobsyncOld)) {
-                    Write-Log '+' "Renamed mobsync.exe to mobsync.old (via TrustedInstaller)"
-                } else {
-                    throw "MinSudo ren exit $($proc.ExitCode)"
-                }
-            } else {
-                # Fallback: take ownership then rename
-                $acl = Get-Acl $mobsync
-                $adminSid = [System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')
-                $acl.SetOwner($adminSid)
-                Set-Acl -Path $mobsync -AclObject $acl -ErrorAction Stop
-                if (Test-Path $mobsyncOld) { Remove-Item -Path $mobsyncOld -Force -ErrorAction Stop }
-                Rename-Item -Path $mobsync -NewName 'mobsync.old' -Force -ErrorAction Stop
-                Write-Log '+' "Renamed mobsync.exe to mobsync.old (ownership takeover)"
-            }
-        }
-    }
-    catch {
-        Write-Log '-' "Could not rename mobsync.exe: $_"
-    }
-
-    $enumKeys = reg query "hklm\SYSTEM\CurrentControlSet\Enum" /f "{4d36e967-e325-11ce-bfc1-08002be10318}" /d /s 2>$null |
-        Select-String -Pattern '^HKEY'
-    foreach ($enumKey in $enumKeys) {
-        $diskPath = Join-Path $enumKey.Line.Trim() 'Device Parameters\Disk'
-        reg add "$diskPath" /v UserWriteCacheSetting /t REG_DWORD /d 1 /f | Out-Null
-        reg add "$diskPath" /v CacheIsPowerProtected /t REG_DWORD /d 1 /f | Out-Null
-    }
-
-    Write-Log '+' "Mobile sync configuration completed."
-}
-function Set-NtfsConfiguration {
-    [CmdletBinding()]
-    param()
-
-    Write-Log '+' "Configuring NTFS behavior and disk power settings..."
-
-    # === NTFS behavior ===
-    fsutil behavior set disable8dot3 1            | Out-Null
     fsutil behavior set disablecompression 1      | Out-Null
     fsutil behavior set disabledeletenotify 0     | Out-Null
     fsutil behavior set disableencryption 1       | Out-Null
@@ -1492,29 +1265,7 @@ function Set-RegistryPowerTweaks {
         return
     }
 
-    # === Power scheme import (high-performance scheme) ===
-    $powPath = "$env:windir\misc\LexBoosT_OS_NexT.pow"
-    $schemeGuid = "01001110-0110-1111-0111-011001100001"
-    if (Test-Path $powPath) {
-        cmd /c "powercfg /import `"$powPath`" $schemeGuid" | Out-Null
-        cmd /c "powercfg /setactive $schemeGuid" | Out-Null
-        Remove-Item $powPath -Force -ErrorAction SilentlyContinue
-    }
-    # Delete all non-LexBoosT schemes
-    cmd /c "powercfg -list" | ForEach-Object {
-        if ($_ -match 'Power Scheme GUID:\s+([a-f0-9-]+)') {
-            $guid = $Matches[1]
-            if ($guid -ne $schemeGuid -and $guid -ne $HIGH_PERFORMANCE_GUID) {
-                cmd /c "powercfg -delete $guid" 2>$null | Out-Null
-            }
-        }
-    }
-
-
-    # === USB selective suspend / LPM ===
-    Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Control\usbflags' -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName.Length -eq 12 } | ForEach-Object {
-        Set-RegistryValue -Path $_.PSPath -Name 'DisableLPM' -Type DWORD -Value 1
-    }
+    # POLICY 2026 (USB stock): USB selective suspend / LPM registry block removed.
 
     # === HKLM\SYSTEM\CurrentControlSet\Control\Wdf ===
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Wdf' -Name 'WdfGlobalLogsDisabled' -Type DWORD -Value 1
@@ -1565,7 +1316,10 @@ function Set-RegistryPowerTweaks {
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\fssProv' -Name 'EncryptProtocol' -Type DWORD -Value 0
 
     # === PCIe ASPM ===
-    Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\pci\Parameters' -Name 'ASPMOptOut' -Type DWORD -Value 1
+    # AMD GUARD (2026-09-04): ASPMOptOut=1 overrides kernel PCIe ASPM; destabilizes AMD boot. Skipped on AMD.
+    if (-not ((Get-CimInstance Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1).Name -match 'AMD')) {
+        Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\pci\Parameters' -Name 'ASPMOptOut' -Type DWORD -Value 1
+    }
 
     # === Schedule (RPC over scheduler) ===
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule' -Name 'DisableRpcOver' -Type DWORD -Value 1
@@ -1653,8 +1407,6 @@ function Invoke-Main {
             "Configure-Adapters" { Set-NetConfig }
             "Configure-Drives" { Set-DrivesConfiguration }
             "Configure-PowerThrottling" { Disable-PowerThrottling }
-            "Configure-IRQAffinity" { Set-IRQAffinity }
-            "Configure-IRQPriority" { Set-IRQPriority }
             "Configure-NDISOptimizer" { Set-NDISOptimizer }
             "Configure-DesktopPowerOptimizations" { Set-DesktopPowerOptimizations }
             "Configure-TSX" { Set-TSX }
@@ -1675,3 +1427,4 @@ function Invoke-Main {
 
 # Execute main function
 Invoke-Main
+

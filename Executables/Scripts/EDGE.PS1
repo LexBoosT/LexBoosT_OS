@@ -75,49 +75,6 @@ function Delete-IfExists {
 # CORE UNINSTALL — Multi-method (merged from RemoveEdge.ps1)
 # ============================================
 
-function Uninstall-EdgeProcess {
-    param([string]$Key)
-
-    $originalNation = [Microsoft.Win32.Registry]::GetValue('HKEY_USERS\.DEFAULT\Control Panel\International\Geo', 'Nation', [Microsoft.Win32.RegistryValueKind]::String)
-
-    $baseKey = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate'
-    $registryPath = "$baseKey\ClientState\$Key"
-    if (!(Test-Path $registryPath)) {
-        Write-Log '-' "Registry key not found: $registryPath"
-        return
-    }
-
-    Remove-ItemProperty -Path $registryPath -Name 'experiment_control_labels' -ErrorAction SilentlyContinue | Out-Null
-
-    $folderPath = "$env:SystemRoot\SystemApps\Microsoft.MicrosoftEdge_8wekyb3d8bbwe"
-    if (!(Test-Path $folderPath)) { New-Item -ItemType Directory -Path $folderPath -Force | Out-Null }
-    New-Item -ItemType File -Path $folderPath -Name 'MicrosoftEdge.exe' -Force | Out-Null
-
-    [Microsoft.Win32.Registry]::SetValue('HKEY_USERS\.DEFAULT\Control Panel\International\Geo', 'Nation', 84, [Microsoft.Win32.RegistryValueKind]::String) | Out-Null
-
-    $env:windir = ''
-    try {
-        $uninstallString = (Get-ItemProperty -Path $registryPath -ErrorAction SilentlyContinue).UninstallString
-        $uninstallArguments = (Get-ItemProperty -Path $registryPath -ErrorAction SilentlyContinue).UninstallArguments
-        if ([string]::IsNullOrEmpty($uninstallString) -or [string]::IsNullOrEmpty($uninstallArguments)) {
-            Write-Log '-' "Cannot find uninstall methods for $Key"
-            return
-        }
-        $uninstallArguments += ' --force-uninstall --delete-profile'
-        if (!(Test-Path $uninstallString)) {
-            Write-Log '-' "setup.exe not found at: $uninstallString"
-            return
-        }
-        Start-Process -FilePath $uninstallString -ArgumentList $uninstallArguments -Wait -NoNewWindow
-        if ((Get-ItemProperty -Path $baseKey -ErrorAction SilentlyContinue).IsEdgeStableUninstalled -eq 1) {
-            Write-Log '+' 'Edge Stable has been successfully uninstalled'
-        }
-    } finally {
-        [Microsoft.Win32.Registry]::SetValue('HKEY_USERS\.DEFAULT\Control Panel\International\Geo', 'Nation', $originalNation, [Microsoft.Win32.RegistryValueKind]::String) | Out-Null
-        $env:windir = [System.Environment]::GetEnvironmentVariable('windir', 'Machine')
-    }
-}
-
 function Remove-EdgeChromium {
     Write-Log '+' 'Trying to find Edge uninstallers...'
 

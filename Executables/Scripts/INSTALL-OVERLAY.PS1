@@ -177,30 +177,6 @@ $script:bottomText = 'Some installation steps may take a while. Please be patien
 # ============================================================
 # Log helpers
 # ============================================================
-function Get-ExpectedStatuses {
-    $dirs = @(Get-ChildItem -LiteralPath $script:logRoot -Directory -ErrorAction SilentlyContinue)
-    if (-not $dirs) { return 100 }
-    $dirs = @($dirs | Sort-Object LastWriteTime -Descending)
-    if ($dirs.Count -lt 2) { return 100 }
-    $max = 0
-    for ($i = 1; $i -lt $dirs.Count; $i++) {
-        $out = Join-Path $dirs[$i].FullName 'Output.txt'
-        if (-not (Test-Path -LiteralPath $out)) { continue }
-        try {
-            $fs = [System.IO.File]::Open($out, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-            $len = [int]$fs.Length
-            $buf = New-Object byte[] $len
-            [void]$fs.Read($buf, 0, $len)
-            $fs.Dispose()
-            $c = [System.Text.Encoding]::UTF8.GetString($buf, 0, $len)
-            $n = [regex]::Matches($c, '(?m)^\[Status\]').Count
-            if ($n -gt $max) { $max = $n }
-        } catch { }
-    }
-    if ($max -lt 1) { $max = 100 }
-    return $max
-}
-
 function Get-LatestLogFile {
     $dirs = @(Get-ChildItem -LiteralPath $script:logRoot -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
     if (-not $dirs) { return $null }

@@ -22,14 +22,13 @@ Write-Host '============================================'
 
 $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Microsoft-Windows-Rdp-Graphics-RdpIdd-Trace'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; Name = 'HwSchMode'; Value = '2'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\MonitorDataStore'; Name = 'AutoColorManagementEnabled'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers'; Name = 'DisableVersionMismatchCheck'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'AdjustWorkerThreadPriority'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'AudioDgAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'AutoSyncToCPUPriority'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'ForegroundPriorityBoost'; Value = '0'; Type = 'REG_DWORD' }
-    @{ Path = 'Registry::HKLM\SYSTEM\ControlSet001\Control\GraphicsDrivers\Scheduler'; Name = 'FrameServerAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; Name = 'DisableVersionMismatchCheck'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'AdjustWorkerThreadPriority'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'AudioDgAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'AutoSyncToCPUPriority'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'ForegroundPriorityBoost'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'FrameServerAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage'; Name = 'EnableDirectStorage'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage'; Name = 'EnableOptimizations'; Value = '1'; Type = 'REG_DWORD' }
 )

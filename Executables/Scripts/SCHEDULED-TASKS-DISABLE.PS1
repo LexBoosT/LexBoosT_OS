@@ -28,10 +28,6 @@ $tasksToDisable = @(
     '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleCollector'
     '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector'
 
-    # --- Autochk & Chkdsk ---
-    '\Microsoft\Windows\Autochk\Proxy'
-    '\Microsoft\Windows\Chkdsk\ProactiveScan'
-
     # --- Diagnostics ---
     '\Microsoft\Windows\Diagnosis\RecommendedTroubleshootingScanner'
     '\Microsoft\Windows\Diagnosis\Scheduled'
@@ -81,59 +77,12 @@ $tasksToDisable = @(
     '\Microsoft\Windows\InstallService\ScanForUpdates'
     '\Microsoft\Windows\InstallService\ScanForUpdatesAsUser'
     '\Microsoft\Windows\InstallService\SmartRetry'
-    '\Microsoft\Windows\InstallService\RestoreDevice'
-    '\Microsoft\Windows\InstallService\WakeUpAndContinueUpdates'
-    '\Microsoft\Windows\InstallService\WakeUpAndScanForUpdates'
-
-    # --- UpdateOrchestrator (USO) ---
-    '\Microsoft\Windows\UpdateOrchestrator\Start Oobe Expediate Work'
-    '\Microsoft\Windows\UpdateOrchestrator\StartOobeAppsScan_LicenseAccepted'
-    '\Microsoft\Windows\UpdateOrchestrator\StartOobeAppsScan_OobeAppReady'
-    '\Microsoft\Windows\UpdateOrchestrator\StartOobeAppsScan'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Scan'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Scan Static Task'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Wake To Work'
-    '\Microsoft\Windows\UpdateOrchestrator\Report Policies'
-    '\Microsoft\Windows\UpdateOrchestrator\UUS Failover Task'
-    '\Microsoft\Windows\UpdateOrchestrator\Backup Scan'
-    '\Microsoft\Windows\UpdateOrchestrator\Maintenance Install'
-    '\Microsoft\Windows\UpdateOrchestrator\Policy Install'
-    '\Microsoft\Windows\UpdateOrchestrator\Reboot_AC'
-    '\Microsoft\Windows\UpdateOrchestrator\Reboot_Battery'
-    '\Microsoft\Windows\UpdateOrchestrator\Refresh Settings'
-    '\Microsoft\Windows\UpdateOrchestrator\Resume On Boot'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Maintenance Work'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Work'
-    '\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask'
-    '\Microsoft\Windows\UpdateOrchestrator\AC Power Download'
-    '\Microsoft\Windows\UpdateOrchestrator\AC Power Install'
-    '\Microsoft\Windows\UpdateOrchestrator\Battery Saver Deferred Install'
-    '\Microsoft\Windows\UpdateOrchestrator\MusUx_LogonUpdateResults'
-    '\Microsoft\Windows\UpdateOrchestrator\MusUx_UpdateInterval'
-    '\Microsoft\Windows\UpdateOrchestrator\Reboot'
-    '\Microsoft\Windows\UpdateOrchestrator\Schedule Retry Scan'
-    '\Microsoft\Windows\UpdateOrchestrator\USO_Broker_Display'
-    '\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_Display'
-    '\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker_ReadyToReboot'
-    '\Microsoft\Windows\UpdateOrchestrator\Universal Orchestrator Start'
-    '\Microsoft\Windows\UpdateOrchestrator\Universal Orchestrator Idle Start'
-    '\Microsoft\Windows\UpdateOrchestrator\UpdateAssistant'
-    '\Microsoft\Windows\UpdateOrchestrator\UpdateAssistantAllUsersRun'
-    '\Microsoft\Windows\UpdateOrchestrator\UpdateAssistantCalendarRun'
-    '\Microsoft\Windows\UpdateOrchestrator\UpdateAssistantWakeupRun'
 
     # --- WindowsUpdate ---
     '\Microsoft\Windows\WindowsUpdate\Scheduled Start'
     '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network'
     '\Microsoft\Windows\WindowsUpdate\Automatic App Update'
-    '\Microsoft\Windows\WindowsUpdate\sih'
-    '\Microsoft\Windows\WindowsUpdate\sihboot'
-    '\Microsoft\Windows\WindowsUpdate\sihpostreboot'
-    '\Microsoft\Windows\WindowsUpdate\AUScheduledInstall'
-    '\Microsoft\Windows\WindowsUpdate\AUSessionConnect'
     '\Microsoft\Windows\WindowsUpdate\RUXIM\PLUGScheduler'
-    '\Microsoft\Windows\WaaS\WaaSMedicAgent'
-    '\Microsoft\Windows\WaaSMedic\PerformRemediation'
 
     # --- Windows Error Reporting ---
     '\Microsoft\Windows\Windows Error Reporting\QueueReporting'
@@ -281,11 +230,6 @@ $tasksToDisable = @(
     '\Microsoft\Windows\Maps\MapsToastTask'
     '\Microsoft\Windows\Maps\MapsUpdateTask'
 
-    # --- Data Integrity Scan ---
-    '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan for Crash Recovery'
-    '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan'
-    '\Microsoft\Windows\Data Integrity Scan\Data Integrity Check And Scan'
-
     # --- Settings Sync ---
     '\Microsoft\Windows\SettingSync\BackgroundUploadTask'
     '\Microsoft\Windows\SettingSync\NetworkStateChangeTask'
@@ -363,7 +307,6 @@ foreach ($task in $tasksToDisable) {
 # Special: tasks with spaces/special chars handled via PS cmdlet
 # ----------------------------------------------------------------
 $psCmdletTasks = @(
-    @{Path = '\Microsoft\Windows\UpdateOrchestrator\';   Name = 'USO_UxBroker'}
     @{Path = '\Microsoft\Windows\AppxDeploymentClient\'; Name = 'UCPD velocity'}
 )
 

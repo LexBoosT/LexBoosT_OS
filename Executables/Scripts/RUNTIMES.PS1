@@ -224,22 +224,6 @@ Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.DesktopRuntime.8" -T
     Test-DotNetDesktopRuntime -MajorVersion 8
 }
 
-# .NET 9
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.SDK.9" -Test {
-    Test-DotNetSdk -MajorVersion 9
-}
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.DesktopRuntime.9" -Test {
-    Test-DotNetDesktopRuntime -MajorVersion 9
-}
-
-# .NET 10
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.SDK.10" -Test {
-    Test-DotNetSdk -MajorVersion 10
-}
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.DesktopRuntime.10" -Test {
-    Test-DotNetDesktopRuntime -MajorVersion 10
-}
-
 # VC++ Redistributables (AIO abbodi1406 - latest release)
 $vcAioUrl = 'https://github.com/abbodi1406/vcredist/releases/latest/download/VisualCppRedist_AIO_x86_x64.exe'
 

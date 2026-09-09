@@ -65,7 +65,7 @@ if /i "!diskDrive!" == "SSD" (
 
 :: Boot configuration & branding
 echo [+] Boot configuration...
-bcdedit /set {current} description "LexBoosT OS 26.09" >nul 2>&1
+bcdedit /set {current} description "LexBoosT OS 26.09.1" >nul 2>&1
 label LexBoosT_OS >nul 2>&1
 
 :: Disable search indexing on non-system drives (reduces I/O micro-stutters during gaming)
@@ -98,12 +98,6 @@ reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notificatio
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Print.Notification" /v Enabled /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v Enabled /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.WiFiNetworkManager" /v Enabled /t REG_DWORD /d 0 /f >nul 2>&1
-
-:: Native NVMe driver optimization - STABLE MODE
-echo [+] Native NVMe driver optimization (Stable Mode)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NativeNVMePerformance /t REG_DWORD /d 0 /f >nul 2>&1
-reg delete "HKLM\SYSTEM\CurrentControlSet\Policies\Microsoft\FeatureManagement\Overrides" /f >nul 2>&1
-
 
 :: DMA protection policy removed (Hyper-V DDA compatibility)
 echo [+] Skipping DMA enumeration policy (Hyper-V DDA compatibility)

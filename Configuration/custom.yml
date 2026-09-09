@@ -1,12 +1,12 @@
 ---
-title: LexBoosT OS™ 26.09
-description: Applies LexBoosT OS™ 26.09 configuration tasks, including registry tweaks, service tweaks, and system tweaks
+title: LexBoosT OS™ 26.09.1
+description: Applies LexBoosT OS™ 26.09.1 configuration tasks, including registry tweaks, service tweaks, and system tweaks
 privilege: TrustedInstaller
 actions:
   - !status: {status: 'Starting Playbook Setup'}
 
   - !status: {
-      status: "LexBoosT OS™ 26.09",
+      status: "LexBoosT OS™ 26.09.1",
     }
 
   # ============================================
@@ -45,7 +45,8 @@ actions:
       powercfg /x hibernate-timeout-ac 0;
       powercfg /x hibernate-timeout-dc 0;
 
-  - !powerShell: {command: '$env:PATH="$([Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory());$env:PATH";foreach($a in [AppDomain]::CurrentDomain.GetAssemblies()){if($a.Location){[void](ngen install $a.Location /nologo 2>&1);[IO.Path]::GetFileName($a.Location)}}'}
+  # (NGEN inline removed 26.09.1.1 - duplicate of NGEN.PS1 called from setup.yml;
+  #   NGEN.PS1 is the single entry point for .NET native image generation.)
 
   - !taskKill: {
       name: "explorer",
@@ -68,5 +69,4 @@ tasks:
   # Phase 5: Final cleanup
   - Tasks\final.yml
 
-  # Phase 6: Utilities (HKCU hive propagation, rollback, max refresh, network extras, power extras)
   - Tasks\utilities.yml

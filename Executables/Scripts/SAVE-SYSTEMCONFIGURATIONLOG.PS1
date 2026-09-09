@@ -12,7 +12,7 @@ $ver = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion')
 
 '=== LexBoosT OS System Configuration Log ===' | Out-File $logFile -Encoding UTF8
 "Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File $logFile -Encoding UTF8 -Append
-'Playbook Version: 26.09' | Out-File $logFile -Encoding UTF8 -Append
+'Playbook Version: 26.09.1' | Out-File $logFile -Encoding UTF8 -Append
 "Windows: $($ver.ProductName) ($($ver.EditionID)) Build $($ver.CurrentBuild)" | Out-File $logFile -Encoding UTF8 -Append
 "Architecture: $(if([Environment]::Is64BitOperatingSystem){'x64'}else{'x86'})" | Out-File $logFile -Encoding UTF8 -Append
 try {

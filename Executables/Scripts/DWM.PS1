@@ -52,6 +52,13 @@ $regValues = @(
     @{ Path = 'Registry::HKCU\Software\Microsoft\Windows\DWM'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'DisableIndependentFlip'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\XAML'; Name = 'DisableGlobalAnimations'; Value = '1'; Type = 'REG_DWORD' }
+
+    # ============================================================
+    #  DWM Schedule MASTER VALUES - Performance
+    # ============================================================
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'FrameRateMin'; Value = '4294967295'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'LingerInterval'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Windows\Dwm'; Name = 'RestrictedNvcpuIUMode'; Value = '0'; Type = 'REG_DWORD' }
 )
 
 $set = 0

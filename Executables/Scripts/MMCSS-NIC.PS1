@@ -58,7 +58,7 @@ if ($defaultRoute) {
 
 # ── Fallback: scan all ────────────────────────────────────────────────────────
 if (-not $primaryType) {
-    Get-CimInstance Win32_NetworkAdapter | Where-Object { $_.PNPDeviceID -ne $null } | ForEach-Object {
+    Get-CimInstance Win32_NetworkAdapter | Where-Object { $null -ne $_.PNPDeviceID } | ForEach-Object {
         $type = Get-DriverType $_.PNPDeviceID
         if ($type -and $type -ne 'Unknown') {
             if (-not $primaryType) { $primaryType = $type }

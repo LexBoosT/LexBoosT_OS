@@ -54,7 +54,6 @@ ContentDeliveryManager*
 *VisualAssist*
 *Voiess*
 *WidgetsPlatformRuntime*
-*Windows.CBSPreview*
 *WindowsBackup*
 *XGpuEjectDialog*
 *c5e2524a-ea46-4f67-841f-6a9465d9d515*

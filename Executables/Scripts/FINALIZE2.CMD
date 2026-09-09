@@ -36,8 +36,8 @@ echo ================================================
 echo GAMING OPTIMIZATIONS
 echo ================================================
 
-:: Disable USB selective suspend - NOTE: Already handled by extreme-performance-optimization.yml
-echo [+] USB selective suspend already disabled via registry
+:: USB selective suspend - left at Windows defaults (USB stock policy)
+echo [+] USB selective suspend left at Windows defaults
 
 :: Disable network card power saving
 echo [+] Disabling network card power saving...
@@ -121,10 +121,8 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\QoS" /v "GamingQoS" /t REG_SZ 
 :: CPU Gaming Optimizations
 echo [+] CPU gaming optimizations...
 
-:: USB Gaming Optimizations
-echo [+] USB gaming optimizations...
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters\Wdf" /v "NoExtraBufferRoom" /t REG_DWORD /d "1" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\usbflags" /v "GlobalDisableSerNumGen" /t REG_DWORD /d "1" /f >nul 2>&1
+:: USB Gaming Optimizations - REMOVED by policy (USB left 100% stock: no
+:: NoExtraBufferRoom, no GlobalDisableSerNumGen, no USBXHCI/usbflags writes).
 
 :: disable suggestions in the search box and in search home
 echo [+] Disable suggestions in the search box and in search home

@@ -4,16 +4,20 @@ modify(mode=mode.multiple
 	where=this.id(id.restore_previous_versions,id.cast_to_device)
 	vis=vis.remove)
 
-modify(type="recyclebin" where=window.is_desktop and this.id==id.empty_recycle_bin pos=1 sep)
-
-// Move Copy/Cut/Paste/Delete/Rename to the top of the menu (Windows 11 icon-row style)
-modify(where=this.id(id.cut, id.copy, id.paste, id.paste_shortcut, id.rename, id.delete)
+// Move Cut/Copy/Rename/Delete to the top of the menu (Windows 11 icon-row style)
+modify(where=this.id(id.cut, id.copy, id.rename, id.delete)
+	col=1)
+// Paste (and paste shortcut) stay in the icon row only when the clipboard has content;
+// when the clipboard is empty Windows leaves the item disabled, so hide it there.
+modify(where=!this.disabled and this.id(id.paste, id.paste_shortcut)
 	col=1)
 modify(where=this.id==id.delete sep="bottom")
 
+modify(type="recyclebin" where=window.is_desktop and this.id==id.empty_recycle_bin pos=1 sep)
+
 modify(find="unpin*" pos="bottom" menu="Pin/Unpin")
 modify(find="pin*" pos="top" menu="Pin/Unpin")
-modify(find='Notepad' vis='true')
+
 modify(where=this.id==id.copy_as_path menu="file manage")
 modify(type="dir.back|drive.back" where=this.id==id.customize_this_folder pos=1 sep="top" menu="file manage")
 

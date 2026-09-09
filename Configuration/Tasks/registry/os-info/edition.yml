@@ -19,11 +19,11 @@ actions:
       path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
       value: "EditionSubVersion",
       type: REG_SZ,
-      data: "LexBoosT OS™ 26.09",
+      data: "LexBoosT OS™ 26.09.1",
     }
   - !registryValue: {
       path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
       value: "RegisteredOrganization",
       type: REG_SZ,
-      data: "LexBoosT OS™ 26.09",
+      data: "LexBoosT OS™ 26.09.1",
     }

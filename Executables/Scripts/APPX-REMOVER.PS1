@@ -373,37 +373,12 @@ public class TokenManipulator {
         }
     }
 
-    # Schedule a folder for deletion at next boot via PendingFileRenameOperations.
-    # Used when the package is still registered (Staged SYSTEM) and files are locked.
+
     function Add-RebootDeletion {
         param([string]$path)
         if (-not (Test-Path -LiteralPath $path)) { return $true }
-        try {
-            $regPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
-            $existing = @()
-            try {
-                $existing = @(Get-ItemProperty -Path $regPath -Name 'PendingFileRenameOperations' -ErrorAction Stop |
-                        Select-Object -ExpandProperty PendingFileRenameOperations)
-            } catch { }
-
-            $entries = New-Object System.Collections.Generic.List[string]
-            # Cast to string[]: AddRange rejects Object[] from Get-ItemProperty.
-            $entries.AddRange([string[]]$existing)
-            # PendingFileRenameOperations is (source, dest) pairs; empty dest = delete.
-            $entries.Add("\??\$path")
-            $entries.Add("")
-            Get-ChildItem -LiteralPath $path -Recurse -Force -File -ErrorAction SilentlyContinue | ForEach-Object {
-                $entries.Add("\??\$($_.FullName)")
-                $entries.Add("")
-            }
-            Set-ItemProperty -Path $regPath -Name 'PendingFileRenameOperations' -Value $entries.ToArray() -Type MultiString
-            Write-Log '+' "Scheduled reboot deletion: $path"
-            return $true
-        }
-        catch {
-            Write-Log '-' "Failed to schedule reboot deletion for $path : $_"
-            return $false
-        }
+        Write-Log '-' "26.09.1.1: reboot-deletion disabled (PendingFileRenameOperations) - leftover folder kept: $path"
+        return $false
     }
 
     try {
@@ -670,7 +645,7 @@ public class TokenManipulator {
                                 Where-Object { $_ -and (Test-Path -LiteralPath $_) }
                             $stillRegistered = [bool](Get-AppxPackage -AllUsers -Name $pkg.Name -ErrorAction SilentlyContinue)
                             if ($leftovers -or $stillRegistered) {
-                                Write-Log '-' "Still locked after SYSTEM purge — scheduling reboot deletion for '$fullPackageName'..."
+                                Write-Log '-' "Still locked after SYSTEM purge - leftover folder kept (reboot-deletion disabled, 26.09.1.1): '$fullPackageName'"
                                 foreach ($p in $leftovers) {
                                     Add-RebootDeletion -path $p | Out-Null
                                 }

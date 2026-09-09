@@ -1,3 +1,41 @@
+﻿# LexBoosT OS™ V26.09.1
+
+## Performance & latency (DWM / Kernel)
+- ✨ SYSTEM_TWEAKS.PS1: clock timer kernel keys added (KiClockTimerPerCpu=1, ClockTimerPerCpu=1, KiClockTimerHighLatency=0, ClockTimerHighLatency=0, KiClockTimerAlwaysOnPresent=1, ClockTimerAlwaysOnPresent=1). Potential gain: per-CPU clock timers (each core handles its own timer interrupts — less cross-core overhead), high-latency timer mode disabled (quicker timer responses), timers kept always active (no low-power states) → more consistent frame times and lower input latency.
+- ✨ DWM.PS1: DWM schedule master keys added (FrameRateMin=0xFFFFFFFF (removes the minimum frame rate cap (full uncapped rendering)), LingerInterval=0 (eliminates delay between frame presents (lower latency))).
+- ✨ Updated DLSS files to 310.9.0 and Streamline 2.14 in DLSS GLOM.
+- ✨ DEVICES-TWEAKER-AUTO.PS1: NIC (Ethernet) IRQ pinning upgraded to **2 distinct physical cores** (SMT-aware selection from the free-core pool, adaptive, no hardcoded core numbers) — RSS/DPC load can now genuinely spread across two cores instead of straddling SMT siblings. Multi-queue is left intact (no forced MessageNumberLimit, driver queues unchanged), the ≤8-threads LOWTHREADS guard no longer blocks the NIC pin (it still guards GPU/AUDIO, X3D/laptop guards kept), and a vendor-agnostic RSS probe (`_nicVendorRSS`) scans the PnP + service "Device Parameters" keys for any vendor RSS/queue/interrupt-moderation mask and confines it to the pinned NIC cores when numeric — driver-managed/UI-only knobs are reported, never forced (works on any vendor).
+- ✨ DEVICES-TWEAKER-AUTO.PS1: the **GPU now reserves the best physical P-core** (MSI + High priority + SpecCPU affinity, mask validated) — previously it fell in the generic round-robin and could share a core with a NIC or audio interrupt, a known source of frametime jitter.
+- ✨ DEVICES-TWEAKER-AUTO.PS1: **USB input latency** — the mouse/keyboard HID child has no `Interrupt Management` key; its interrupt is actually serviced by the **xHCI host controller**. The 3 xHCI controllers are now detected language-agnostically (PnPClass=`USB` + IM key present = xHCI, hubs excluded) and pinned to a **dedicated 2nd-best P-core** (MSI + High priority + SpecCPU, mask validated; the GPU keeps the best core, the reserved core is excluded from the NIC/audio round-robin). Reverses the 26.09.1 blanket "xHCI = MSI + priority only" for controllers only: validated masks, X3D/laptop guards kept.
+
+## Stability fixes
+- 🪛 IRQ affinity restricted to GPU + Ethernet classes (DEVICES-TWEAKER-AUTO.PS1): USB (xHCI) controllers and audio codecs are now "MSI + priority only" (no more AssignmentSetOverride) — reduces the boot-freeze risk reported since 26.08; X3D and laptop guards added (no affinity pinning on 3D V-Cache CPUs or portable chassis).
+- 🪛 `SystemApps\Windows.CBSPreview` removal reverted (appx.yml + APPX-REMOVE-LIST.TXT) — deleting a SystemApps component breaks servicing/Windows Update and can destabilize the next boot.
+- 🪛 CrashControl restored (FINALIZE3.CMD): `CrashDumpEnabled=2`, `LogEvent=1`, `AutoReboot=1` — a boot-time bugcheck reboots, dumps and logs again (no more machines frozen with no diagnostic).
+- 🪛 Legacy "delete all power schemes" block removed from DEVICES.PS1 (it only triggered on EN locale and destroyed Balanced/OEM schemes) — CPU-specific and Windows power schemes are preserved.
+- 🪛 LOW-LATENCY-PROFILE.PS1: real **26200.8728+** build guard (UBR value read) — no more unknown ViVeTool feature IDs activated on early 25H2 revisions (boot bugcheck).
+- 🪛 Update finalization tasks re-enabled (SCHEDULED-TASKS-DISABLE.PS1 + tasks.yml): `sih`/`sihboot`/`sihpostreboot`, full UpdateOrchestrator block (`Reboot*`, `Resume On Boot`, `USO_UxBroker*`, `Universal Orchestrator Start`…), `WaaSMedicAgent` + `PerformRemediation`, `InstallService\RestoreDevice`/`WakeUpAnd*` — the first boot "Working on updates" can finalize again (fix for the stall when updates were pending).
+- 🪛 Disk integrity tasks re-enabled: `Autochk\Proxy`, `Chkdsk\ProactiveScan`, `Data Integrity Scan*` — boot-time chkdsk recovery after unclean shutdown.
+- 🪛 APPX-REMOVER.PS1: `PendingFileRenameOperations` mechanism disabled (smss boot-time folder deletion) — `StateRepository` purge confirmed per-package targeted; locked folders stay and are retried on the next run.
+- 🪛 DEVICES.PS1: duplicate functions removed (`Set-NtfsConfiguration` ×2, `Set-MobileSyncOptimizations` ×2); `Set-IRQAffinity`/`Set-IRQPriority` purged (unwired since 26.09; the GPU→CPU0 mask was dangerous if run manually); `Get-EcoreLayout` kept (used by `Set-NDISOptimizer`).
+- 🪛 broker.yml re-wired: TimeBroker keys (X3D-guarded) + WinRT activation blocks (WindowsSearchTask, ValueBanner, GamingAI.Companion) applied again; graphics.yml re-wired (HAGS `HwSchMode=2` effective).
+- 🪛 Kernel DPC/timer tweak keys (`DpcQueueDepth`/`IdealDpcRate`/`MinimumDpcRate`, `SplitLargeCaches`, `ThreadDpcEnable`, `MaximumSharedReadyQueueSize`, `GlobalTimerResolutionRequests`, `KiClockTimer*`/`ClockTimer*`) are applied on ALL CPUs.
+- 🪛 Storage interrupt handling restored to 26.07 behavior (DEVICES-TWEAKER-AUTO.PS1): the 26.09 `APPLY.MSIOFF.STOR` block that forced `MSISupported=0` (INTx) on ALL storage controllers is REMOVED.
+
+## LexBoosT Shell (context menu)
+- 🪛 Context menu: the **Paste** icon no longer appears in the icon row when nothing is on the clipboard. Previously `modify.nss` moved Cut/Copy/Paste/Rename/Delete to the Win11 icon column with no condition, so Paste stayed visible even when there was nothing to paste. It is now shown only when the clipboard actually has content (`modify.where=!this.disabled and this.id(id.paste, id.paste_shortcut)`) — empty clipboard = no Paste entry, filled clipboard = Paste back in the icon row.
+
+## Windows AI
+- 💥 Removed the LexBoosT Windows Remove AI tool. It is now replaced by direct Windows AI removal at first installation of the playbook.
+
+## LexBoosT Launcher
+- ✨ Lex Snake and Vampire Rage are now downloaded by the Launcher on demand instead of being preinstalled in `C:\Windows\LexBoosTOS\Games`: when a game's files are missing, an orange download arrow (↓) is shown next to its name. Clicking the button downloads the game zip (with a live % progress) and extracts it into its folder — the app icon and name are then restored automatically (no need to click the window to refresh the icon).
+- ✨ The button label stays centered in every state; while a download is running the name is hidden and only the download arrow + % are shown, so progress is clearly readable.
+- ✨ The Launcher now always opens elevated: an app manifest (`requireAdministrator`) was added so UAC runs it as Administrator at every launch, giving its launched apps the highest available elevation (no more failed "run as administrator" on some buttons).
+
+## New Programm
+- 🆕 LexBoosT Wallpaper Manager: easily change your wallpaper and lock screen background.
+
 # LexBoosT OS™ V26.09
 
 ## Performance & latency
@@ -1373,4 +1411,3 @@ https://ko-fi.com/post/LexBoosT-OS-V6-4-E1E71V5YFA
 - Collection of Powerplan (in LexBoosT OS Folder in Desktop)
 - Add Winmerge and Godot Engine in LexBoosT Ultimate Toolbox
 - Others little adjustments
-

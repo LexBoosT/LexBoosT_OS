@@ -475,11 +475,24 @@ actions:
   # ============================================
   # RUNTIMES / .NET optimization
   # ============================================
-  - !status: {status: 'Configuring Runtimes', onUpgrade: false}
+  - !status: {status: 'Configuring Runtimes (This may take some time, please be patient...)', onUpgrade: false}
   - !run:
       exeDir: true
       exe: 'powershell.exe'
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\RUNTIMES.PS1"'
+      runas: currentUserElevated
+      wait: true
+      weight: 100
+      onUpgrade: false
+
+  # ============================================
+  # DELETE WINDOWS AI
+  # ============================================
+  - !status: {status: 'Removing Windows AI (This may take some time, please be patient...)', onUpgrade: false}
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\REMOVEWINDOWSAI.PS1"'
       runas: currentUserElevated
       wait: true
       weight: 100

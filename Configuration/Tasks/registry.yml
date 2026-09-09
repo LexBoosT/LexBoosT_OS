@@ -41,6 +41,10 @@ actions:
   - !task: {path: 'Tasks\registry\bcdedit.yml'}
   - !status: {status: 'Config gaming'}
   - !task: {path: 'Tasks\registry\gaming.yml'}
+  - !status: {status: 'Config graphics'}
+  - !task: {path: 'Tasks\registry\graphics.yml'}
+  - !status: {status: 'Config broker'}
+  - !task: {path: 'Tasks\registry\broker.yml'}
   - !status: {status: 'Config power'}
   - !task: {path: 'Tasks\registry\power.yml'}
   - !status: {status: 'Config mobsync'}

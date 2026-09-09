@@ -51,8 +51,11 @@ try {
         Write-Log '-' "CPU detection failed: $_"
     }
     $build = 0
+    $ubr = 0
     try {
-        $build = [int](Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name CurrentBuild -ErrorAction Stop).CurrentBuild
+        $ver = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name CurrentBuild -ErrorAction Stop
+        $build = [int]$ver.CurrentBuild
+        $ubr = [int](Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name UBR -ErrorAction SilentlyContinue).UBR
     } catch {
         Write-Log '-' "Build detection failed: $_"
     }
@@ -60,14 +63,15 @@ try {
     $llpIds = '58989092,60716524,61391826,62816659'
     $uiIds  = '59213768,61754985,61225604,61596616,61596617,61596618,61596619'
 
+    $llpAvailable = ($build -gt 26200) -or ($build -eq 26200 -and $ubr -ge 8728)
     $enable = @()
     if ($isX3D) {
         Write-Log '-' "AMD 3D V-Cache detected: Low Latency Profile (K2 CPU boost) skipped (X3D stability)."
-    } elseif ($build -lt 26200) {
-        Write-Log '-' "Build ${build}: Low Latency Profile not available (26200.8728+ required), skipped."
+    } elseif (-not $llpAvailable) {
+        Write-Log '-' "Build ${build}.${ubr}: Low Latency Profile not available (26200.8728+ required), skipped."
     } else {
         $enable += $llpIds
-        Write-Log '+' "Low Latency Profile (K2 CPU boost) enabled."
+        Write-Log '+' "Low Latency Profile (K2 CPU boost) enabled (build ${build}.${ubr})."
     }
 
     # UI feature IDs (new Start Menu / Taskbar) also only exist on 26200+;

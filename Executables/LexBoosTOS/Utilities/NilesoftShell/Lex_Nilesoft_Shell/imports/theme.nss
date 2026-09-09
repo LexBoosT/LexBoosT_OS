@@ -1,13 +1,13 @@
-theme
+﻿theme
 {
-	name = "modern"
-	dark = 1
+	name="modern"
+	dark=auto
 	background
 	{
-		color = auto
-		opacity = 70
-		effect = auto
+		color=auto
+		opacity=auto
+		effect=auto
 	}
-	animation=10
-	image.align = 2
+	animation=0
+	image.align=2
 }

@@ -1,18 +1,6 @@
 ﻿#Requires -RunAsAdministrator
 #Requires -Version 5.1
 
-<#
-.SYNOPSIS
-    Telemetry and data-collection disabling.
-.DESCRIPTION
-    Migrated from registry/telemetry.yml. Disables:
-    - Telemetry services (DiagTrack, WTDS)
-    - AllowTelemetry policy
-    - 30+ WMI Autologger sessions
-    - DMA remapping / StorPort idle power management
-    - Cloud SDK / Docker / .NET / VS / npm telemetry env vars
-#>
-
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference    = 'SilentlyContinue'
 
@@ -23,20 +11,6 @@ function Write-Log {
 
 Write-Log '+' "Applying telemetry and data-collection disabling..."
 
-# =============================================================================
-# 1. Core telemetry policies
-# =============================================================================
-# HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components is owned by
-# TrustedInstaller ??? "Acc??s refus??" via reg add even when elevated. Use MinSudo.
-$minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
-$hasMinSudo = Test-Path $minSudo
-
-# WTDS\Components\ServiceEnabled. The value lives in 'HKLM\...\WTDS\Components"'
-# (note the trailing double-quote in the subkey name ??? a Windows quirk).
-# The key/value pair is owned by the WTDS service and the registry ACL forbids
-# modifications by Administrators after the first write. The value is already 0
-# on any system where WTDS has been disabled even once, so we just verify and
-# skip otherwise.
 $wtdsValue = Get-ItemProperty -Path 'Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components"' -Name 'ServiceEnabled' -ErrorAction SilentlyContinue
 if ($wtdsValue -and ($wtdsValue.ServiceEnabled -eq 0)) {
     Write-Log '+' "WTDS ServiceEnabled already 0 (no change needed)"
@@ -102,6 +76,9 @@ foreach ($name in $autologgers) {
 # Use the registry provider directly instead of parsing reg.exe output (avoids
 # the "ERREUR: nom de cl?? non valide" loop when a value name contains spaces
 # or special characters that confuse the regex match).
+    # AMD GUARD (2026-09-04): AMD-Vi/IOMMU critical on AMD; disable DMA remapping only on Intel
+    $isAMD = ((Get-CimInstance Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1).Name -match 'AMD')
+    if (-not $isAMD) {
 try {
     $root = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
         [Microsoft.Win32.RegistryHive]::LocalMachine, $env:COMPUTERNAME)
@@ -111,7 +88,7 @@ try {
             $sub = $servicesKey.OpenSubKey($subName)
             if ($sub) {
                 try {
-                    if ($sub.GetValue('DmaRemappingCompatible') -ne $null) {
+                    if ($null -ne $sub.GetValue('DmaRemappingCompatible')) {
                         $sub.SetValue('DmaRemappingCompatible', 0, [Microsoft.Win32.RegistryValueKind]::DWord)
                     }
                 } catch { }
@@ -123,6 +100,7 @@ try {
 } catch {
     Write-Log '-' "DMA remapping sweep failed: $_"
 }
+    }
 $root = $null
 
 # =============================================================================
@@ -140,7 +118,7 @@ try {
                 $dev = $bus.OpenSubKey($devName)
                 if (-not $dev) { continue }
                 try {
-                    if ($dev.GetValue('StorPort') -ne $null) {
+                    if ($null -ne $dev.GetValue('StorPort')) {
                         $dev.SetValue('EnableIdlePowerManagement', 0, [Microsoft.Win32.RegistryValueKind]::DWord)
                     }
                 } catch { }
