@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -417,13 +417,68 @@
             max-width: 900px;
             margin: 0 auto;
         }
-        .showcase-img {
+        .showcase-slideshow {
+            position: relative;
             width: 100%;
-            max-width: 100%;
+            aspect-ratio: 1408 / 760;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
             box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            background: #000;
         }
+        .showcase-slideshow img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .showcase-slideshow img.active { opacity: 1; }
+        .showcase-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: rgba(5,5,8,0.6);
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .showcase-nav:hover { background: rgba(139,92,246,0.4); }
+        .showcase-nav.prev { left: 10px; }
+        .showcase-nav.next { right: 10px; }
+        .showcase-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 50px;
+        }
+        .showcase-dots button {
+            width: 8px;
+            height: 8px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            cursor: pointer;
+            padding: 0;
+        }
+        .showcase-dots button.active { background: var(--accent-1); }
     </style>
 </head>
 <body>
@@ -434,7 +489,7 @@
         <ul class="nav-links">
             <li><a href="#perf"><span lang-fr>Performances</span><span lang-en>Performance</span></a></li>
             <li><a href="#features"><span lang-fr>Fonctionnalités</span><span lang-en>Features</span></a></li>
-            <li><a href="#launcher"><span lang-fr>Launcher</span><span lang-en>Launcher</span></a></li>
+            <li><a href="#launcher"><span lang-fr>Tweaks &amp; Tools</span><span lang-en>Tweaks &amp; Tools</span></a></li>
             <li><a href="#install"><span lang-fr>Installation</span><span lang-en>Installation</span></a></li>
             <li><a href="#support">Support</a></li>
             <li><a href="changelog.html" style="color: var(--accent2);"><span lang-fr>📋 Changelog</span><span lang-en>📋 Changelog</span></a></li>
@@ -603,7 +658,7 @@
                     <li><span lang-fr>6 navigateurs au choix (Brave, Firefox, Vivaldi, etc.)</span><span lang-en>6 browsers to choose from (Brave, Firefox, Vivaldi, etc.)</span></li>
                     <li><span lang-fr>Thème dark personnalisé, wallpapers, avatar</span><span lang-en>Custom dark theme, wallpapers, avatar</span></li>
                     <li><span lang-fr>Menu Démarrer nettoyable (Wipe!), icônes desktop</span><span lang-en>Cleanable Start Menu (Wipe!), desktop icons</span></li>
-                    <li><span lang-fr>LexBoosT Launcher: 40+ outils post-installation</span><span lang-en>LexBoosT Launcher: 40+ post-install tools</span></li>
+                    <li><span lang-fr>LexBoosT Tweaks &amp; Tools: 40+ outils post-installation</span><span lang-en>LexBoosT Tweaks &amp; Tools: 40+ post-install tools</span></li>
                     <li><span lang-fr>Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7</span><span lang-en>Runtimes: VC++ 2005-2022, .NET 7/8/9, DirectX, PS7</span></li>
                 </ul>
             </div>
@@ -616,11 +671,29 @@
     <div class="container">
         <div class="section-header reveal">
             <div class="icon">🚀</div>
-            <h2><span lang-fr>LexBoosT Launcher</span><span lang-en>LexBoosT Launcher</span></h2>
+            <h2><span lang-fr>LexBoosT Tweaks &amp; Tools</span><span lang-en>LexBoosT Tweaks &amp; Tools</span></h2>
             <p><span lang-fr>40+ outils post-installation pour garder le contrôle total de votre système.</span><span lang-en>40+ post-install tools to keep full control of your system.</span></p>
         </div>
         <div class="showcase reveal">
-            <img src="1.png" alt="LexBoosT OS Launcher" class="showcase-img">
+            <div class="showcase-slideshow" id="showcase-slideshow">
+            <img src="launcher-01.png" alt="LexBoosT Tweaks &amp; Tools 01/17" loading="lazy">
+            <img src="launcher-02.png" alt="LexBoosT Tweaks &amp; Tools 02/17" loading="lazy">
+            <img src="launcher-03.png" alt="LexBoosT Tweaks &amp; Tools 03/17" loading="lazy">
+            <img src="launcher-04.png" alt="LexBoosT Tweaks &amp; Tools 04/17" loading="lazy">
+            <img src="launcher-05.png" alt="LexBoosT Tweaks &amp; Tools 05/17" loading="lazy">
+            <img src="launcher-06.png" alt="LexBoosT Tweaks &amp; Tools 06/17" loading="lazy">
+            <img src="launcher-07.png" alt="LexBoosT Tweaks &amp; Tools 07/17" loading="lazy">
+            <img src="launcher-08.png" alt="LexBoosT Tweaks &amp; Tools 08/17" loading="lazy">
+            <img src="launcher-09.png" alt="LexBoosT Tweaks &amp; Tools 09/17" loading="lazy">
+            <img src="launcher-10.png" alt="LexBoosT Tweaks &amp; Tools 10/17" loading="lazy">
+            <img src="launcher-11.png" alt="LexBoosT Tweaks &amp; Tools 11/17" loading="lazy">
+            <img src="launcher-12.png" alt="LexBoosT Tweaks &amp; Tools 12/17" loading="lazy">
+            <img src="launcher-13.png" alt="LexBoosT Tweaks &amp; Tools 13/17" loading="lazy">
+            <img src="launcher-14.png" alt="LexBoosT Tweaks &amp; Tools 14/17" loading="lazy">
+            <img src="launcher-15.png" alt="LexBoosT Tweaks &amp; Tools 15/17" loading="lazy">
+            <img src="launcher-16.png" alt="LexBoosT Tweaks &amp; Tools 16/17" loading="lazy">
+            <img src="launcher-17.png" alt="LexBoosT Tweaks &amp; Tools 17/17" loading="lazy">
+            </div>
         </div>
     </div>
 </section>
@@ -797,6 +870,55 @@
             });
     })();
 })();
+
+    // Showcase slideshow (auto + nav + dots)
+    (function() {
+        var wrap = document.getElementById("showcase-slideshow");
+        if (!wrap) return;
+        var imgs = wrap.querySelectorAll("img");
+        var n = imgs.length;
+        if (!n) return;
+        var idx = 0, timer = null;
+        // dots
+        var dots = document.createElement("div");
+        dots.className = "showcase-dots";
+        for (var k = 0; k < n; k++) {
+            (function(k) {
+                var b = document.createElement("button");
+                b.setAttribute("aria-label", "Image " + (k+1));
+                b.addEventListener("click", function() { show(k, true); });
+                dots.appendChild(b);
+            })(k);
+        }
+        wrap.appendChild(dots);
+        var dotEls = dots.querySelectorAll("button");
+        // prev/next arrows
+        function mkArrow(cls, ch, fn) {
+            var a = document.createElement("button");
+            a.className = "showcase-nav " + cls;
+            a.innerHTML = ch;
+            a.addEventListener("click", function() { fn(); });
+            wrap.appendChild(a);
+        }
+        mkArrow("prev", "&#8249;", function() { show(idx-1, true); });
+        mkArrow("next", "&#8250;", function() { show(idx+1, true); });
+        function show(i, user) {
+            idx = (i + n) % n;
+            for (var m = 0; m < n; m++) {
+                imgs[m].classList.toggle("active", m === idx);
+                dotEls[m].classList.toggle("active", m === idx);
+            }
+            if (user) restart();
+        }
+        function restart() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(function() { show(idx+1, false); }, 3000);
+        }
+        show(0, false);
+        // pause on hover
+        wrap.addEventListener("mouseenter", function() { if (timer) { clearInterval(timer); timer = null; } });
+        wrap.addEventListener("mouseleave", function() { restart(); });
+    })();
 </script>
 
 </body>
