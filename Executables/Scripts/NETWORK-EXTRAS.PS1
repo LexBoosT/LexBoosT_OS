@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 #Requires -Version 5.1
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -18,20 +18,6 @@ Write-Log '+' 'Applying targeted netsh settings (DNS + congestion provider prese
 netsh int tcp set security profiles=disabled | Out-Null
 netsh int udp set global uro=enabled         | Out-Null
 netsh int tcp set global timestamps=disabled| Out-Null
-
-# -----------------------------------------------------------------------------
-# 0a. Global UDP low-latency settings (absorbed from the former network
-#      finalize step): RSC / checksum offload / GRO off and low-latency on.
-#      Avoids internal buffering pauses in games (CS2, Valorant, Quake-like)
-#      and keeps Realtek/Killer drivers stable. No stack reset.
-# -----------------------------------------------------------------------------
-Write-Log '+' 'Applying global UDP low-latency settings...'
-netsh int udp set global rsc=disabled             | Out-Null
-netsh int udp set global checksumoffload=disabled | Out-Null
-netsh int udp set global gro=disabled             | Out-Null
-netsh int udp set global lowlatency=enabled       | Out-Null
-netsh int udp set global flowcontrol=disabled     | Out-Null
-Write-Log '+' 'Global UDP low-latency settings applied'
 
 # -----------------------------------------------------------------------------
 # 0b. Disable unused bindings (live apply - no device removal; pnputil
@@ -73,7 +59,6 @@ foreach ($nic in $adapters) {
         @{ Keyword='*EEE';                     Value=0;    Name='Energy-Efficient Ethernet' },
         @{ Keyword='EnableGreenEthernet';      Value=0;    Name='Green Ethernet' },
         @{ Keyword='PowerSavingMode';          Value=0;    Name='Power Saving Mode' },
-        @{ Keyword='*SpeedPowerManagement';    Value=0;    Name='Speed Power Management' },
         @{ Keyword='UseInterruptSteering';     Value=0;    Name='Interrupt Steering' },
         @{ Keyword='*JumboPacket';             Value=1514; Name='Jumbo Packet' },
         @{ Keyword='DisableLLDP';              Value=1;    Name='Disable LLDP' },
@@ -191,3 +176,4 @@ try {
 
 Write-Log '+' 'Network extras applied.'
 exit 0
+

@@ -29,6 +29,9 @@ Write-Host ' LexBoosT OS - Network Stack Configuration       '
 Write-Host '================================================'
 
 Write-Log '+' 'Applying TCP/IP global settings...'
+# [FIX] ECN forcé à disabled (état identique au défaut Windows — ne casse PAS
+# Discord/Vesktop, contrairement à ecncapability=enabled qui cassait la connexion
+# sur les chemins réseau dont les middleboxes gèrent mal ECN).
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global ecncapability=disabled 2>$null } -TimeoutSec 3 -Description 'ecncapability=disabled'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global rss=enabled 2>$null } -TimeoutSec 3 -Description 'rss=enabled'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global rssbasecpu=0 2>$null } -TimeoutSec 3 -Description 'rssbasecpu=0'
@@ -37,15 +40,12 @@ Invoke-WithTimeout -ScriptBlock { netsh int tcp set global netdma=disabled 2>$nu
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global nonsackrttresiliency=disabled 2>$null } -TimeoutSec 3 -Description 'nonsackrttresiliency=disabled'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global autotuninglevel=normal 2>$null } -TimeoutSec 3 -Description 'autotuninglevel=normal'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global congestionprovider=ctcp 2>$null } -TimeoutSec 3 -Description 'congestionprovider=ctcp'
-# initialRTO=2000 REMOVED (2026-10-03): the 2s first retransmit timer made
-# RustDesk/AnyDesk session setup crawl on packet loss (relays, wake-from-sleep).
-# Stock Windows initial RTO (~300ms) restores fast TCP handshakes with no
-# gaming downside measurable at our MTU/RTO profile.
-# Active reset: machines provisioned before the fix still carry 2000.
-Invoke-WithTimeout -ScriptBlock { netsh int tcp set global initialRTO=300 2>$null } -TimeoutSec 3 -Description 'initialRTO=300 (stock reset)'
+Invoke-WithTimeout -ScriptBlock { netsh int tcp set global initialRTO=2000 2>$null } -TimeoutSec 3 -Description 'initialRTO=2000'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global rsc=disabled 2>$null } -TimeoutSec 3 -Description 'rsc=disabled'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global timestamps=disabled 2>$null } -TimeoutSec 3 -Description 'timestamps=disabled'
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global maxsynretransmissions=4 2>$null } -TimeoutSec 3 -Description 'maxsynretransmissions=4'
+# [FIX] Fast Open retiré : fastopen=enabled cassait aussi la connexion Discord/Vesktop
+# (suspect secondaire, même symptôme qu'ECN). Le défaut Windows (disabled) est conservé.
 Invoke-WithTimeout -ScriptBlock { netsh int tcp set global prr=enabled 2>$null } -TimeoutSec 3 -Description 'prr=enabled'
 Write-Log '+' 'TCP/IP global settings applied'
 
@@ -65,9 +65,16 @@ Invoke-WithTimeout -ScriptBlock { netsh int ip set dynamicport tcp start=32769 n
 Invoke-WithTimeout -ScriptBlock { netsh int ip set dynamicport udp start=32769 num=32766 2>$null } -TimeoutSec 3 -Description 'dynamicport udp'
 Write-Log '+' 'Dynamic port range set'
 
+# [FIX] Polices QoS VoIP retirées : le marquage DSCP 46 + priorité 802.1p 7 sur
+# Discord.exe/Vesktop.exe cassait la connexion (trames VLAN-taggées dropées par
+# certains routeurs/box). Cleanup seul — si le playbook est relancé sur une
+# machine déjà affectée, les anciennes polices VoIP_* sont supprimées (répare).
 Write-Log '+' 'Cleaning up VoIP QoS policies (DSCP/802.1p tagging removed — broke Discord/Vesktop)...'
 Get-NetQosPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq 'VoIP' -or $_.Name -like 'VoIP_*' } | Remove-NetQosPolicy -Confirm:$false -ErrorAction SilentlyContinue
 Write-Log '+' 'VoIP QoS policies cleaned'
+
+# [MODIFIÉ] Suppression du restart des cartes réseau — préserve les DNS/config statiques
+Write-Log '+' 'Skipping network adapter restart (DNS/config preservation)'
 
 Write-Log '+' 'Disabling Remote Assistance firewall rule...'
 Invoke-WithTimeout -ScriptBlock { netsh advfirewall firewall set rule group='Remote Assistance' new enable=no *>$null } -TimeoutSec 3 -Description 'disable Remote Assistance'
