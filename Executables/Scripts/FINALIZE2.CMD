@@ -174,20 +174,6 @@ reg add "HKCU\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /v 
 reg add "HKCU\SOFTWARE\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f >nul 2>&1
 
-:: ============================================================
-:: SAFE TOUCH / TABLET / TOUCHPAD UI TWEAKS (desktop-only guard, cosmetic only)
-:: ============================================================
-:: Block design:
-::   Layer 1 Chassis type: skip entirely on laptop/notebook/tablet/convertible
-::   Layer 2 PnP device scan: skip if any I2C HID, touchpad, touchscreen,
-::             precision touchpad, ELAN/Synaptics/ALPS pointing device is present
-::   The block below only runs on a genuine desktop with no touch/touchpad HID.
-::   NOTE 2026-08-10: only cosmetic/UI tweaks remain. The input-blocking values
-::   (TabletPC\TurnOffTouchInput=1, PenService Start=4) were removed - the detection
-::   is language-dependent (FR "Ecran tactile compatible HID" matches nothing) and
-::   misses USB touch monitors plugged in after install: real touchscreens were
-::   getting disabled. Do NOT re-add input-blocking keys here.
-:: ============================================================
 echo [+] Checking chassis + PnP for touch/touchpad/I2C HID devices...
 powershell -NoP -Command ^
   "$skip=$false; " ^

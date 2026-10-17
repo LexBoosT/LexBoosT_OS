@@ -1,4 +1,4 @@
----
+﻿---
 title: System
 privilege: TrustedInstaller
 description: Core system tweaks — values migrated to SYSTEM_TWEAKS.PS1
@@ -9,10 +9,12 @@ actions:
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\SYSTEM_TWEAKS.PS1"'
     weight: 200
     wait: true
+
   - !run:
     exeDir: true
     exe: 'powershell.exe'
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES.PS1" -Device @("Configure-PowerScheme","Configure-Adapters","Configure-Drives","Configure-PowerThrottling","Configure-NDISOptimizer","Configure-DesktopPowerOptimizations","Configure-IntelHybridVisibility")'
+    runas: currentUserElevated
     weight: 200
     wait: true
 
@@ -22,6 +24,7 @@ actions:
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEVICES-TWEAKER-AUTO.PS1"'
     weight: 200
     wait: true
+    onUpgrade: false
 
   - !run:
     exeDir: true
@@ -29,6 +32,7 @@ actions:
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\MMCSS-NIC.PS1"'
     weight: 200
     wait: true
+    onUpgrade: false
 
   # Intel APO (si Intel 12e gen+/Core Ultra) - no-op sur AMD
   - !run:
@@ -37,6 +41,7 @@ actions:
     args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\ENABLE-INTEL-APO.PS1"'
     weight: 200
     wait: true
+    onUpgrade: false
 
   - !status: {status: 'Removing EFI Drive Letter'}
   - !run:
@@ -46,3 +51,6 @@ actions:
     wait: true
     weight: 200
     onUpgrade: false
+
+  - !status: {status: 'Configuring Win32PrioritySeparation', onUpgrade: false}
+  - !registryValue: {path: HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl', value: 'Win32PrioritySeparation', type: REG_DWORD, data: '38', onUpgrade: false}

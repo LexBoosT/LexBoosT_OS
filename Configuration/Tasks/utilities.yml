@@ -41,14 +41,13 @@ actions:
   # ============================================
   # APPLY THEME (after browsers are installed)
   # ============================================
-  - !status: {status: 'Installing Theme', option: "configure-theme"}
+  - !status: {status: 'Installing Theme'}
   - !powerShell: {
       command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action CopyThemeFile',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
       weight: 50,
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action InstallTheme',
@@ -56,7 +55,6 @@ actions:
       runas: currentUserElevated,
       wait: true,
       weight: 50,
-      option: "configure-theme",
     }
 
   - !status: {status: 'Configuring User Folders'}
@@ -68,12 +66,20 @@ actions:
       weight: 50,
     }
 
-  - !run:
-      exeDir: true
-      exe: 'powershell.exe'
-      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DEPLOYWELCOME.PS1"'
-      runas: currentUserElevated
-      wait: true
+  # ============================================
+  # BOOT WELCOME PANEL (post-sign-in)
+  # CONFIGURE-BOOT-WELCOME.PS1 deploys SHOW-WELCOME-PANEL.PS1 +
+  # LAUNCH-WELCOME-PANEL.VBS and registers the LOGON task
+  # "LexBoosT OS - Welcome".
+  # ============================================
+  - !status: {status: 'Configuring Boot Welcome Panel'}
+  - !run: {
+      exeDir: true,
+      exe: 'powershell.exe',
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\CONFIGURE-BOOT-WELCOME.PS1"',
+      runas: currentUserElevated,
+      wait: true,
+    }
 
   # ============================================
   # END OF INSTALLATION - completion marker

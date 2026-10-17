@@ -32,24 +32,24 @@ $backupDir = Join-Path $env:ProgramData 'LexBoosTOS\Backups'
 # -----------------------------------------------------------------------------
 $presetIntelEthernet = @{
     '*EnableDynamicPowerGating'      = 0
-    '*EncapsulatedPacketTaskOffload' = 0
-    '*EncapsulatedPacketTaskOffloadNvgre' = 0
-    '*EncapsulatedPacketTaskOffloadVxlan' = 0
-    '*IPChecksumOffloadIPv4'         = 0
-    '*IPsecOffloadV1IPv4'            = 0
-    '*IPsecOffloadV2'                = 0
-    '*IPsecOffloadV2IPv4'            = 0
+    '*EncapsulatedPacketTaskOffload' = 1
+    '*EncapsulatedPacketTaskOffloadNvgre' = 1
+    '*EncapsulatedPacketTaskOffloadVxlan' = 1
+    '*IPChecksumOffloadIPv4'         = 3
+    '*IPsecOffloadV1IPv4'            = 3
+    '*IPsecOffloadV2'                = 3
+    '*IPsecOffloadV2IPv4'            = 3
     '*InterruptModeration'           = 0
     '*InterruptModerationRate'       = 0
-    '*LsoV1IPv4'                     = 0
-    '*LsoV2IPv4'                     = 0
-    '*LsoV2IPv6'                     = 0
+    '*LsoV1IPv4'                     = 1
+    '*LsoV2IPv4'                     = 1
+    '*LsoV2IPv6'                     = 1
     '*MaxRssProcessors'              = 4
     '*ModernStandbyWoLMagicPacket'   = 0
     '*NicAutoPowerSaver'             = 0
     '*NumRSSQueues'                  = 1
-    '*PMARPOffload'                  = 0
-    '*PMWiFiRekeyOffload'            = 0
+    '*PMARPOffload'                  = 1
+    '*PMWiFiRekeyOffload'            = 1
     '*PacketDirect'                  = 1
     '*PriorityVLANTag'               = 0
     '*RSSBaseProcGroup'              = 0
@@ -60,14 +60,21 @@ $presetIntelEthernet = @{
     '*RscIPv6'                       = 0
     '*SelectiveSuspend'              = 0
     '*SSIdleTimeout'                 = 0
-    '*TCPChecksumOffloadIPv4'        = 0
-    '*TCPChecksumOffloadIPv6'        = 0
-    '*TCPUDPChecksumOffloadIPv4'     = 0
-    '*TCPUDPChecksumOffloadIPv6'     = 0
+    '*TCPChecksumOffloadIPv4'        = 3
+    '*TCPChecksumOffloadIPv6'        = 3
+    '*TCPUDPChecksumOffloadIPv4'     = 3
+    '*TCPUDPChecksumOffloadIPv6'     = 3
     '*TransmitBuffers'               = 1024
-    '*UDPChecksumOffloadIPv4'        = 0
-    '*UDPChecksumOffloadIPv6'        = 0
-    '*UsoIPv4'                       = 0
+    '*UDPChecksumOffloadIPv4'        = 3
+    '*UDPChecksumOffloadIPv6'        = 3
+    '*UsoIPv4'                       = 1
+    '*PMNSOffload'                   = 1
+    '*TCPConnectionOffloadIPv4'      = 3
+    '*TCPConnectionOffloadIPv6'      = 3
+    '*UsoIPv6'                       = 1
+    '*EEE'                           = 0
+    'EEELinkAdvertisement'           = 0
+    'EnableGreenEthernet'            = 0
     '*WakeOnMagicPacket'             = 0
     '*WakeOnPattern'                 = 0
     '*DeviceSleepOnDisconnect'       = 0
@@ -76,7 +83,7 @@ $presetIntelEthernet = @{
     '*TxIntDelay'                    = 0
     '*InterruptCoalescing'           = 0
     '*RscIpV4'                       = 0
-    '*UdpRsc'                        = 0
+    '*UdpRsc'                        = 1
     '*ForceRscEnabled'               = 0
     # Non-prefixed variants (same values)
     'ReceiveBuffers'                 = 2048
@@ -87,7 +94,7 @@ $presetIntelEthernet = @{
     'Coalesce'                       = 0
     'RscIpV4'                        = 0
     'RscIpV6'                        = 0
-    'UdpRsc'                         = 0
+    'UdpRsc'                         = 1
     'ForceRscEnabled'                = 0
     'FlowControl'                    = 0
     'PriorityVLANTag'                = 0
@@ -312,6 +319,12 @@ foreach ($adapter in $adapters) {
     Set-NetIPInterface -InterfaceIndex $idx -WeakHostReceive Disabled -ErrorAction SilentlyContinue
     Set-NetIPInterface -InterfaceIndex $idx -WeakHostSend Disabled -ErrorAction SilentlyContinue
     Set-NetIPInterface -InterfaceIndex $idx -NlMtu 1500 -ErrorAction SilentlyContinue
+    # TCP (per-interface): disable delayed ACK
+    $tcpKey = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$($adapter.InterfaceGuid)"
+    if (Test-Path $tcpKey) {
+        Set-ItemProperty -Path $tcpKey -Name 'TcpAckFrequency' -Value 1 -Type DWord -EA SilentlyContinue
+        Set-ItemProperty -Path $tcpKey -Name 'TcpDelAckTicks' -Value 0 -Type DWord -EA SilentlyContinue
+    }
 }
 
 # -----------------------------------------------------------------------------

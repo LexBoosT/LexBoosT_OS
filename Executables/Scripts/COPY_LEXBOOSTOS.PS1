@@ -146,7 +146,7 @@ if (Test-Path -LiteralPath $sourcePath) {
         $robocopyArgs += 'Force Timer Resolution.xml'
         Write-Log '+' 'Preserving existing Force Timer Resolution.xml'
     }
-    $robocopyArgs += @('/XD', 'Logs', 'Backup')
+    $robocopyArgs += @('/XD', 'Logs', 'Backup', 'Games')
     & robocopy @robocopyArgs
 
     foreach ($pair in @(@{S=$shellSrc; D=$shellDst}, @{S=$blurSrc; D=$blurDst})) {

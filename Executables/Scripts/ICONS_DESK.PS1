@@ -21,10 +21,6 @@ $script:LEXBOOST_ROOT = "$env:WINDIR\LexBoosTOS"
 $script:LEXBOOST_OTHER = Join-Path $script:LEXBOOST_ROOT "Resources\Icons"
 $script:DESKTOP_PATH = [Environment]::GetFolderPath("Desktop")
 
-# URLs and external links
-$script:SUPPORT_URL = "https://ko-fi.com/lexboostdev"
-$script:WEBSITE_URL = "https://lexboost.github.io/LexBoosT_OS/"
-
 # ============================================================================
 # Utility Functions
 # ============================================================================
@@ -226,44 +222,6 @@ function Enable-UserFolderIcon {
     return $success
 }
 
-function New-SupportShortcut {
-    [CmdletBinding()]
-    param()
-
-    Write-LogMessage "Creating support shortcut..." -Level Info
-
-    $iconPath = Join-Path $script:LEXBOOST_OTHER "Donate.ico"
-
-    # Check if icon exists
-    if (-not (Test-Path $iconPath)) {
-        Write-LogMessage "Support icon not found: $iconPath" -Level Warning
-        $iconPath = "" # Clear icon path if not found
-    }
-
-    $success = New-DesktopShortcut -ShortcutName "Support Me" -TargetPath $script:SUPPORT_URL -IconLocation $iconPath -Description "Support LexBoosT Development"
-
-    return $success
-}
-
-function New-WebsiteShortcut {
-    [CmdletBinding()]
-    param()
-
-    Write-LogMessage "Creating website shortcut..." -Level Info
-
-    $iconPath = Join-Path $script:LEXBOOST_OTHER "website.ico"
-
-    # Check if icon exists
-    if (-not (Test-Path $iconPath)) {
-        Write-LogMessage "Website icon not found: $iconPath" -Level Warning
-        $iconPath = "" # Clear icon path if not found
-    }
-
-    $success = New-DesktopShortcut -ShortcutName "LexBoosT OS™ Website" -TargetPath $script:WEBSITE_URL -IconLocation $iconPath -Description "Visit the LexBoosT OS Website"
-
-    return $success
-}
-
 function Disable-SilentAppInstallations {
     [CmdletBinding()]
     param()
@@ -283,10 +241,10 @@ function New-LexBoosTLauncherShortcut {
     [CmdletBinding()]
     param()
 
-    Write-LogMessage "Creating LexBoosT Launcher shortcut..." -Level Info
+    Write-LogMessage "Creating LexBoosT Tweaks & Tools shortcut..." -Level Info
 
-    $launcherPath = Join-Path $script:LEXBOOST_ROOT "LexBoosT_Launcher\LexBoost_Launcher.exe"
-    $iconPath = Join-Path $script:LEXBOOST_OTHER "icon.ico"
+    $launcherPath = Join-Path $script:LEXBOOST_ROOT "\Scripts\Programs\INSTALLSOFTS.exe"
+    $iconPath = Join-Path $script:LEXBOOST_OTHER "soft.ico"
 
     # Validate required files
     $fileChecks = @{
@@ -294,7 +252,7 @@ function New-LexBoosTLauncherShortcut {
     }
 
     if (-not (Test-RequiredFiles -FileChecks $fileChecks)) {
-        Write-LogMessage "Cannot create LexBoosT Launcher shortcut due to missing executable" -Level Error
+        Write-LogMessage "Cannot create LexBoosT Tweaks & Tools shortcut due to missing executable" -Level Error
         return $false
     }
 
@@ -304,7 +262,7 @@ function New-LexBoosTLauncherShortcut {
         $iconPath = "" # Clear icon path if not found
     }
 
-    $success = New-DesktopShortcut -ShortcutName "LexBoosT™ Tools Launcher" -TargetPath $launcherPath -IconLocation $iconPath -Description "Launch LexBoosT OS Applications"
+    $success = New-DesktopShortcut -ShortcutName "LexBoosT Tweaks & Tools" -TargetPath $launcherPath -IconLocation $iconPath -Description "Launch LexBoosT Tweaks & Tools"
 
     return $success
 }
@@ -330,8 +288,6 @@ else {
 
 # Create shortcuts
 $shortcutSuccess = $true
-$shortcutSuccess = $shortcutSuccess -and (New-SupportShortcut)
-$shortcutSuccess = $shortcutSuccess -and (New-WebsiteShortcut)
 $shortcutSuccess = $shortcutSuccess -and (New-LexBoosTLauncherShortcut)
 
 if ($shortcutSuccess) {

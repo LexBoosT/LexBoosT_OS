@@ -1,4 +1,4 @@
-﻿#Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 #Requires -Version 5.1
 
 [CmdletBinding()]
@@ -67,6 +67,9 @@ Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\16.0\SQM'                 'OptIn'  
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\VSCommon\17.0\SQM'                 'OptIn'         'REG_DWORD' '0'
 
 # === Fault Tolerant Heap ===
+if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') {
+    try { rundll32.exe fthsvc.dll,FthSysprepSpecialize 2>$null } catch {}
+}
 Invoke-Reg 'HKLM\SOFTWARE\Microsoft\FTH'                                 'Enabled'       'REG_DWORD' '0'
 
 # === Error Reporting ===

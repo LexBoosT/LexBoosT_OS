@@ -46,7 +46,6 @@ actions:
   - !scheduledTask: {path: '\Microsoft\Windows\Input\LocalUserSyncDataAvailable', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\Input\MouseSyncDataAvailable', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\Input\PenSyncDataAvailable', operation: disable}
-  - !scheduledTask: {path: '\Microsoft\Windows\Input\TouchPadSyncDataAvailable', operation: disable, option: 'disable-touchpad-sync'}
   - !scheduledTask: {path: '\Microsoft\Windows\Input\syncpensettings', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\InstallService\ScanForUpdates', operation: disable}
   - !scheduledTask: {path: '\Microsoft\Windows\InstallService\ScanForUpdatesAsUser', operation: disable}

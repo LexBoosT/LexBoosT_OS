@@ -452,7 +452,7 @@ foreach ($d in $orderedDevices) {
 
     $policy = 'SpecCPU'
     $affinityRestricted = $d.Kind -eq 'AUDIO'
-    if ($affinityRestricted) { _log "AUTO.RESTRICT: $($d.Kind) $($d.InstanceId) -> MSI + priority only (affinity restricted in 26.09.1.1)" }
+    if ($affinityRestricted) { _log "AUTO.RESTRICT: $($d.Kind) $($d.InstanceId) -> MSI + priority only (affinity restricted in 26.10)" }
       # NIC overrides the LOWTHREADS guard: pinning the NIC to 2 cores on an 8-thread CPU is safe
       # (it is the whole point of RSS/DPC confinement). X3D + laptop guards still apply.
       $nicOverrideLowThreads = ($d.Kind -match 'NET') -and $lowThreadCpu -and (-not ($IsAmdX3D -or $isLaptopChassis))

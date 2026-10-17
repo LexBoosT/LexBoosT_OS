@@ -65,7 +65,7 @@ if /i "!diskDrive!" == "SSD" (
 
 :: Boot configuration & branding
 echo [+] Boot configuration...
-bcdedit /set {current} description "LexBoosT OS 26.09.1" >nul 2>&1
+bcdedit /set {current} description "LexBoosT OS 26.10" >nul 2>&1
 label LexBoosT_OS >nul 2>&1
 
 :: Disable search indexing on non-system drives (reduces I/O micro-stutters during gaming)
@@ -131,27 +131,5 @@ reg add "HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\WindowsMediaPlayer" /v Pre
 
 :: Disable ESP padding (potentially reduces latency on some UEFI systems).
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Bfsvc" /v EspPaddingPercent /t REG_DWORD /d 0 /f >nul 2>&1
-
-:: ================================================
-:: PAGEFILE - INTELLIGENT SIZING
-:: ================================================
-echo [+] Configuring pagefile based on RAM...
-powershell -NoProfile -Command ^
-  "$ramGB = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB); " ^
-  "$sysDrive = $env:SystemDrive; " ^
-  "if ($ramGB -le 8) { " ^
-    "$min = 1024; $max = 4096 " ^
-  "} elseif ($ramGB -le 16) { " ^
-    "$min = 1024; $max = 8192 " ^
-  "} elseif ($ramGB -le 32) { " ^
-    "$min = 2048; $max = 16384 " ^
-  "} else { " ^
-    "$min = 4096; $max = 32768 " ^
-  "} " ^
-  "$cs = Get-CimInstance Win32_ComputerSystem; " ^
-  "$cs.AutomaticManagedPagefile = $false; " ^
-  "Set-CimInstance -InputObject $cs; " ^
-  "Set-CimInstance -Query 'SELECT * FROM Win32_PageFileSetting' -Property @{InitialSize=$min; MaximumSize=$max} -ErrorAction SilentlyContinue; " ^
-  "Write-Host ('[OK] Pagefile: ' + $min + '-' + $max + ' MB (RAM: ' + $ramGB + ' GB)')" >nul 2>&1
 
 goto :eof

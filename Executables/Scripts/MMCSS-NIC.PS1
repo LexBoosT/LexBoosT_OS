@@ -79,9 +79,9 @@ if ($primaryType -eq 'NetAdapterCx') {
     Set-Reg $MMCSS 'Start' DWord 2
     Set-Reg $MP 'SystemResponsiveness'      DWord 10
     Set-Reg $MP 'NoLazyMode'                DWord 1
-    Set-Reg $MP 'NetworkThrottlingIndex'    DWord 10
-    Set-Reg $MP 'LazyModeTimeout'          DWord 0xFFFFFFFF
-    Set-Reg $MP 'SchedulingPeriod'       DWord 10000
+    Set-Reg $MP 'NetworkThrottlingIndex' DWord 4294967295
+    Set-Reg $MP 'LazyModeTimeout' DWord 25000
+    Set-Reg $MP 'SchedulerPeriod' DWord 1000000
     Set-Reg $MP 'IdleDetectionCycles'      DWord 6
     Set-Reg $MP 'SchedulerTimerResolution' DWord 5000
 

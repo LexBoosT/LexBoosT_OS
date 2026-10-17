@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("Desktop", "LockScreen")]
     [string]$Mode,
@@ -21,7 +21,7 @@ function Set-DesktopWallpaper {
         $userKey = $_.Name
         [microsoft.win32.registry]::SetValue("$userKey\Control Panel\Desktop", "WallPaper", $imagePath, [Microsoft.Win32.RegistryValueKind]::String)
     }
-    
+
     $setwallpapersrc = @"
     using System.Runtime.InteropServices;
 
@@ -80,11 +80,50 @@ function Set-LockScreenWallpaper {
 }
 
 $path = Get-ChildItem $ImagePath -Force | Select-Object -ExpandProperty FullName
+# ---------------------------------------------------------------------------
+# Keeps INSTALLSOFTS in sync: writes the applied image path to the app's
+# wallpaper_state.txt (line 1 = desktop, line 2 = lockscreen).
+# The app reads this file at startup to show the current wallpaper previews.
+# ---------------------------------------------------------------------------
+function Update-WallpaperState {
+    param(
+        [ValidateSet("Desktop", "LockScreen")]
+        [string]$Target,
+        [string]$FilePath
+    )
+
+    try {
+        $appExe = Join-Path $env:SystemRoot 'LexBoosTOS\Scripts\Programs\INSTALLSOFTS.exe'
+        if (-not (Test-Path $appExe)) { return }
+
+        $statePath = Join-Path (Split-Path $appExe -Parent) 'wallpaper_state.txt'
+
+        $desktop = ''
+        $lock    = ''
+        if (Test-Path $statePath) {
+            $lines = @(Get-Content $statePath)
+            $desktop = if ($lines.Count -ge 1) { $lines[0] } else { '' }
+            $lock    = if ($lines.Count -ge 2) { $lines[1] } else { '' }
+        }
+
+        if ($Target -eq 'Desktop')    { $desktop = $FilePath }
+        else                          { $lock    = $FilePath }
+
+        [System.IO.File]::WriteAllLines($statePath, @($desktop, $lock))
+    }
+    catch {
+        # Never block the wallpaper change because of state-file issues
+        Write-Verbose "Update-WallpaperState: $($_.Exception.Message)"
+    }
+}
+
 switch ($Mode) {
     "Desktop" {
         Set-DesktopWallpaper -ImagePath $path
+        Update-WallpaperState -Target "Desktop" -FilePath $path
     }
     "LockScreen" {
         Set-LockScreenWallpaper -ImagePath $path
+        Update-WallpaperState -Target "LockScreen" -FilePath $path
     }
 }

@@ -1,0 +1,1045 @@
+﻿# fr_strings.txt - dictionnaire EN/FR externe, une paire par ligne
+# format: CHAINE_ENGHAISE<TAB>CHAINE_FRancaise  - echappements: \t \n \")
+# modifiable sans recompilation. Charge par TranslationService.External.cs (pas de trim).
+\n\nCheck:\n• The application is running with the right privileges\n• Your version of Windows supports TCP congestion control	\n\nVérifiez :\n• L'application s'exécute avec les bons droits\n• Votre version de Windows prend en charge le contrôle de congestion TCP
+   •   	   •   
+   •   IPv6: 	   •   IPv6 : 
+ appliqué	 appliqué
+\" loaded	 » chargé
+- Disables RMCtxswLog	- Désactive RMCtxswLog
+- Disables RMDebugSetSMCMode	- Désactive RMDebugSetSMCMode
+- Disables RMDisableFeatureDisablement	- Désactive RMDisableFeatureDisablement
+- Disables RMIntrDetailedLogs	- Désactive RMIntrDetailedLogs
+- Disables RMNvLog	- Désactive RMNvLog
+- Disables RMSuppressGPIOIntrErrLog	- Désactive RMSuppressGPIOIntrErrLog
+- Disables RMUsbcDebugMode	- Désactive RMUsbcDebugMode
+- Disables RmBreakonRC	- Désactive RmBreakonRC
+Active network adapter :	Carte réseau active :
+Activity Feed & Tracking	Fil d'activité & suivi
+Activity feed & app tracking disabled	Fil d'activité et suivi des apps désactivés
+Activity feed & app tracking restored	Fil d'activité et suivi des apps restaurés
+Activity feed, recent-apps tracking, experiments	Fil d'activité, suivi des apps récentes, expérimentations
+Adapter list refreshed	Liste des cartes réseau rafraîchie
+Adapter not found	Carte introuvable
+Adapter ready for configuration	Carte prête pour la configuration
+Adapter:	Carte :
+Adapter: 	Carte : 
+Advertising & Suggestions	Publicité & suggestions
+Advertising & suggestions disabled	Publicité et suggestions désactivées
+Advertising & suggestions restored	Publicité et suggestions restaurées
+Advertising ID, sponsored suggestions, sync notifications	ID publicitaire, suggestions sponsorisées, notifications de synchronisation
+All cached DNS entries were cleared.	Toutes les entrées DNS mises en cache ont été effacées.
+Allow apps to run in the background	Autoriser les apps à fonctionner en arrière-plan
+App Permissions	Autorisations des apps
+App permissions (diagnostics/location/account) denied	Autorisations apps (diagnostics/localisation/compte) refusées
+App permissions (diagnostics/location/account) restored to Windows defaults	Autorisations apps (diagnostics/localisation/compte) restaurées (valeurs Windows)
+Apply DNS	Appliquer DNS
+Apply TCP	Appliquer TCP
+Applying DNS servers…	Application des serveurs DNS…
+Applying TCP algorithm	Application de l'algorithme TCP
+Applying TCP algorithm 	Application de l'algorithme TCP 
+Automatic Windows Updates	Mises à jour Windows automatiques
+Automatic updates (AUOptions)	Mises à jour automatiques (AUOptions)
+Automatic updates disabled	Mises à jour automatiques désactivées
+Automatic updates enabled	Mises à jour automatiques activées
+Automatically archive unused Store apps	Archiver automatiquement les apps du Store inutilisées
+Background Apps	Apps en arrière-plan
+Background apps disabled	Apps en arrière-plan désactivées
+Background apps enabled	Apps en arrière-plan activées
+Blocks dangerous websites and downloads	Bloque les sites web et téléchargements dangereux
+Browse	Parcourir
+CANCEL	ANNULER
+CFG / SEHOP / Spectre-Meltdown mitigations	Atténuations CFG / SEHOP / Spectre-Meltdown
+Cannot create junction: source path still exists and is not empty: {0}	Impossible de créer la jonction : le chemin source existe toujours et n'est pas vide : {0}
+Check Failed	Échec de la vérification
+Check:	Vérifiez :
+Check:\n• The application is running with the right privileges\n• Your version of Windows supports TCP congestion control	Vérifiez :\n• L'application s'exécute avec les bons droits\n• Votre version de Windows prend en charge le contrôle de congestion TCP
+Checking driver version…	Vérification de la version du pilote…
+Checking…	Vérification…
+Clear All	Tout désélectionner
+Click the button to download the latest NVIDIA driver	Cliquez sur le bouton pour télécharger le dernier pilote NVIDIA
+Cloud Sync	Synchronisation cloud
+Cloud sync disabled	Synchronisation cloud désactivée
+Cloud sync restored	Synchronisation cloud restaurée
+Computer :	Ordinateur :
+Confirm Move Operation	Confirmer le déplacement
+Connecting…	Connexion…
+Container Tweaks	Réglages Conteneur
+Copilot assistant (install / uninstall)	Assistant Copilot (installation / désinstallation)
+Copilot installed/enabled	Copilot installé/activé
+Copilot removed/disabled	Copilot supprimé/désactivé
+Copilot: applying… (explorer will restart)	Copilot : application… (explorateur va redémarrer)
+Core Isolation / VBS	Isolation matérielle / VBS
+Core graphics driver optimizations	Optimisations du pilote graphique principal
+Creating junction point at {0}...	Création du point de jonction dans {0}...
+Current DNS — IPv4:	DNS actuel — IPv4 :
+Current DNS — IPv4: 	DNS actuel — IPv4 : 
+Current DNS: —	DNS actuel : —
+Current path for {0} is empty	Le chemin actuel de {0} est vide
+Current:	Actuel :
+Current: 	Actuel : 
+Current: —	Actuel : —
+Currently detected:	Détecté actuellement :
+Currently detected: 	Détecté actuellement : 
+DEFAULT	PAR DÉFAUT
+DHCP DNS	DNS DHCP
+DHCP DNS restored	DNS DHCP restauré
+DHCP restore failed:	Échec de la restauration DHCP :
+DHCP restore failed: 	Échec de la restauration DHCP : 
+DNS IPv4 primary :	DNS IPv4 principal :
+DNS IPv4 secondary :	DNS IPv4 secondaire :
+DNS IPv6 primary :	DNS IPv6 principal :
+DNS IPv6 secondary :	DNS IPv6 secondaire :
+DNS application failed:	Échec de l'application DNS :
+DNS application failed: 	Échec de l'application DNS : 
+DNS cache flushed	Cache DNS purgé
+DNS flush failed:	Échec de la purge DNS :
+DNS flush failed: 	Échec de la purge DNS : 
+DNS preset \"	Preset DNS « 
+DNS preset :	Preset DNS :
+DNS servers applied	Serveurs DNS appliqués
+DPC/ISR Latency Optimization	Optimisation latence DPC/ISR
+DXGKrnl Priority	Priorité DXGKrnl
+Default Index	Index par défaut
+Defender action failed (UAC cancelled?)	Échec de l'action Defender (UAC annulée ?)
+Defender disabled - reboot to complete. Re-enable from Windows Update if updates fail.	Defender désactivé - redémarrez pour finaliser. Réactivez-le depuis Windows Update si les mises à jour échouent.
+Defender re-armed (reboot strongly advised to complete)	Defender réactivé (redémarrage fortement conseillé pour finaliser)
+Defender: disabling... (may take a minute)	Defender : désactivation… (peut prendre une minute)
+Defender: re-arming...	Defender : réactivation…
+Delivery Optimizations	Optimisations de distribution
+Delivery Optimizations disabled	Optimisations de distribution désactivées
+Delivery Optimizations enabled	Optimisations de distribution activées
+Desktop	Bureau
+Destination selected	Destination sélectionnée
+DeviceIoControl FSCTL_SET_REPARSE_POINT failed	DeviceIoControl FSCTL_SET_REPARSE_POINT a échoué
+Diagnostic data, CEIP, input telemetry, activation ticket	Données de diagnostic, CEIP, télémétrie de saisie, ticket d'activation
+Diagnostics, location & account-info access for apps	Accès apps : diagnostics, localisation et infos de compte
+Disable ASPM	Désactiver ASPM
+Disable Adaptive Contrast	Désactiver le contraste adaptatif
+Disable All Gatings	Désactiver tous les Gatings
+Disable Debug Features	Désactiver les fonctions de débogage
+Disable Debug Logging	Désactiver le débogage du pilote
+Disable Debugs	Désactiver les débogages
+Disable ECC	Désactiver ECC
+Disable HD Audio D3 Cold	Désactiver D3 Cold HD Audio
+Disable HDCP	Désactiver HDCP
+Disable Hot Plug Support	Désactiver le Hot Plug
+Disable Indexing	Désactiver l'indexation
+Disable Logging	Désactiver la journalisation
+Disable Logs	Désactiver les journaux
+Disable NVIDIA Features	Désactiver les Fonctions NVIDIA
+Disable NVIDIA HD Audio Device	Désactiver le périphérique HD Audio NVIDIA
+Disable NVIDIA Services	Désactiver les Services NVIDIA
+Disable NVTray	Désactiver NVTray
+Disable Panel Refresh Rate Override	Désactiver la surcharge du taux de rafraîchissement
+Disable Panel Self Refresh	Désactiver Panel Self Refresh
+Disable Power Gating	Désactiver le Power Gating
+Disable Power Management	Désactiver la gestion d'alimentation
+Disable Power Savings	Désactiver l'économie d'énergie
+Disable Preemption	Désactiver la Préemption
+Disable RC Watchdog	Désactiver le RC Watchdog
+Disable Radeon Boost	Désactiver Radeon Boost
+Disable Radeon Features	Désactiver les fonctions Radeon
+Disable Scrubbers	Désactiver les Scrubbers
+Disable Traces	Désactiver les traces
+Disable ULPS	Désactiver ULPS
+Disables Active State Power Management	Désactive la gestion d'alimentation Active State Power Management
+Disables Ansel and ShadowPlay overlays	Désactive les overlays Ansel et ShadowPlay
+Disables Error Correction Code memory checking	Désactive la vérification mémoire par code de correction d'erreurs
+Disables GPU power management features for maximum performance	Désactive la gestion d'alimentation du GPU pour une performance maximale
+Disables HDCP copy protection (may break Twitch/Netflix)	Désactive la protection HDCP (peut casser Twitch/Netflix)
+Disables Intel DPST (Display Power Saving Technology)	Désactive DPST Intel (Display Power Saving Technology)
+Disables Intel PSR for better stability	Désactive le PSR Intel pour plus de stabilité
+Disables Intel power saving features for better performance	Désactive l'économie d'énergie Intel pour de meilleures performances
+Disables NVIDIA RC watchdog and logon RC for reduced overhead	Désactive le RC watchdog et le logon RC NVIDIA pour réduire les surcoûts
+Disables NVIDIA display hot plug detection (for fixed displays only)	Désactive la détection hot plug des affichages NVIDIA (écrans fixes uniquement)
+Disables NVIDIA driver panel refresh rate override	Désactive la surcharge du taux de rafraîchissement par le pilote NVIDIA
+Disables ONLY the NVIDIA High Definition Audio device (not the system audio bus)	Désactive UNIQUEMENT le périphérique audio HD NVIDIA (pas le bus audio système)
+Disables Radeon Boost feature	Désactive la fonction Radeon Boost
+Disables Radeon Boost, Anti-Lag, and other features for raw performance	Désactive Radeon Boost, Anti-Lag et autres fonctions pour une performance brute
+Disables USB-C debug mode, feature disablement, and SMC debug mode	Désactive le mode débogage USB-C, la désactivation de fonctionnalités et le mode débogage SMC
+Disables Ultra Low Power State for better stability	Désactive l'Ultra Low Power State pour plus de stabilité
+Disables all GPU clock and power gating	Désactive tout le gating d'horloge et d'alimentation du GPU
+Disables all debug features	Désactive toutes les fonctions de débogage
+Disables all logging features	Désactive toutes les fonctions de journalisation
+Disables all tracing features	Désactive toutes les fonctions de tracing
+Disables detailed driver debug logs and context switch logging	Désactive les journaux de débogage détaillés et la journalisation des context switches
+Disables driver logging and tracing features	Désactive la journalisation et le tracing du pilote
+Disables memory scrubbing for faster VRAM operations	Désactive le scrubbing mémoire pour des opérations VRAM plus rapides
+Disables power gating features for Intel Arc GPUs	Désactive les fonctions de power gating pour les GPU Intel Arc
+Disables shader preemption for reduced latency	Désactive la préemption des shaders pour réduire la latence
+Disables unnecessary NVIDIA background services	Désactive les services NVIDIA en arrière-plan inutiles
+Disables various power gating features for better performance	Désactive diverses fonctions de power gating pour de meilleures performances
+Disks	Disques
+Display the NVIDIA Control Panel icon in the Windows notification area	Affiche l'icône du Panneau de configuration NVIDIA dans la zone de notification Windows
+Do you want to continue?	Voulez-vous continuer ?
+Download Driver	Télécharger le pilote
+Download Update	Télécharger la mise à jour
+Download cancelled	Téléchargement annulé
+Download completed!	Téléchargement terminé !
+Download failed	Échec du téléchargement
+Downloads	Téléchargements
+Driver Up to Date	Pilote à jour
+Dynamic PStates	PStates Dynamiques
+Enable GSP Firmware	Activer le firmware GSP
+Enable/Disable GPU dynamic frequency states	Active/Désactive les états de fréquence dynamique du GPU
+Enables GSP (GPU System Processor) firmware for better performance	Active le firmware GSP (processeur système du GPU) pour de meilleures performances
+Enables and optimizes NVIDIA shader disk cache	Active et optimise le cache disque des shaders NVIDIA
+Enables hardware-accelerated GPU scheduling for Intel Arc GPUs	Active la planification GPU accélérée par le matériel pour les GPU Intel Arc
+Enables maximum performance settings for AMD GPU	Active les réglages de performance maximale pour le GPU AMD
+Enables maximum performance settings for Intel GPU	Active les réglages de performance maximale pour le GPU Intel
+Enables optimized shader cache settings	Active les réglages optimisés du cache shaders
+Enter at least one DNS server (IPv4 or IPv6).	Saisissez au moins un serveur DNS (IPv4 ou IPv6).
+Error	Erreur
+Error Reporting (WER)	Signalement des erreurs (WER)
+Error during move	Erreur pendant le déplacement
+Error moving {0}	Erreur lors du déplacement de {0}
+Error reading path	Erreur de lecture du chemin
+Error restarting Explorer	Erreur lors du redémarrage de l'Explorateur
+Error:	Erreur :
+Error: 	Erreur : 
+Exit code:	Code de sortie :
+Exit code: 	Code de sortie : 
+Exploit Mitigations	Atténuations d'exploitation
+FTS Tweaks	Réglages FTS
+Failed to open directory for reparse point creation	Échec de l'ouverture du dossier pour la création du point de réanalyse
+Failed to update registry	Échec de la mise à jour du registre
+Failure	Échec
+Favorites	Favoris
+Flush DNS	Purger DNS
+Flushing DNS cache…	Purge du cache DNS…
+Forces maximum performance settings for Intel Arc GPUs	Force les réglages de performance maximale pour les GPU Intel Arc
+Frame Time Control and Scheduling optimizations	Optimisations du contrôle et de la planification du frame time
+GPU TWEAKS	REGLAGES GPU
+Game Bar / GameDVR disabled	Game Bar / GameDVR désactivée
+Game Bar / GameDVR enabled	Game Bar / GameDVR activée
+Game Bar / GameDVR: applying…	Game Bar / GameDVR : application…
+Good performance with safe defaults	Bonne performance avec des valeurs sûres
+Graphics Drivers Tweaks	Réglages Pilotes Graphiques
+HAGS OFF	HAGS DÉSACTIVÉ
+HAGS ON	HAGS ACTIVÉ
+Hides the NVIDIA tray icon (NVTray)	Masque l'icône NVIDIA dans la zone de notification (NVTray)
+IMPORTANT: a system reboot is recommended for the changes to fully take effect.	IMPORTANT : un redémarrage du système est recommandé pour que les changements prennent pleinement effet.
+IPv6:	IPv6 :
+IPv6: 	IPv6 : 
+Input and render latency optimizations	Optimisations de la latence d'entrée et de rendu
+Instrumentation & PCA disabled	Instrumentation et PCA désactivées
+Instrumentation & PCA restored	Instrumentation et PCA restaurées
+Instrumentation, Program Compatibility Assistant	Instrumentation, Assistant de compatibilité des programmes
+Junction note: the original path is kept as a junction point, so apps and shortcuts keep working. Files that are locked are cleaned up automatically on the next reboot.	Note : le chemin d'origine est conservé sous forme de point de jonction, ainsi les applications et les raccourcis continuent de fonctionner. Les fichiers verrouillés sont nettoyés automatiquement au prochain redémarrage.
+L'algorithme TCP a été appliqué.	L'algorithme TCP a été appliqué.
+Load	Charger
+Loaded	Chargée
+Loading error:	Erreur de chargement :
+Loading error: 	Erreur de chargement : 
+Logical cores :	Cœurs logiques :
+Low Latency Tweaks	Réglages Faible Latence
+Max performance, min latency — may increase power & heat	Performance max, latence min — consommation et chaleur en hausse
+Minimal Index	Index minimal
+Missing DNS	DNS manquant
+Mitigations action failed (UAC cancelled?)	Échec de l'action Atténuations (UAC annulée ?)
+Mitigations disabled - REBOOT NOW to take effect	Atténuations désactivées - REDÉMARREZ MAINTENANT pour prendre effet
+Mitigations: Windows defaults scheduled - REBOOT NOW to complete the restore	Atténuations : valeurs Windows programmées - REDÉMARREZ MAINTENANT pour finaliser
+Mitigations: disabling all... (reboot required)	Atténuations : tout désactiver… (redémarrage requis)
+Mitigations: restoring Windows defaults...	Atténuations : restauration des valeurs Windows…
+Move Selected Folders	Déplacer les dossiers sélectionnés
+Move user folders to another disk. A junction point replaces the original path so everything keeps working.	Déplacez vos dossiers utilisateur sur un autre disque. Un point de jonction remplace le chemin d'origine pour que tout continue de fonctionner.
+Moving {0}...	Déplacement de {0}...
+Music	Musique
+NEWER VERSION INSTALLED	VERSION PLUS RÉCENTE INSTALLÉE
+NO DRIVER INSTALLED	AUCUN PILOTE INSTALLÉ
+NVDisplay Container and logging optimizations	Optimisations du conteneur NVDisplay et de la journalisation
+NVIDIA kernel driver optimizations	Optimisations du pilote noyau NVIDIA
+Network adapter	Carte réseau
+Newer Version Installed	Version plus récente installée
+No Destination Selected	Aucune destination sélectionnée
+No Folders Selected	Aucun dossier sélectionné
+No active network adapter found	Aucune carte réseau active trouvée
+No adapter	Aucune carte
+No adapter selected	Aucune carte sélectionnée
+No destination selected	Aucune destination sélectionnée
+No disks detected	Aucun disque détecté
+No network adapter available	Aucune carte réseau disponible
+No update needed	Aucune mise à jour nécessaire
+Note: BBR2 requires Windows 11 22H2+ with the latest stack.	Note : BBR2 nécessite Windows 11 22H2+ avec le dernier stack.
+Note: Windows may automatically switch BBR to BBR2 in some cases.	Note : Windows peut passer BBR à BBR2 automatiquement dans certains cas.
+One switch - telemetry & advertising off (safe baseline)	Un seul interrupteur - télémétrie et publicité coupées (base sûre)
+Operation Completed	Opération terminée
+Operation completed	Opération terminée
+Operation completed successfully!	Opération terminée avec succès !
+Operation failed. No folders were moved.	L'opération a échoué. Aucun dossier n'a été déplacé.
+Peer-to-peer delivery of updates	Distribution des mises à jour par pair-à-pair
+Performance Benefits:	Avantages Performance :
+Performance Mode	Mode Performance
+Phone Link	Liens avec un appareil mobile (Phone Link)
+Phone Link entry inside Windows Settings	Entrée Phone Link dans Paramètres Windows
+Phone Link hidden in Settings	Phone Link masqué dans Paramètres
+Phone Link shown in Settings	Phone Link visible dans Paramètres
+Pictures	Images
+Please restart your computer to complete the move operation.	Veuillez redémarrer votre ordinateur pour terminer l'opération de déplacement.
+Please select a destination folder first.	Veuillez d'abord sélectionner un dossier de destination.
+Please select at least one folder to move.	Veuillez sélectionner au moins un dossier à déplacer.
+Power efficient, reduced noise and thermals	Économe en énergie, bruit et chaleur réduits
+Preparing to move {0}	Préparation du déplacement de {0}
+Prevents NVIDIA HDMI audio from entering D3 cold power state	Empêche l'audio HDMI NVIDIA d'entrer en état d'alimentation D3 cold
+Privacy	Confidentialité
+Privacy Pack (Master)	Pack Confidentialité (principal)
+Privacy pack reset (telemetry & advertising back to default)	Pack confidentialité réinitialisé (télémétrie et publicité par défaut)
+Privacy pack: telemetry & advertising disabled	Pack confidentialité : télémétrie et publicité désactivées
+Profile:	Profil :
+REFRESH DLSS	ACTUALISER DLSS
+REVERT ALL	TOUT RESTAURER
+Raises DXGKrnl thread priority for reduced DPC latency	Augmente la priorité des threads DXGKrnl pour réduire la latence DPC
+Ready	Prêt
+Ready to download	Prêt à télécharger
+Ready to move folders...	Prêt à déplacer les dossiers...
+Real-time protection (WinDefend / SecurityHealth services)	Protection en temps réel (services WinDefend / SecurityHealth)
+Recall disabled	Recall désactivé
+Recall enabled	Recall activé
+Reduces NVIDIA DPC/ISR counts by disabling polling, power management DPCs, and HD Audio overhead	Réduit les DPC/ISR NVIDIA en désactivant le polling, les DPC de gestion d'alimentation et les surcoûts HD Audio
+Refresh TCP info	Rafraîchir les infos TCP
+Refresh adapters	Rafraîchir les cartes
+Reset Winsock	Réinit. Winsock
+Resetting Winsock…	Réinitialisation de Winsock…
+Restarting Explorer...	Redémarrage de l'Explorateur...
+Restoring DHCP DNS…	Restauration du DNS DHCP…
+Saved Games	Sauvegardes de jeux
+Scheduled junction creation on next reboot for {0}	Création de la jonction programmée au prochain redémarrage pour {0}
+Search indexer started	Indexeur de recherche démarré
+Search indexer starting…	Indexeur de recherche : démarrage…
+Search indexer stopped	Indexeur de recherche arrêté
+Search indexer stopping…	Indexeur de recherche : arrêt…
+Search indexer: DefaultSearchIndex applied	Index de recherche : « Par défaut » appliqué
+Search indexer: DisableSearchIndex applied	Index de recherche : « Désactivé » appliqué
+Search indexer: MinimalSearchIndex applied	Index de recherche : « Minimal » appliqué
+Search indexer: applying preset…	Index de recherche : application du préréglage…
+Security	Sécurité
+Select All	Tout sélectionner
+Select a network adapter first.	Sélectionnez d'abord une carte réseau.
+Select the destination folder for user folders	Sélectionner le dossier de destination des dossiers utilisateur
+Sets NVIDIA RMElpgStateOnInit to 3 for maximum performance state at driver init	Définit NVIDIA RMElpgStateOnInit à 3 pour l'état de performance max à l'initialisation du pilote
+Setting sync, message sync, setup suggestions	Synchronisation des paramètres, des messages, suggestions d'installation
+Shader Cache	Cache des Shaders
+Shader Cache Optimized	Cache Shaders Optimisé
+Show NVIDIA icon in system tray	Afficher l'icône NVIDIA dans la zone de notification
+SmartScreen Filter	Filtre SmartScreen
+SmartScreen disabled	SmartScreen désactivé
+SmartScreen enabled	SmartScreen activé
+Speed:	Vitesse :
+Speed: 	Vitesse : 
+Status:	État :
+Status: 	État : 
+Store Apps Archiving	Archivage des apps du Store
+Store apps archiving disabled	Archivage des apps du Store désactivé
+Store apps archiving enabled	Archivage des apps du Store activé
+Success	Succès
+System	Système
+System Restore	Restauration du système
+System Restore checkpoints	Points de contrôle de la restauration du système
+System Restore disabled	Restauration du système désactivée
+System Restore enabled	Restauration du système activée
+System Tweaks	Réglages Système
+System settings and telemetry disabling	Réglages système et désactivation de la télémétrie
+System-wide Recall / AI data analysis	Recall système / analyse de données par IA
+TCP 	TCP 
+TCP application failed:	Échec de l'application TCP :
+TCP application failed: 	Échec de l'application TCP : 
+TCP info refreshed	Infos TCP rafraîchies
+Telemetry & Diagnostics	Télémétrie & diagnostics
+Telemetry & diagnostics disabled	Télémétrie et diagnostics désactivés
+Telemetry & diagnostics restored	Télémétrie et diagnostics restaurés
+The DNS cache has been flushed.	Le cache DNS a été purgé.
+The DNS cache has been flushed.\n\nAll cached DNS entries were cleared.	Le cache DNS a été purgé.\n\nToutes les entrées DNS mises en cache ont été effacées.
+The TCP algorithm has been applied.\n\nCurrently detected:	L'algorithme TCP a été appliquée.\n\nDétecté actuellement :
+The TCP algorithm has been applied.\n\nCurrently detected: 	L'algorithme TCP a été appliqué.\n\nDétecté actuellement : 
+The folder locations have been updated.	Les emplacements des dossiers ont été mis à jour.
+The process exited with code	Le processus s'est terminé avec le code
+The process exited with code 	Le processus s'est terminé avec le code 
+This will move the selected folders to:	Les dossiers sélectionnés seront déplacés vers :
+Trade-offs:	Contreparties :
+Type:	Type :
+Type: 	Type : 
+UPDATE AVAILABLE	MISE À JOUR DISPONIBLE
+USER FOLDERS	DOSSIERS UTILISATEUR
+Unable to apply the DNS servers.	Impossible d'appliquer les serveurs DNS.
+Unable to apply the DNS servers.\n\nError:	Impossible d'appliquer les serveurs DNS.\n\nErreur :
+Unable to apply the DNS servers.\n\nError: 	Impossible d'appliquer les serveurs DNS.\n\nErreur : 
+Unable to apply the TCP algorithm.	Impossible d'appliquer l'algorithme TCP.
+Unable to apply the TCP algorithm.\n\nError:	Impossible d'appliquer l'algorithme TCP.\n\nErreur :
+Unable to apply the TCP algorithm.\n\nError: 	Impossible d'appliquer l'algorithme TCP.\n\nErreur : 
+Unable to check for updates	Impossible de vérifier les mises à jour
+Unable to clear the DNS cache.	Impossible de purger le cache DNS.
+Unable to flush the DNS cache.\n\nError:	Impossible de purger le cache DNS.\n\nErreur :
+Unable to flush the DNS cache.\n\nError: 	Impossible de purger le cache DNS.\n\nErreur : 
+Unable to reset Winsock.	Impossible de réinitialiser Winsock.
+Unable to reset Winsock.\n\nError:	Impossible de réinitialiser Winsock.\n\nErreur :
+Unable to reset Winsock.\n\nError: 	Impossible de réinitialiser Winsock.\n\nErreur : 
+Unable to restore DHCP DNS.\n\nError:	Impossible de restaurer le DNS DHCP.\n\nErreur :
+Unable to restore DHCP DNS.\n\nError: 	Impossible de restaurer le DNS DHCP.\n\nErreur : 
+Unable to restore the DHCP DNS.	Impossible de restaurer le DNS DHCP.
+Unknown folder	Dossier inconnu
+Update Notifications	Notifications de mise à jour
+Update notifications enabled	Notifications de mise à jour activées
+Update notifications muted	Notifications de mise à jour coupées
+VBS action failed (UAC cancelled?)	Échec de l'action VBS (UAC annulée ?)
+VBS disabled - reboot to take effect	VBS désactivé - redémarrez pour prendre effet
+VBS re-enabled - reboot to take effect	VBS réactivé - redémarrez pour prendre effet
+VBS: disabling all scenarios... (reboot required)	VBS : désactivation de tous les scénarios… (redémarrage requis)
+VBS: re-enabling memory integrity...	VBS : réactivation de l'intégrité mémoire…
+Videos	Vidéos
+Virtualization-Based Security (memory integrity)	Sécurité basée sur la virtualisation (intégrité mémoire)
+WINDOWS SETTINGS	PARAMÈTRES WINDOWS
+Warning: Could not create junction point: {0}	Avertissement : impossible de créer le point de jonction : {0}
+Warning: Could not schedule junction creation: {0}	Avertissement : impossible de programmer la création de la jonction : {0}
+What it does:	Ce que ça fait :
+Windows :	Windows :
+Windows Error Reporting (crash data to Microsoft)	Signalement des erreurs Windows (données de plantage vers Microsoft)
+Windows Error Reporting disabled	Signalement des erreurs Windows désactivé
+Windows Error Reporting restored	Signalement des erreurs Windows restauré
+Windows Search Indexing	Indexation de recherche Windows
+Windows Search indexer service (WSearch)	Service d'indexation Windows Search (WSearch)
+Windows Update restart notifications	Notifications de redémarrage de Windows Update
+Winsock has been reset.	Winsock a été réinitialisé.
+Winsock has been reset.\n\nIMPORTANT: a system reboot is recommended for the changes to fully take effect.	Winsock a été réinitialisé.\n\nIMPORTANT : un redémarrage du système est recommandé pour que les changements prennent pleinement effet.
+Winsock reset complete	Réinitialisation Winsock terminée
+Winsock reset failed:	Échec de la réinitialisation Winsock :
+Winsock reset failed: 	Échec de la réinitialisation Winsock : 
+Winsock reset — reboot recommended	Winsock réinitialisé — redémarrage recommandé
+Xbox Game Bar, GameDVR and fullscreen optimizations	Xbox Game Bar, GameDVR et optimisations plein écran
+YOUR DRIVER IS UP TO DATE	VOTRE PILOTE EST À JOUR
+You have a newer version	Vous avez une version plus récente
+[Intel Arc] Disable Power Gating	[Intel Arc] Désactiver le Power Gating
+[Intel Arc] Hardware GPU Scheduling	[Intel Arc] Planification GPU matérielle
+[Intel Arc] Maximum Performance Mode	[Intel Arc] Mode Performance Maximum
+applied	appliqué
+folders moved successfully	dossiers déplacés avec succès
+folders were moved.	dossiers ont été déplacés.
+locked file(s) could not be moved immediately and will be moved on next system reboot.	fichier(s) verrouillé(s) n'ont pas pu être déplacé(s) immédiatement et seront déplacé(s) au prochain redémarrage.
+nvlddmkm Tweaks	Réglages nvlddmkm
+{0} files copied. Junction will be created after reboot.	{0} fichier(s) copié(s). Le point de jonction sera créé après le redémarrage.
+{0} is already located at the destination path	{0} est déjà situé au chemin de destination
+{0} is empty, updating registry only...	{0} est vide, mise à jour du registre uniquement...
+{0} selected	{0} sélectionné(s)
+{0} successfully moved to {1}	{0} déplacé avec succès vers {1}
+{0}: some files could not be copied. Operation aborted.	{0} : certains fichiers n'ont pas pu être copiés. Opération annulée.
+—	—
+•   IPv6:	•   IPv6 :
+• Adjusts preemption settings	• Ajuste les réglages de préemption
+• Advanced driver settings	• Réglages avancés du pilote
+• Advanced settings that modify core driver behavior	• Réglages avancés modifiant le comportement central du pilote
+• Affects GPU power states	• Affecte les états d'alimentation du GPU
+• Allows GPU to handle more tasks independently	• Permet au GPU de gérer plus de tâches en autonomie
+• Applied to the detected NVIDIA driver instance	• Appliqué à l'instance du pilote NVIDIA détectée
+• Audio device stays warm	• Le périphérique audio reste chaud
+• BBR : best throughput	• BBR : meilleur débit
+• BBR2 : improved BBR (recommended)	• BBR2 : BBR amélioré (recommandé)
+• Best for dedicated gaming systems	• Idéal pour les PC de jeu dédiés
+• Best for desktops with fixed monitor setup	• Idéal pour les PC avec configuration écran fixe
+• Best gaming performance	• Meilleure performance en jeu
+• Better 1% lows	• Meilleurs 1% lows
+• Better PCIe performance	• Meilleure performance PCIe
+• Better color accuracy	• Meilleure précision des couleurs
+• Better display stability	• Meilleure stabilité de l'affichage
+• Better frame pacing	• Frame pacing meilleur
+• Better gaming performance	• Meilleure performance en jeu
+• Better memory handling	• Meilleure gestion de la mémoire
+• Better memory management	• Meilleure gestion de la mémoire
+• Better performance consistency	• Performance plus constante
+• Better performance in some titles	• Meilleure performance dans certains jeux
+• Better performance stability	• Stabilité de performance accrue
+• Better privacy	• Meilleure vie privée
+• Better responsiveness	• Réactivité améliorée
+• Better stability	• Meilleure stabilité
+• CTCP : high-loss networks	• CTCP : réseaux à forte perte
+• Cache may need clearing after driver updates	• Le cache peut nécessiter un nettoyage après mise à jour du pilote
+• Can reduce multitasking ability	• Peut réduire le multitâche
+• Changes clock behavior	• Modifie le comportement des horloges
+• Cleaner driver operation	• Fonctionnement pilote plus propre
+• Cleaner system tray	• Zone de notification plus propre
+• Competitive gaming optimizations	• Optimisations pour le jeu compétitif
+• Competitive gaming where every microsecond of DPC latency matters	• Jeu compétitif où chaque microseconde de latence DPC compte
+• Configures TDR settings with safe defaults	• Configure les réglages TDR avec des valeurs sûres
+• Configures control panel settings	• Configure les réglages du panneau de contrôle
+• Configures driver flags	• Configure les drapeaux du pilote
+• Consistent GPU clocks	• Horloges GPU constantes
+• Consistent behavior	• Comportement constant
+• Consistent frame delivery	• Livraison des frames constante
+• Consistent image quality	• Qualité d'image constante
+• Consistent performance	• Performance constante
+• Controls dynamic frequency scaling	• Contrôle le scaling dynamique des fréquences
+• Create a system restore point before applying	• Créez un point de restauration système avant d'appliquer
+• Cubic : Windows standard	• Cubic : standard Windows
+• DISABLED: Better latency for competitive gaming	• DÉSACTIVÉ : meilleure latence pour le jeu compétitif
+• DISABLED: Fixed frequencies for consistent performance	• DÉSACTIVÉ : fréquences fixes pour une performance constante
+• DISABLED: Higher power consumption	• DÉSACTIVÉ : consommation plus élevée
+• DISABLED: More heat output	• DÉSACTIVÉ : plus de chaleur
+• Desktops with fixed monitor setups (no hot-plug)	• PC de bureau avec écrans fixes (sans hot-plug)
+• Direct video output	• Sortie vidéo directe
+• Disabled unnecessary features	• Fonctions inutiles désactivées
+• Disabled unnecessary services	• Services inutiles désactivés
+• Disables AERR handling	• Désactive la gestion AERR
+• Disables ASPM L0s	• Désactive ASPM L0s
+• Disables ASPM L1	• Désactive ASPM L1
+• Disables ASPM PCIe power saving	• Désactive l'économie d'énergie ASPM PCIe
+• Disables Anti-Lag	• Désactive Anti-Lag
+• Disables BGM debug	• Désactive le débogage BGM
+• Disables CAIL debug	• Désactive le débogage CAIL
+• Disables DAL debug	• Désactive le débogage DAL
+• Disables DAL logs	• Désactive les journaux DAL
+• Disables DMUB traces	• Désactive les traces DMUB
+• Disables DPST feature	• Désactive la fonction DPST
+• Disables ECC FB scrub	• Désactive le scrub FB ECC
+• Disables FBSR (Frame Buffer Self Refresh) polling	• Désactive le polling FBSR (Frame Buffer Self Refresh)
+• Disables FreeSync	• Désactive FreeSync
+• Disables GPU downclocking	• Empêche le downclocking du GPU
+• Disables GPU power state DPCs (RmDisableGpsPowerFeatures)	• Désactive les DPC d'état d'alimentation GPU (RmDisableGpsPowerFeatures)
+• Disables HD Audio D3Cold state transitions (EnableHDAudioD3Cold)	• Désactive les transitions D3Cold de HD Audio (EnableHDAudioD3Cold)
+• Disables HDCP 2.2	• Désactive HDCP 2.2
+• Disables KMD logs	• Désactive les journaux KMD
+• Disables NVDisplay.ContainerLocalSystem	• Désactive NVDisplay.ContainerLocalSystem
+• Disables NVIDIA Ansel (in-game photo mode / hooks)	• Désactive NVIDIA Ansel (mode photo in-game / hooks)
+• Disables NVIDIA ShadowPlay / In-Game Overlay	• Désactive NVIDIA ShadowPlay / In-Game Overlay
+• Disables NvContainerLocalSystem	• Désactive NvContainerLocalSystem
+• Disables NvContainerNetworkService	• Désactive NvContainerNetworkService
+• Disables PCIe ASPM power saving	• Désactive l'économie d'énergie PCIe ASPM
+• Disables PCIe DPC polling (RmPcieDpc)	• Désactive le polling DPC PCIe (RmPcieDpc)
+• Disables PP logs	• Désactive les journaux PP
+• Disables Panel Self Refresh	• Désactive le Panel Self Refresh
+• Disables RC on DBE	• Désactive RC sur DBE
+• Disables RC6 power gating	• Désactive le power gating RC6
+• Disables Radeon Boost	• Désactive Radeon Boost
+• Disables Radeon Chill	• Désactive Radeon Chill
+• Disables RmLogonRC	• Désactive RmLogonRC
+• Disables RmRcWatchdog	• Désactive RmRcWatchdog
+• Disables SAMU power gating	• Désactive le power gating SAMU
+• Disables SDMA traces	• Désactive les traces SDMA
+• Disables ULPS feature	• Désactive la fonction ULPS
+• Disables UVD/VCE power gating	• Désactive le power gating UVD/VCE
+• Disables Windows Update driver updates	• Désactive les mises à jour de pilotes via Windows Update
+• Disables all gating features	• Désactive toutes les fonctions de gating
+• Disables alloc traces	• Désactive les traces alloc
+• Disables async memory scrub	• Désactive le scrub mémoire asynchrone
+• Disables clock gating	• Désactive le clock gating
+• Disables container subcomponents	• Désactive les sous-composants du conteneur
+• Disables debug output	• Désactive la sortie de débogage
+• Disables display power sequencing DPCs (RmDisableDisplayPowerSequencing)	• Désactive les DPC de séquencement d'alimentation de l'affichage (RmDisableDisplayPowerSequencing)
+• Disables dynamic P-states to prevent downclocking	• Désactive les P-states dynamiques pour éviter le downclocking
+• Disables error logging	• Désactive la journalisation des erreurs
+• Disables event tracing	• Désactive le tracing d'événements
+• Disables fast scrubber	• Désactive le fast scrubber
+• Disables frequency scaling	• Désactive le scaling des fréquences
+• Disables hot-plug DPCs (RmDisableHotPlug)	• Désactive les DPC hot-plug (RmDisableHotPlug)
+• Disables it via PnP API (not by disabling the HDAudBus service)	• Le désactive via l'API PnP (pas par la désactivation du service HDAudBus)
+• Disables overlay quality enhancement DPCs (Disable_OverlayDSQualityEnhancements)	• Désactive les DPC d'amélioration de qualité de l'overlay (Disable_OverlayDSQualityEnhancements)
+• Disables power gating	• Désactive le power gating
+• Disables render power gating	• Désactive le power gating de rendu
+• Disables runtime power management	• Désactive la gestion d'alimentation dynamique
+• Disables runtime power management (Intel)	• Désactive la gestion d'alimentation dynamique (Intel)
+• Disables scrub on free	• Désactive le scrub au libération
+• Disables shader preemption	• Désactive la préemption des shaders
+• Disables telemetry collection	• Désactive la collecte de télémétrie
+• Disables thermal diode polling (RmDisableThermalDiode)	• Désactive le polling de la diode thermique (RmDisableThermalDiode)
+• Disables unnecessary debug features	• Désactive les fonctions de débogage inutiles
+• Disables unnecessary logging	• Désactive les journalisations inutiles
+• Do NOT use if you hot-plug monitors (USB-C/DisplayPort hot-plug)	• N'utilisez PAS si vous branchez/débranchez des écrans (hot-plug USB-C/DisplayPort)
+• Do NOT use if you hot-plug monitors or use HDMI audio from GPU	• N'utilisez PAS si vous faites du hot-plug d'écrans ou utilisez l'audio HDMI du GPU
+• Does NOT affect motherboard audio (Realtek, USB, etc.)	• N'affecte PAS l'audio de la carte mère (Realtek, USB, etc.)
+• Does NOT touch HDAudBus service (only NVIDIA's device instance)	• Ne touche PAS au service HDAudBus (uniquement l'instance du périphérique NVIDIA)
+• Driver will not override panel refresh rate	• Le pilote ne forcera plus le taux de rafraîchissement du panneau
+• ENABLED: Better power efficiency (Recommended)	• ACTIVÉ : meilleure efficacité énergétique (recommandé)
+• ENABLED: May have slight latency spikes	• ACTIVÉ : légères pointes de latence possibles
+• Eliminates HDAudBus.sys ISR load from NVIDIA HDMI/DP audio	• Élimine la charge ISR HDAudBus.sys de l'audio HDMI/DP NVIDIA
+• Eliminates RC6 residency stuttering	• Élimine les à-coups liés à la résidence RC6
+• Eliminates polling DPCs from power management, thermal monitoring, and hot-plug detection	• Élimine les DPC de polling de gestion d'alimentation, de surveillance thermique et de hot-plug
+• Eliminates power state transitions	• Élimine les transitions d'état d'alimentation
+• Eliminates power state transitions (Intel)	• Élimine les transitions d'état d'alimentation (Intel)
+• EnableGR535 = 0 enables legacy sharpening on all GPUs	• EnableGR535 = 0 active l'accentuation legacy sur tous les GPU
+• Enables GSP firmware support	• Active la prise en charge du firmware GSP
+• Enables Hardware-Accelerated GPU Scheduling (HAGS)	• Active le Hardware-Accelerated GPU Scheduling (HAGS)
+• Enables NVIDIA sharpening (EnableGR535 = 0)	• Active l'accentuation NVIDIA (EnableGR535 = 0)
+• Enables frame scheduling tweaks	• Active les réglages de planification des frames
+• Enables hardware scheduling (HwSchMode = 2)	• Active la planification matérielle (HwSchMode = 2)
+• Enables optimized shader cache	• Active le cache shaders optimisé
+• Enables shader disk cache	• Active le cache disque des shaders
+• Enhanced WDDM behavior	• Comportement WDDM amélioré
+• Enhanced stability	• Stabilité accrue
+• FTS tweaks are driver-level modifications	• Les réglages FTS modifient le pilote en profondeur
+• Faster VRAM operations	• Opérations VRAM plus rapides
+• Faster audio response after idle	• Réponse audio plus rapide après inactivité
+• Faster boot	• Démarrage plus rapide
+• Faster frame delivery	• Livraison des frames plus rapide
+• Faster power state transitions	• Transitions d'état d'alimentation plus rapides
+• Faster shader compilation	• Compilation des shaders plus rapide
+• Fewer dxgkrnl.sys ISR chains triggered by GPU activity	• Moins de chaînes ISR dxgkrnl.sys déclenchées par l'activité GPU
+• Finds the NVIDIA High Definition Audio device (VEN_10DE)	• Trouve le périphérique audio HD NVIDIA (VEN_10DE)
+• For advanced users only	• Utilisateurs avancés uniquement
+• Forces 3D performance mode	• Force le mode performance 3D
+• Forces high-performance GPU state at driver initialization	• Force l'état de performance maximale du GPU à l'initialisation du pilote
+• Frees IRQ resources for the GPU	• Libère des ressources IRQ pour le GPU
+• Fully reversible via the Revert button	• Totalement réversible via le bouton Restaura
+• GPU runs at maximum frequencies	• Le GPU tourne à fréquence maximale
+• GPU runs at optimal frequencies	• Le GPU tourne à ses fréquences optimales
+• GPU runs at optimal frequencies continuously	• Le GPU tourne en continu à ses fréquences optimales
+• Generally safe to apply	• Généralement sûr à appliquer
+• Generally safe — recommended for all users	• Généralement sûr — recommandé à tous
+• HAGS helps on some systems and hurts on others — test and revert if FPS drops.	• HAGS aide sur certains systèmes et nuit sur d'autres — testez et rétablissez si les FPS chutent.
+• HD Audio device stays warm (no D3 cold exit latency)	• Le périphérique HD Audio reste chaud (aucune latence de sortie D3 cold)
+• HDMI audio device always active	• Le périphérique audio HDMI toujours actif
+• Harder to debug driver issues	• Plus difficile de déboguer les problèmes de pilote
+• Harder to debug issues	• Plus difficile de déboguer les problèmes
+• Hides tray icons	• Masque les icônes de la zone de notification
+• Higher idle power consumption	• Consommation plus élevée au repos
+• Higher power consumption	• Consommation plus élevée
+• Highest performance states	• États de performance les plus élevés
+• Highest power states	• États d'alimentation les plus élevés
+• Hot-plug detection disabled (fixed displays only)	• Détection hot-plug désactivée (écrans fixes uniquement)
+• If GPU crashes, driver may not auto-recover	• En cas de crash GPU, le pilote peut ne pas se récupérer tout seul
+• If you experience crashes, revert this tweak	• En cas de crash, rétablissez ce réglage
+• If you experience driver crashes, revert TDR settings to default.	• En cas de crash du pilote, rétablissez les réglages TDR par défaut.
+• Improved DPC latency	• Latence DPC améliorée
+• Improved performance in GPU-bound scenarios	• Meilleure performance dans les scénarios limités par le GPU
+• Improved preemption control	• Contrôle de préemption amélioré
+• Improves compatibility	• Améliore la compatibilité
+• Improves driver stability	• Améliore la stabilité du pilote
+• Improves shader loading	• Améliore le chargement des shaders
+• Increased heat output	• Chaleur accrue
+• Initial compilation may take time	• La compilation initiale peut prendre du temps
+• Keeps GPU cores active	• Garde les cœurs GPU actifs
+• Keeps GPU focused on current task	• Garde le GPU focalisé sur la tâche courante
+• Keeps GPU in high-performance state	• Maintient le GPU en état haute performance
+• Less CPU usage	• Moins d'utilisation du CPU
+• Less CPU usage from debug logging	• Moins de CPU pour la journalisation de débogage
+• Less CPU usage from logging	• Moins de CPU pour la journalisation
+• Less background capture activity	• Moins d'activité de capture en arrière-plan
+• Less diagnostic information	• Moins d'informations de diagnostic
+• Less telemetry data for NVIDIA	• Moins de données de télémétrie pour NVIDIA
+• Lets GPU manage its own memory	• Permet au GPU de gérer sa propre mémoire
+• Loss of Radeon Boost feature	• Perte de la fonction Radeon Boost
+• Loss of Radeon features	• Perte des fonctions Radeon
+• Loss of automatic contrast adjustment	• Perte de l'ajustement automatique du contraste
+• Lower input latency	• Latence d'entrée réduite
+• Maintains consistent display	• Maintient un affichage constant
+• Maintains native resolution	• Maintient la résolution native
+• Massive reduction in nvlddmkm.sys DPC counts (target: -30% to -50%)	• Réduction massive des DPC nvlddmkm.sys (cible : -30 % à -50 %)
+• Maximum GPU frequencies	• Fréquences GPU maximales
+• May affect battery life	• Peut affecter l'autonomie
+• May affect battery life on laptops	• Peut affecter l'autonomie sur les portables
+• May affect gaming experience	• Peut affecter l'expérience de jeu
+• May affect stability	• Peut affecter la stabilité
+• May affect system stability on some configurations	• Peut affecter la stabilité système sur certaines configurations
+• May cause data corruption	• Peut causer une corruption de données
+• May cause instability on some systems	• Peut causer de l'instabilité sur certains systèmes
+• May cause issues on older Intel GPUs	• Peut causer des problèmes sur les GPU Intel plus anciens
+• May cause stuttering in some games	• Peut causer des à-coups dans certains jeux
+• May improve frame time consistency	• Peut améliorer la régularité du frame time
+• May increase power consumption	• Peut augmenter la consommation
+• May miss driver update notifications	• Risque de manquer des notifications de mise à jour de pilote
+• May reduce FPS in some games	• Peut réduire les FPS dans certains jeux
+• May reduce GPU lifespan	• Peut réduire la durée de vie du GPU
+• May use more disk space	• Peut occuper plus d'espace disque
+• May use slightly more VRAM	• Peut utiliser légèrement plus de VRAM
+• May violate content agreements	• Peut violer les accords de contenu
+• Modern driver feature	• Fonctionnalité moderne du pilote
+• Modern drivers (>= ~570) store active FTS values under nvlddmkm\Parameters\FTS.	• Les pilotes récents (>= ~570) stockent les valeurs FTS actives sous nvlddmkm\Parameters\FTS.
+• Modern drivers (>= ~570) store active FTS values under nvlddmkm\\Parameters\\FTS.	• Les pilotes récents (>= ~570) stockent les valeurs FTS actives sous nvlddmkm\\Parameters\\FTS.
+• Modern drivers also mirror these settings under \Parameters\LocalSystem.	• Les pilotes récents répliquent ces réglages sous \Parameters\LocalSystem.
+• Modern drivers also mirror these settings under \\Parameters\\LocalSystem.	• Les pilotes récents répliquent ces réglages sous \\Parameters\\LocalSystem.
+• Monitor speakers won't work	• Les haut-parleurs du moniteur ne fonctionneront plus
+• More consistent frame times	• Frame times plus constants
+• More efficient GPU operation	• GPU plus efficace
+• More stable connection	• Connexion plus stable
+• NVIDIA GPUs only	• GPU NVIDIA uniquement
+• Native resolution always	• Résolution native en permanence
+• Netflix/Streaming may not work	• Netflix/le streaming peut ne plus fonctionner
+• NewReno : balanced	• NewReno : équilibré
+• No ASPM latency	• Aucune latence ASPM
+• No Ansel / ShadowPlay hooks in games	• Plus de hooks Ansel / ShadowPlay dans les jeux
+• No D3 cold exit latency	• Aucune latence de sortie D3 cold
+• No ECC overhead	• Aucun surcoût ECC
+• No GeForce Experience / NVIDIA container overhead	• Plus de surcoût GeForce Experience / conteneur NVIDIA
+• No HDCP handshake delays	• Aucun délai de handshake HDCP
+• No HDMI/DP audio output from your NVIDIA GPU	• Plus de sortie audio HDMI/DP depuis votre GPU NVIDIA
+• No PSR-related issues	• Plus de problèmes liés au PSR
+• No PSR-related stuttering	• Plus d'à-coups liés au PSR
+• No ULPS-related crashes	• Plus de crashes liés à l'ULPS
+• No ULPS-related issues	• Plus de problèmes liés à l'ULPS
+• No automatic brightness changes	• Plus de variations automatiques de luminosité
+• No clock gating delays	• Aucun délai de clock gating
+• No content restrictions	• Aucune restriction de contenu
+• No context switching overhead	• Aucun surcoût de contexte switching
+• No debug overhead	• Aucun surcoût de débogage
+• No dynamic resolution scaling	• Pas de scaling dynamique de résolution
+• No error correction	• Aucune correction d'erreurs
+• No feature overhead	• Aucun surcoût de fonctionnalités
+• No frequency throttling during load	• Aucun throttling de fréquence sous charge
+• No frequency throttling during load (Intel)	• Aucun throttling sous charge (Intel)
+• No hot plug polling overhead	• Plus de polling hot plug
+• No power gating delays	• Aucun délai de power gating
+• No recompilation on game restart	• Pas de recompilation au redémarrage d'un jeu
+• No refresh rate override overhead	• Plus de surcharge du taux de rafraîchissement
+• No scrubbing overhead	• Aucun surcoût de scrubbing
+• No watchdog overhead	• Aucun surcoût de watchdog
+• Not recommended for daily use	• Non recommandé pour un usage quotidien
+• Not recommended for laptops	• Non recommandé pour les portables
+• Not recommended for most users	• Non recommandé pour la plupart des utilisateurs
+• Only for stable overclocks	• Uniquement pour des OC stables
+• Only the NVIDIA audio endpoint is disabled	• Seulement l'endpoint audio NVIDIA est désactivé
+• Optimized driver behavior	• Comportement du pilote optimisé
+• Optimized kernel driver	• Pilote noyau optimisé
+• Optimizes for maximum throughput	• Optimise le débit maximal
+• Optimizes for performance	• Optimise pour la performance
+• Optimizes frame queue handling	• Optimise la gestion de la file de frames
+• Optimizes memory tiling	• Optimise le tilage mémoire
+• Optimizes power settings	• Optimise les réglages d'alimentation
+• Optimizes service startup	• Optimise le démarrage des services
+• Optimizes shader cache mode	• Optimise le mode du cache shaders
+• Panel uses its native refresh rate	• Le panneau utilise son taux de rafraîchissement natif
+• Persists compiled shaders across reboots	• Les shaders compilés survivent aux redémarrages
+• Potential data corruption	• Corruption de données potentielle
+• Prevents GPU downclocking	• Empêche le downclocking du GPU
+• Prevents adaptive contrast	• Empêche le contraste adaptatif
+• Prevents deep sleep states	• Empêche les états de veille profonde
+• Prevents display power saving	• Empêche l'économie d'énergie de l'affichage
+• Prevents power saving states	• Empêche les états d'économie d'énergie
+• Prevents resolution changes	• Empêche les changements de résolution
+• Prevents task interruption	• Empêche l'interuption des tâches
+• RMNvLinkControlLinkPM is for multi-GPU setups only.	• RMNvLinkControlLinkPM est uniquement pour les configurations multi-GPU.
+• RTX 20-series and newer only	• Uniquement RTX série 20 et plus récentes
+• Raw GPU performance	• Performance GPU brute
+• Recommended for color-critical work	• Recommandé pour un travail critique en couleur
+• Recommended for desktops	• Recommandé pour les PC de bureau
+• Recommended for gaming/performance use	• Recommandé pour le jeu/la performance
+• Recommended for stable overclocked systems	• Recommandé pour les systèmes overclockés stables
+• Recommended for stable systems	• Recommandé pour les systèmes stables
+• Reduced CPU overhead	• Surcoûts CPU réduits
+• Reduced DPC latency on some systems	• Latence DPC réduite sur certains systèmes
+• Reduced background CPU/disk usage	• Moins de CPU/disque en arrière-plan
+• Reduced background overhead	• Moins de surcoûts en arrière-plan
+• Reduced diagnostic capability	• Capacité de diagnostic réduite
+• Reduced driver CPU usage	• Moins de CPU utilisé par le pilote
+• Reduced frame time variance	• Moins de variance du frame time
+• Reduced input lag	• Moins de lag d'entrée
+• Reduced input latency	• Latence d'entrée réduite
+• Reduced latency	• Latence réduite
+• Reduced memory latency	• Latence mémoire réduite
+• Reduced stuttering	• Moins d'à-coups
+• Reduced stuttering in games	• Moins d'à-coups dans les jeux
+• Reduced telemetry overhead	• Moins de surcoûts de télémétrie
+• Reduced tracing overhead	• Moins de surcoûts de tracing
+• Reduced unnecessary checks	• Moins de vérifications inutiles
+• Reduces CPU overhead	• Réduit les surcoûts CPU
+• Reduces HDAudBus.sys ISR load if NVIDIA HDMI audio is unused	• Réduit la charge ISR HDAudBus.sys si l'audio HDMI NVIDIA n'est pas utilisé
+• Reduces Windows scheduler overhead	• Réduit les surcoûts du planificateur Windows
+• Reduces crash recovery capability	• Réduit la capacité de récupération après crash
+• Reduces driver overhead	• Réduit les surcoûts du pilote
+• Reduces power state transition latency	• Réduit la latence des transitions d'état d'alimentation
+• Reflex / Low Latency Mode must be set in NVIDIA Control Panel or in-game.	• Reflex / le mode Faible Latence doit être réglé dans le Panneau de configuration NVIDIA ou en jeu.
+• Required for some newer features	• Requis pour certaines fonctions récentes
+• Requires Intel Arc GPU (A-Series or B-Series)	• Nécessite un GPU Intel Arc (A-Series ou B-Series)
+• Requires Windows 11 for best results	• Windows 11 requis pour de meilleurs résultats
+• Requires reboot to take effect	• Demande un redémarrage pour prendre effet
+• Requires reboot to take full effect	• Demande un redémarrage pour prendre tout son effet
+• Revert if you experience display issues or audio problems	• Rétablissez en cas de problèmes d'affichage ou audio
+• Revert if you need to connect/disconnect displays	• Rétablissez si vous devez brancher/débrancher des écrans
+• RmGpsPsEnablePerCpuCoreDpc = 1 improves latency on all modern GPUs	• RmGpsPsEnablePerCpuCoreDpc = 1 améliore la latence sur tous les GPU modernes
+• Safe for all NVIDIA GPUs	• Sûr sur tous les GPU NVIDIA
+• Safe for all NVIDIA GPUs (Maxwell, Pascal, Turing, Ampere, Ada)	• Sûr sur tous les GPU NVIDIA (Maxwell, Pascal, Turing, Ampere, Ada)
+• Safe for most systems	• Sûr pour la plupart des systèmes
+• Safe to revert.	• Sûr à rétablir.
+• Sets EnableHDAudioD3Cold = 0 on nvlddmkm service	• Fixe EnableHDAudioD3Cold = 0 sur le service nvlddmkm
+• Sets HDCP keys to zero	• Met les clés HDCP à zéro
+• Sets RMElpgStateOnInit = 3 in the NVIDIA GPU class registry key	• Définit RMElpgStateOnInit = 3 dans la clé de registre de la classe GPU NVIDIA
+• Sets RMHotPlugSupportDisable = 1 on GPU driver key	• Fixe RMHotPlugSupportDisable = 1 sur la clé du pilote GPU
+• Sets SetPanelRefreshRate = 0 on GPU driver key	• Fixe SetPanelRefreshRate = 0 sur la clé du pilote GPU
+• Sets WDDM to use DPC for watchdog callbacks (UseDpcForGpuWatchdogCallback)	• Configure WDDM pour utiliser les DPC pour les callbacks watchdog (UseDpcForGpuWatchdogCallback)
+• Sets aggressive frequency targets	• Fixe des cibles de fréquence agressives
+• Sets aggressive power limits	• Fixe des limites d'alimentation agressives
+• Sets cache mode to optimized	• Met le mode cache en optimisé
+• Sets high DPM levels	• Fixe des niveaux DPM élevés
+• Sets log levels to minimum	• Met les niveaux de journalisation au minimum
+• Sets max cache size to 2 GB	• Fixe la taille max du cache à 2 Go
+• ShaderCacheMode = 2 (Optimized) is safe for all architectures	• ShaderCacheMode = 2 (Optimized) est sûr sur toutes les architectures
+• Significantly higher power consumption	• Consommation nettement plus élevée
+• Skips ECC fuse check	• Passe la vérification du fusible ECC
+• Skips HDCP initialization	• Passe l'initialisation HDCP
+• Slightly higher idle power consumption	• Légèrement plus de consommation au repos
+• Slightly higher memory bandwidth	• Bandwidth mémoire légèrement supérieur
+• Smaller driver footprint	• Empreinte pilote plus petite
+• Smoother first-run experience	• Première expérience plus fluide
+• Smoother frame pacing	• Frame pacing plus régulier
+• Some RID values may have different effects per architecture	• Certains RID peuvent avoir des effets différents selon l'architecture
+• Some features may be unavailable	• Certaines fonctions peuvent devenir indisponibles
+• Systems with high HDAudBus ISR in xperf/LatencyMon	• Systèmes avec un fort ISR HDAudBus sous xperf/LatencyMon
+• Systems with high nvlddmkm.sys DPC counts in xperf/LatencyMon	• Systèmes avec un fort nombre de DPC nvlddmkm.sys sous xperf/LatencyMon
+• TDR values are set to safer defaults (10s delay, recovery enabled) — no longer disables recovery.	• Les valeurs TDR sont mises à des valeurs sûres (délai 10 s, récupération activée) — la récupération n'est plus désactivée.
+• Test before daily use	• À tester avant usage quotidien
+• Test thoroughly before daily use	• À tester soigneusement avant usage quotidien
+• Test with xperf/LatencyMon before and after to measure improvement	• Testez avec xperf/LatencyMon avant et après pour mesurer l'amélioration
+• The application is running with the right privileges	• L'application s'exécute avec les bons droits
+• The legacy nvlddmkm\FTS key is kept for backwards compatibility.	• La clé legacy nvlddmkm\FTS est conservée pour la rétrocompatibilité.
+• The legacy nvlddmkm\\FTS key is kept for backwards compatibility.	• La clé legacy nvlddmkm\\FTS est conservée pour la rétrocompatibilité.
+• This will BREAK GeForce Experience, NVIDIA overlay, and possibly the NVIDIA Control Panel (depending on driver version).	• Cela cassera GeForce Experience, l'overlay NVIDIA et possiblement le Panneau de configuration NVIDIA (selon la version du pilote).
+• ThreadPriority is set to HIGH (15), not REALTIME (31), to avoid DPC storms.	• ThreadPriority est fixé à HIGH (15), pas REALTIME (31), pour éviter les tempêtes DPC.
+• To restore, set Start back to 2 (Manual) or 3.	• Pour restaurer, remettez Start à 2 (Manuel) ou 3.
+• Tunes WDDM parameters	• Ajuste les paramètres WDDM
+• Use GeForce Experience to re-enable if needed.	• Utilisez GeForce Experience pour réactiver si besoin.
+• Use USB headset, DAC, or motherboard audio instead	• Utilisez un casque USB, un DAC ou l'audio de carte mère à la place
+• Use only for competitive gaming	• À utiliser uniquement pour le jeu compétitif
+• Use only if you manage your driver manually (DDU + clean install).	• À n'utiliser que si vous gérez votre pilote manuellement (DDU + installation propre).
+• Use only if you prefer native resolution	• À n'utiliser que si vous préférez la résolution native
+• Useful if you experience audio pops/clicks	• Utile si vous avez des grésillements audio
+• Useful if you set refresh rate manually	• Utile si vous réglez le taux de rafraîchissement manuellement
+• Users who don't use HDMI/DP audio from their GPU	• Utilisateurs qui n'utilisent pas l'audio HDMI/DP de leur GPU
+• Uses up to 2 GB disk space	• Occupe jusqu'à 2 Go d'espace disque
+• Value applied under the GPU class key (SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\XXXX)	• Valeur appliquée sous la clé de classe GPU (SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\XXXX)
+• Value applied under the GPU class key (SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\XXXX)	• Valeur appliquée sous la clé de classe GPU (SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\XXXX)
+• Verify with: nvidia-smi -q	• Vérifiez avec : nvidia-smi -q
+• We write both locations for compatibility and to prevent reset on service restart.	• Nous écrivons aux deux emplacements pour compatibilité et pour éviter la réinitialisation au redémarrage du service.
+• Works on all driver versions	• Fonctionne sur toutes les versions de pilote
+• You will lose the ability to use NVIDIA overlay, instant replay, and Ansel.	• Vous perdrez l'accès à l'overlay NVIDIA, à l'instant replay et à Ansel.
+• Your motherboard audio, USB audio, and other devices are PRESERVED	• Votre audio de carte mère, l'audio USB et les autres périphériques sont PRÉSERVÉS
+• Your version of Windows supports TCP congestion control	• Votre version de Windows prend en charge le contrôle de congestion TCP
+• ✅ NVIDIA RTX 20-series (Turing)	• ✅ NVIDIA RTX série 20 (Turing)
+• ✅ NVIDIA RTX 30-series (Ampere)	• ✅ NVIDIA RTX série 30 (Ampere)
+• ✅ NVIDIA RTX 40-series (Ada Lovelace)	• ✅ NVIDIA RTX série 40 (Ada Lovelace)
+• ✅ NVIDIA RTX 50-series (Blackwell)	• ✅ NVIDIA RTX série 50 (Blackwell)
+• ❌ GTX 10-series and older (Pascal, Maxwell) - Not supported	• ❌ GTX série 10 et plus anciennes (Pascal, Maxwell) — non prises en charge
+• 📌 Compatible GPUs:	• 📌 GPU compatibles :
+…	…
+← BACK	← RETOUR
+⚖️  Balanced	⚖️  Équilibré
+⚙️ What it does:	⚙️ Ce que ça fait :
+⚠️ CRITICAL WARNINGS:	⚠️ Avertissements importants :
+⚠️ IMPORTANT:	⚠️ IMPORTANT :
+⚠️ Trade-offs:	⚠️ Contreparties :
+⚡ Performance Benefits:	⚡ Avantages Performance :
+✅ Safe approach:	✅ Abordage sûr :
+🎛️  Custom	🎛️  Personnalisé
+🎯 Performance	🎯 Performance
+📌 GPU Compatibility:	📌 Compatibilité GPU :
+📌 Target:	📌 Cibles :
+📝 Note:	📝 Note :
+🔇 Quiet	🔇 Silencieux
+Windows Settings	Paramètres Win
+Context Menu	Menu contextuel
+Timer Resolution Manager	Gestionnaire de résolution de timer
+Manage system timer resolution for optimal performance	Gère la résolution du timer système pour une performance optimale
+Current Status	Statut actuel
+Resolution:	Résolution :
+Scheduled Task:	Tâche planifiée :
+Timer Configuration:	Configuration du timer :
+Timer Value (5000-10000):	Valeur du timer (5000-10000) :
+Set Value	Définir la valeur
+Live Measurement	Mesure en direct
+Current timer interval	Intervalle actuel du timer
+Slept:	Sommeil :
+Actual sleep duration (should be ~1ms)	Durée de sommeil réelle (devrait être ~1ms)
+Delta:	Écart :
+Difference from target (lower is better)	Écart par rapport à la cible (plus bas = mieux)
+Actions:	Actions :
+Enable Timer	Activer le timer
+Disable Timer	Désactiver le timer
+Start Monitoring	Démarrer la surveillance
+Stop Monitoring	Arrêter la surveillance
+Important Information	Informations importantes
+Restart Required	Redémarrage requis
+After enabling or disabling Timer Resolution,	Après activation ou désactivation de la résolution de timer,
+you must restart your computer	vous devez redémarrer votre ordinateur
+ for the changes to take effect.	 pour que les changements prennent effet.
+Recommended Timer Values	Valeurs recommandées du timer
+Gaming:	Gaming :
+5000 - 5200 (Best performance)	5000 - 5200 (Meilleure performance)
+General Use:	Usage général :
+5200 - 6000 (Balanced)	5200 - 6000 (Équilibré)
+Power Saving:	Économie d'énergie :
+7000 - 10000 (Lower CPU usage)	7000 - 10000 (Moins d'usage CPU)
+Delta Target	Objectif d'écart
+Aim for the 	Viser le 
+lowest and most stable Delta	Delta le plus bas et le plus stable
+ possible. A consistent Delta near 0.0000ms means your system timer is well optimized.	 possible. Un Delta cohérent près de 0,0000 ms signifie que le timer de votre système est bien optimisé.
+High or fluctuating Delta = timer instability	Delta élevé ou fluctuant = instabilité du timer
+xperf DPC/ISR Test	Test DPC/ISR xperf
+Measure DPC/ISR system impact using xperf	Mesure l'impact système DPC/ISR avec xperf
+Test Duration:	Durée du test :
+10 seconds	10 secondes
+30 seconds	30 secondes
+60 seconds	60 secondes
+Start Test	Démarrer le test
+Stop Test	Arrêter le test
+DPC/ISR Results	Résultats DPC/ISR
+DPC Impact:	Impact DPC :
+ISR Impact:	Impact ISR :
+Total Impact:	Impact total :
+Test not started	Test non démarré
+DPC/ISR Rating Guide:	Guide de notation DPC/ISR :
+< 0.3% - Excellent	< 0,3 % - Excellent
+0.3% - 1.0% - Good	0,3 % - 1,0 % - Bon
+> 1.0% - Poor	> 1,0 % - Mauvais
+Test History:	Historique des tests :
+Clear	Effacer
+No tests run yet	Aucun test effectué
+Enabled	Activé
+Disabled	Désactivé
+Active	Actif
+Inactive	Inactif
+XML configuration file missing: {0}	Fichier de configuration XML manquant : {0}
+Failed to set registry key: {0}	Échec de la définition de la clé du registre : {0}
+Failed to create scheduled task: {0}	Échec de la création de la tâche planifiée : {0}
+Timer Resolution enabled successfully.	Résolution de timer activée avec succès.
+Error enabling timer resolution: {0}	Erreur lors de l'activation de la résolution de timer : {0}
+Timer Resolution disabled with warnings — scheduled task could not be deleted. Please remove it manually.	Résolution de timer désactivée avec avertissements — la tâche planifiée n'a pas pu être supprimée. Veuillez la supprimer manuellement.
+Timer Resolution disabled successfully.	Résolution de timer désactivée avec succès.
+Error disabling timer resolution: {0}	Erreur lors de la désactivation de la résolution de timer : {0}
+Please restart your computer for changes to take effect.	Veuillez redémarrer votre ordinateur pour que les changements prennent effet.
+Warning	Avertissement
+Please enter a valid number	Veuillez saisir un nombre valide
+Invalid Input	Saisie invalide
+Value must be between {0} and {1}	La valeur doit être entre {0} et {1}
+Invalid Value	Valeur invalide
+Timer value set successfully to {0}	Valeur du timer définie avec succès à {0}
+Failed to set timer value. Make sure timer resolution is enabled first.	Échec de la définition de la valeur du timer. Assurez-vous que la résolution de timer est activée d'abord.
+Invalid number format	Format de nombre invalide
+Failed to set timer value: {0}	Échec de la définition de la valeur du timer : {0}
+xperf.exe not found.	xperf.exe introuvable.
+xperf start failed: {0}	Échec du démarrage de xperf : {0}
+Capturing... {0}s remaining	Capturage... {0}s restants
+xperf stop failed: {0}	Échec de l'arrêt de xperf : {0}
+ETL file not created.	Fichier ETL non créé.
+Error: {0}	Erreur : {0}
+Could not parse xperf output.	Impossible d'analyser la sortie de xperf.
+Excellent	Excellent
+Good	Bon
+Poor	Mauvais
+Your system rating: {0} (Top DPC: {1}, Top ISR: {2})	Note de votre système : {0} (Top DPC : {1}, Top ISR : {2})
+Test completed ({0}s)	Test terminé ({0}s)
+Define	Définir
+Wallpaper Changer	Échangeur de fond d'écran
+Drop image here or click "Select"	Zone de dépôt du fond d'écran du bureau ou cliquez sur Sélectionner
+Drop lock screen image here	Zone de dépôt du fond d'écran de verrouillage
+Select Image	Sélectionner image
+Apply Wallpaper	Appliquer le fond d'écran
+Reboot PC	Rédémarrer l'ordinateur
+Ready. Select or drag images to apply.	Prêt. Sélectionnez ou glissez des images pour appliquer.
+Select Desktop Wallpaper	Sélectionner le fond d'écran du bureau
+Select Lock Screen Wallpaper	Sélectionner le fond d'écran de verrouillage
+Apply the lock-screen image and reboot the computer now?\n\nA reboot is sometimes needed for the WinRT lock-screen image to take effect.	Appliquer l'image de verrouillage et redémarrer l'ordinateur maintenant ?\n\nUn redémarrage est parfois nécessaire pour que l'image s'applique correctement.
+Reboot to apply lock screen	Rédémarrer pour appliquer
+Desktop Wallpaper	Fond d'écran du bureau
+Lock Screen Wallpaper	Fond d'écran de verrouillage
+Desktop image loaded: {0}	Fond d'écran du bureau chargé : {0}
+Lock screen image loaded: {0}	Image d'écran de verrouillage chargée : {0}
+Not a valid image (expected .jpg / .png / .bmp)	Non une image valide (attendu .jpg / .png / .bmp)
+Nothing selected. Pick at least one image first.	Rien de sélectionné. Choisissez au moins une image d'abord.
+Failed to apply: {0}	Échec de l'application : {0}
+Wallpaper(s) applied successfully!	Fond(s) d'écran appliqué(s) avec succès !
+Rebooting to apply the lock-screen wallpaper...	Redémarrage pour appliquer le fond d'écran de verrouillage...
+Error loading preview	Erreur lors du chargement de l'aperçu
+Desktop error	Erreur bureau
+Drop an image into a zone below, or click "Select Image".	Glissez une image dans une zone ci-dessous, ou cliquez sur "Sélectionner Image".
+No image	Aucune image
+Others Tools	Autres Outils
+Test stopped.	Test arrêté.
+
+# ---- Settings module card descriptions (added 2026-10) ----
+ON = AI analysis enabled  |  OFF = disabled	ON = analyse IA activée  |  OFF = désactivée
+ON = Copilot installed / enabled  |  OFF = removed	ON = Copilot installé / activé  |  OFF = supprimé
+ON = automatic updates enabled (default)  |  OFF = disabled	ON = MAJ automatiques activées (défaut)  |  OFF = désactivées
+ON = apps allowed in background  |  OFF = blocked	ON = apps autorisées en arrière-plan  |  OFF = bloquées
+ON = P2P distribution enabled  |  OFF = disabled	ON = distribution P2P activée  |  OFF = désactivée
+ON = Game Bar / GameDVR enabled  |  OFF = disabled	ON = Game Bar / GameDVR activés  |  OFF = désactivés
+ON = Phone Link visible in Settings  |  OFF = hidden	ON = Phone Link visible dans Paramètres  |  OFF = masqué
+ON = Windows indexer active  |  OFF = stopped	ON = indexeur Windows actif  |  OFF = arrêté
+ON = auto-archiving of Store apps enabled  |  OFF = disabled	ON = archivage auto des apps Store activé  |  OFF = désactivé
+ON = restore points enabled  |  OFF = disabled	ON = points de restauration activés  |  OFF = désactivés
+ON = restart notifications shown  |  OFF = hidden	ON = notifications de redémarrage affichées  |  OFF = masquées
+ON = Defender protection active  |  OFF = protection disabled	ON = protection Defender active  |  OFF = protection désactivée
+ON = SmartScreen enabled  |  OFF = disabled	ON = SmartScreen activé  |  OFF = désactivé
+ON = memory integrity enabled  |  OFF = disabled (reboot)	ON = intégrité mémoire activée  |  OFF = désactivée (redémarrage)
+ON = custom mitigations applied  |  OFF = Windows defaults	ON = mitigations personnalisées appliquées  |  OFF = valeurs par défaut Windows
+ON = telemetry & ads cut (security base)  |  OFF = defaults	ON = télémétrie & pub coupées (base de sécurité)  |  OFF = valeurs par défaut
+ON = telemetry cut  |  OFF = defaults	ON = télémétrie coupée  |  OFF = valeurs par défaut
+ON = ads & suggestions cut	ON = pub & suggestions coupées
+ON = activity feed & tracking cut	ON = flux d'activité & suivi coupés
+ON = error reports cut	ON = rapports d'erreurs coupés
+ON = cloud sync cut	ON = synchro cloud coupée
+ON = app access (diagnostics, location, account) restricted	ON = accès apps (diagnostics, localisation, compte) restreints
+ON = instrumentation & PCA cut	ON = instrumentation & PCA coupés
+{0} package(s) already updated in this session (ignored).	{0} package(s) déjà mis à jour dans cette session (ignorés).
+turns	tours
+fixed	fixe
+turns in front	tours en tête
+on wake-up	au réveil
+CPU turns	tours processeur
+all threads equal	tous les threads égaux
+threads in front get extra priority	les threads en tête ont une priorité supplémentaire
+priority on wake-up	priorité au réveil
+Windows default	défaut Windows
+Now:	Actuellement :
+long	long
+short	court
+CPU time for the window in front	Temps processeur de la fenêtre au premier plan
+Win32PrioritySeparation: how Windows shares CPU time between the window in front and everything else. A new value works at once, no restart.	Win32PrioritySeparation : comment Windows partage le temps processeur entre la fenêtre au premier plan et tout le reste. Une nouvelle valeur prend effet immédiatement, sans redémarrage.
+⏱  Measure	⏱  Mesurer
+Compare values on this PC	Comparer les valeurs sur ce PC
+A busy program in the background shares one processor with this window. For each value, in a new random order each round, it measures how much of the processor this window gets and how fast its thread wakes up. Your value is put back at the end. Keep this window in front while it runs.	Un programme actif en arrière-plan partage un processeur avec cette fenêtre. Pour chaque valeur, dans un nouvel ordre aléatoire à chaque tour, il mesure la part de processeur obtenue par cette fenêtre et la vitesse de réveil de son thread. Votre valeur est restaurée à la fin. Gardez cette fenêtre au premier plan pendant l'exécution.
+ rounds	 tours
+Run comparison	Lancer la comparaison
+Measuring…	Mesure en cours…
+Measuring Win32PrioritySeparation…	Mesure de Win32PrioritySeparation…
+0x{0}: {1}% processor, wake-up {2} µs	0x{0} : {1} % processeur, réveil {2} µs
+Measurement failed	Échec de la mesure
+Pick at least 2 values to compare	Choisissez au moins 2 valeurs à comparer
+Running {0} measurements…	Exécution de {0} mesures…
+Comparing {0} values × {1} rounds…	Comparaison de {0} valeurs × {1} tours…
+Best on this PC: 0x{0}	Meilleur sur ce PC : 0x{0}
+The window in front got {0}% of the processor	La fenêtre au premier plan a obtenu {0} % du processeur
+Use	Utiliser
+Win32PrioritySeparation set to 0x{0}	Win32PrioritySeparation réglé sur 0x{0}
+MSI mode and CPU affinity	Mode MSI et affinité CPU
+Hyper-Threading: 	Hyper-threading :
+Hide devices	Masquer les appareils
+Show devices	Afficher les appareils
+How each PCI device signals the CPU, and which processors handle it. Windows reads these when the device starts, so a restart is needed after a change.	Comment chaque appareil PCI signale le CPU et quel(s) processeur(s) le gère. Windows lit ces valeurs au démarrage de l'appareil, un redémarrage est donc nécessaire après toute modification.
+If a device stops working after the restart	Si un appareil cesse de fonctionner après le redémarrage
+If a device stops working, boot into Safe Mode (hold Shift while clicking Restart), then press Reset here to revert it.	Si un appareil cesse de fonctionner, redémarrez en Mode Sans Échec (maintenez Maj pendant que vous cliquez sur Redémarrer), puis appuyez sur Réinitialiser ici pour le rétablir.
+Benchmark	Benchmark
+rounds	passes
+Best for devices: 	Meilleur pour les appareils :
+Best for devices: —	Meilleur pour les appareils : —
+A small piece of work runs on one logical processor at a time, in a new random order each round. It runs at the highest priority, so only interrupts and deferred calls (DPCs) can stop it; the bars show how much of the time they took on each processor (lower is better). CPU 0 is never suggested: Windows uses it for much of its own work.	Un petit morceau de travail s'exécute sur un processeur logique à la fois, dans un nouvel ordre aléatoire à chaque passe. Il tourne à la plus haute priorité, seules les interruptions et les appels différés (DPC) peuvent l'interrompre ; les barres montrent le temps qu'ils ont pris sur chaque processeur (plus c'est bas, mieux c'est). Le CPU 0 n'est jamais suggéré : Windows l'utilise pour une grande partie de son propre travail.
+After the benchmark, press Suggested on a device to fill in its settings, then Apply.	Après le benchmark, appuyez sur Suggéré sur un appareil pour remplir ses réglages, puis Appliquer.
+Devices	Appareils
+Apply	Appliquer
+Reset	Réinitialiser
+Suggested	Suggéré
+MSI on	MSI actif
+MSI off	MSI inactif
+Legacy IRQ	IRQ legacy
+yes	oui
+no	non
+CPU	CPU
+Running…	En cours…
+Applying changes…	Application des modifications…
+change(s) — a restart is needed to take effect.	modification(s) — un redémarrage est nécessaire pour prendre effet.
+Run the benchmark first.	Lancez d'abord le benchmark.
+Suggested CPUs filled for 	CPU suggérés remplis pour
+ — press Apply.	 — appuyez sur Appliquer.
+Run the benchmark and press Suggested on a device first.	Lancez le benchmark et appuyez sur Suggéré sur un appareil d'abord.
+Tick a device (and press Suggested on it) before Apply.	Cochez un appareil (et appuyez sur Suggéré) avant Appliquer.
+Applied	Appliqué
+device(s) — restart to apply.	appareil(s) — redémarrez pour appliquer.
+MSI and IRQ	MSI et IRQ
+Priority	Priorité
+Limit	Limite
+Applied to 	Appliqué à 
+Failed to apply for 	Échec d'application pour
+Auto	Auto
+Low	Faible
+Normal	Normal
+High	Élevée
+All	Tous
+None	Aucun
+CPU auto	CPU auto 
+Presets	Préréglages
+Pick a value. Click applies it immediately (registry + NtSetSystemInformation) — no restart needed.	Choisissez une valeur. Un clic l'applique immédiatement (registre + NtSetSystemInformation) — pas de redémarrage nécessaire.
+Benchmark failed: {0}	Échec du benchmark : {0}

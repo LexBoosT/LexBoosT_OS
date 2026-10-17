@@ -1,4 +1,4 @@
----
+﻿---
 title: Services
 description: Applies service tweaks
 privilege: TrustedInstaller
@@ -96,11 +96,6 @@ actions:
   - !service: { name: 'PNRPsvc', operation: change, startup: 3 }
   - !service: { name: 'tcpipreg', operation: change, startup: 4 }
   # -- Disabled --
-  # Noverse cross-check (deliberate): the 7 services below are kept disabled despite docs
-  # warnings — none of their features are used on a gaming desktop: AppMgmt (GPO software
-  # deployment), MSDTC (distributed transactions), MapsBroker (Maps app), SEMgrSvc (NFC
-  # payments), WalletService, WMPNetworkSvc (media sharing), SSDPSRV (UPnP/SSDP discovery —
-  # re-enable if DLNA / network discovery is ever needed).
   - !service: { name: 'AJRouter', operation: change, startup: 4 }
   - !service: { name: 'ALG', operation: change, startup: 4 }
   - !service: { name: 'Fax', operation: change, startup: 4 }
@@ -277,7 +272,7 @@ actions:
   - !service: { name: 'amdfendrmgr', operation: change, startup: 2 }
 
   # ============================================
-  # PER-USER SYNC SERVICES (wildcard — disabled for all users)
+  # PER-USER SYNC SERVICES (wildcard - disabled for all users)
   # ============================================
   - !service: { name: 'MessagingSvc*', operation: change, startup: 4 }
   - !service: { name: 'UserDataSvc*', operation: change, startup: 4 }
@@ -298,3 +293,10 @@ actions:
   - !service: { name: 'vmicvmsession', operation: change, startup: 3 }
   - !service: { name: 'vmicvss', operation: change, startup: 3 }
   - !service: { name: 'vmvss', operation: change, startup: 3 }
+
+  # SvcHostSplitDisable : SELECTIVE logic (from the playbook's original tweak) :
+  # SVC-SPLIT-DISABLE.PS1 removes =1 on the full list (60 services),
+  # then if RAM < 8 GB re-applies =1 on the reduced list (36 services),
+  # skipping the protected services (Xbox/GameBar, NVIDIA/GPU, VM).
+  # Single source of truth in the playbook : the network finalize step no longer touches this registry.
+  - !powerShell: {command: '.\\Scripts\\SVC-SPLIT-DISABLE.PS1', exeDir: true, runas: currentUserElevated, wait: true}

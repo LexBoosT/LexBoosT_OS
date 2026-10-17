@@ -1,4 +1,4 @@
-﻿#Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 #Requires -Version 5.1
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -57,10 +57,26 @@ try {
     $activeLine = (powercfg /getactivescheme)
     $active = [regex]::Match($activeLine, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}').Value
     if ($active) {
+        # Hybrid sleep + hibernate-after: disable on all PCs (fine everywhere)
         powercfg /setacvalueindex $active SUB_SLEEP HYBRIDSLEEP 0 | Out-Null
         powercfg /setacvalueindex $active SUB_SLEEP HIBERNATEIDLE 0 | Out-Null
-        powercfg /setacvalueindex $active SUB_SLEEP STANDBYIDLE 0 | Out-Null
         powercfg /setdcvalueindex $active SUB_SLEEP HYBRIDSLEEP 0 | Out-Null
+
+        # STANDBYIDLE (auto-sleep timer):
+        #   Desktop  -> 0 (never, desktops don't auto-sleep)
+        #   Laptop   -> 600000 ms = 10 min (S0 Modern Standby needs this!)
+        # On a S0 Modern Standby laptop, STANDBYIDLE is the ONLY auto-sleep
+        # mechanism. Setting it to 0 makes the laptop NEVER sleep = "fully broken".
+        $standbyIdleAC = 0
+        $standbyIdleDC = 0
+        if ($isLaptop) {
+            $standbyIdleAC = 600000  # 10 min on AC
+            $standbyIdleDC = 600000  # 10 min on DC
+        }
+        powercfg /setacvalueindex $active SUB_SLEEP STANDBYIDLE $standbyIdleAC | Out-Null
+        powercfg /setdcvalueindex $active SUB_SLEEP STANDBYIDLE $standbyIdleDC | Out-Null
+
+        # Disk idle: never spin down (gaming/perf)
         powercfg /setacvalueindex $active SUB_DISK DISKIDLE 0 | Out-Null
         powercfg /setactive $active | Out-Null
         Write-Log '+' 'AC timers configured'

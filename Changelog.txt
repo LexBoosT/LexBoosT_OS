@@ -1,4 +1,58 @@
-﻿# LexBoosT OS™ V26.09.1
+# LexBoosT OS™ V26.10
+
+## Timer resolution
+- ✨ SYSTEM_TWEAKS.PS1: timer resolution keys added (Session Manager\kernel DisableDynamicTick=1, TimeBroker TimerResolution=1 (X3D-guarded), Psched TimerResolution=1 / MaxOutstandingSends=0 / NonBestEffortLimit=0) — tighter timer/dynamic-tick handling for lower latency.
+
+## Graphics & GPU power
+- ✨ GRAPHICS.PS1: GPU timer and power/latency tolerance keys added (UseGpuTimer=1, EnableAggressivePStateBoost=1, DefaultLatencyTolerance* = 1, DefaultD3TransitionLatency* = 1, LatencyToleranceDefault/FSVP = 1, MonitorLatencyTolerance = 1, MonitorRefreshLatencyTolerance = 1, ExitLatency = 1, ExitLatencyCheckEnabled = 1) — tighter GPU idle/boost behavior.
+- ✨ GRAPHICS.PS1: Direct3D/DirectDraw debug and emulation keys added (EnableDebugging=0, FullDebug=0, LoadDebugRuntime=0, DisableMMX=0, DisableVidMemVBs=0, SoftwareOnly=0 under HKCU/HKLM + Direct3D\Drivers) — no software fallback, no debug overhead.
+
+## DWM / desktop performance
+- ✨ DWM.PS1: desktop visual and animation keys added (EnableShadow=0, DisableProjectedShadows=1, MousewheelAnimationDurationMs=0, Blur=0, DisableAccentGradient=1, DisallowAnimations=1, DisallowColorizationColorChanges=1, EnableAeroPeek=0, Composition=1, DisableDWM=0) — applied to HKLM + HKCU + Policies for consistency.
+
+## Network & NIC
+- ✨ NIC-TWEAKS.PS1: Intel Ethernet preset offload values updated — EncapsulatedPacketTaskOffload*=1, Lso*=1, IPsec*/TCP*/UDP* checksum offloads=3, PMARP/PMNS/PMWiFiRekey=1, Uso=1, UdpRsc=1 — plus new keys (TCPConnectionOffload*=3, UsoIPv6=1) and EEE / Green Ethernet disabled: reduced NIC CPU load, lower LAN latency.
+- ✨ NIC-TWEAKS.PS1: per-interface TCP keys added (TcpAckFrequency=1, TcpDelAckTicks=0 under Tcpip\Parameters\Interfaces\<GUID>) — faster ACK responses, no delayed-ack ticks on the active LAN adapter.
+- ✨ MMCSS-NIC.PS1: MMCSS network thread values updated (NetworkThrottlingIndex=4294967295, SchedulerPeriod=1000000, LazyModeTimeout=25000) — no network-thread throttling, stable scheduler period for the NDIS network thread.
+
+## Performance & system
+- ✨ SYSTEM_TWEAKS.PS1: DisablePagingExecutive=1 (HKLM Memory Management) — kernel and paged executive memory kept in RAM, no more executive pages swapped out (complements existing DisablePageCombining).
+- ✨ SYSTEM_TWEAKS.PS1: Windows Search RespectPowerModes=1 (HKLM Windows Search\Gather\Windows\SystemIndex) — indexing respects power modes to prevent battery drain on laptops.
+- ✨ SYSTEM_TWEAKS.PS1: background apps disabled (GlobalUserDisabled=1 + BackgroundAppGlobalToggle=0, HKCU) — fewer background processes eating RAM/IO.
+- ✨ SYSTEM_TWEAKS.PS1: IFEO PerfOptions added — SearchIndexer=5, SearchProtocolHost=5, MoUsoCoreWorker=5, PhoneExperienceHost=5, spoolsv=1: background services run at idle CPU priority under load while Windows Search and the indexer stay fully functional (no service or engine disabled).
+- ✨ SYSTEM_TWEAKS.PS1: IFEO PerfOptions for the 3 Defender SecurityHealth processes (SecurityHealthService/Systray/Host) — CpuPriorityClass=1, IoPriority=0, PagePriority=0, EcoQoS=1, WorkingSetLimitInKB=65536: Defender stays fully active with reduced CPU priority instead of being disabled.
+- ✨ CEIP.PS1: FTH reset via rundll32 fthsvc.dll,FthSysprepSpecialize (X64 only, guarded) — full Fault Tolerant Heap reset in addition to the registry disable.
+- 💥 Remove REMOVEWINDOWSAI.PS1. If you want uninstall that, use other tools like Winhance.
+- ✨ Updated GLOM to 2.8.50.21 and DLSS files to 310.9.1 and Streamline 2.14.1 in DLSS GLOM.
+- ✨ LexBoosT Packages Manager updated to 3.0: interface refresh and install/update improvements.
+- 🪛 Disable automatic pagefile based on RAM during the playbook installation.
+- ✨ The LexBoosT theme is applied by default.
+- ✨ The Start Menu and taskbar pins are cleared during the initial installation of LexBoosT OS; the menu will only contain:: LexBoosT Tweaks & Tools, Edge, File Explorer, Store, Xbox, Settings.
+- ✨ Removal of Antivirus exclusions which allowed certain applications/games to run faster, because some people think it's so that I can integrate viruses into the playbook. -_-!
+- ✨ I modified the Powerplan installation because the traditional method doesn't work on some hardware. Now only LexBoosT FPS/Latency powerplan is installed.
+- ✨ Several options in AME Wizard have been removed and are now hardcoded. Regarding the Start Menu wipe, this will now be done automatically upon the first playbook installation, and a safeguard has been integrated to prevent the menu from being wiped again after the same playbook or future updates are installed.
+- ✨ Update ExplorerBlurMica.dll (LexBoosT DWM Effects Manager).
+- ✨ Update NvidiaProfileInspector to v3.0.2.3.
+
+## Game Improvements
+
+## Vampire Rage:
+	- ✨ Disable all Xbox Live stuff.
+	- 🆕 Added possibility to enter your name for scoring (Gamertag before).
+	- 🆕 New Mode "Carnage":  +33% bullets and +25% bullets speed and one less life.
+	- 🪛 Mode 2 players work now.
+	- 🪛 Fixed bloom during the bomb and added a flash when the bomb explodes.
+	- 🆕 Added a health bar for bosses
+
+## Software Improvements
+	- ✨ The LexBoosT Tools launcher has been replaced by LexBoosT Tweaks & Tools:
+	- The program has been completely rewritten. It now offers the option to scan for Nvidia driver updates and offer them for installation at intervals of 1, 3, 6, 12, or 24 hours.
+	- Packages Manager, Internet Settings, GPU Tweaks, MSI & IRQ Settings, Timer Resolution, Win32 Priorities, Users Folders, Windows Settings, Context Menu, Ram Cleaner, Wallpaper Changer, Infos... in the same interface. The others Tools & Games it's present in "Others Tools" Tab.
+	- ✨ LexBoosT Discord debloater rewritten also with many more options.
+	- 🆕 New Program: LexBoosT PowerSeyttings Explorer.(Allows you to create, modify, import, and export power profiles in xml, .pow or .bat format.)
+
+
+# LexBoosT OS™ V26.09.1
 
 ## Performance & latency (DWM / Kernel)
 - ✨ SYSTEM_TWEAKS.PS1: clock timer kernel keys added (KiClockTimerPerCpu=1, ClockTimerPerCpu=1, KiClockTimerHighLatency=0, ClockTimerHighLatency=0, KiClockTimerAlwaysOnPresent=1, ClockTimerAlwaysOnPresent=1). Potential gain: per-CPU clock timers (each core handles its own timer interrupts — less cross-core overhead), high-latency timer mode disabled (quicker timer responses), timers kept always active (no low-power states) → more consistent frame times and lower input latency.
@@ -1411,3 +1465,4 @@ https://ko-fi.com/post/LexBoosT-OS-V6-4-E1E71V5YFA
 - Collection of Powerplan (in LexBoosT OS Folder in Desktop)
 - Add Winmerge and Godot Engine in LexBoosT Ultimate Toolbox
 - Others little adjustments
+

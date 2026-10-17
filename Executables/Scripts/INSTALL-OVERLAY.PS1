@@ -66,25 +66,19 @@ function New-ScaledFont {
 
 function Draw-AnimatedDots {
     param($g, [string]$BaseText, [System.Drawing.RectangleF]$Rect, $Font, $Brush)
-    if ($script:dotCount -le 0) { return }
-    $tSz = $g.MeasureString($BaseText, $Font)
-    $dstep = [single]($Font.Height * 0.45)
-    $dotsRect = New-Object System.Drawing.RectangleF(
-        [single]($Rect.Width / 2 + $tSz.Width / 2 + 6),
-        [single]$Rect.Y,
-        [single]($dstep * 3),
-        [single]$Rect.Height)
-    $dotsFmt = New-Object System.Drawing.StringFormat
-    $dotsFmt.LineAlignment = [System.Drawing.StringAlignment]::Center
-    for ($i = 0; $i -lt $script:dotCount; $i++) {
-        $dRect = New-Object System.Drawing.RectangleF(
-            [single]($dotsRect.X + $i * $dstep),
-            $dotsRect.Y,
-            $dstep,
-            $dotsRect.Height)
-        $g.DrawString('.', $Font, $Brush, $dRect, $dotsFmt)
+    $dots = ''
+    for ($i = 0; $i -lt $script:dotCount; $i++) { $dots += '.' }
+    $full = $BaseText + $dots
+    $tSz = $g.MeasureString($full, $Font)
+    $sx = [single]($Rect.X + ($Rect.Width - $tSz.Width) / 2)
+    $sy = [single]($Rect.Y + ($Rect.Height - $Font.Height) / 2)
+    $sf = New-Object System.Drawing.StringFormat
+    $sf.LineAlignment = [System.Drawing.StringAlignment]::Near
+    $g.DrawString($BaseText, $Font, $Brush, $sx, $sy, $sf)
+    if ($dots) {
+        $g.DrawString($dots, $Font, $Brush, [single]($sx + $g.MeasureString($BaseText, $Font).Width), $sy, $sf)
     }
-    $dotsFmt.Dispose()
+    $sf.Dispose()
 }
 
 function New-RoundRect {
@@ -97,6 +91,45 @@ function New-RoundRect {
     $p.AddArc($Rect.X, $Rect.Bottom - $d, $d, $d, 90, 90)
     $p.CloseFigure()
     return $p
+}
+
+function Draw-SpacedText {
+    param($gr, [string]$Text, $Font, $Brush, [single]$CenterX, [single]$Y, [single]$Tracking, [single]$MaxWidth = 0)
+    if (-not $Text) { return }
+    $chars = $Text.ToCharArray()
+    $widths = New-Object single[] $chars.Count
+    $baseTotal = [single]0
+    for ($i = 0; $i -lt $chars.Count; $i++) {
+        $widths[$i] = [single]$gr.MeasureString($chars[$i].ToString(), $Font).Width
+        $baseTotal += $widths[$i]
+    }
+    $tr = [single]$Tracking
+    if ($MaxWidth -gt 0 -and $chars.Count -gt 1) {
+        $avail = [single]($MaxWidth - $baseTotal)
+        if ($avail -lt 0) { $avail = 0 }
+        $tr = [single][math]::Min($Tracking, $avail / ($chars.Count - 1))
+    }
+    $total = $baseTotal
+    if ($chars.Count -gt 1) { $total += $tr * ($chars.Count - 1) }
+    $x = [single]($CenterX - $total / 2)
+    $sf = New-Object System.Drawing.StringFormat
+    $sf.LineAlignment = [System.Drawing.StringAlignment]::Near
+    for ($i = 0; $i -lt $chars.Count; $i++) {
+        $gr.DrawString($chars[$i].ToString(), $Font, $Brush, $x, $Y, $sf)
+        $x += $widths[$i] + $tr
+    }
+    $sf.Dispose()
+}
+
+function Draw-PathGlow {
+    param($g, $Path, $Color, [int]$Passes, [int]$BaseAlpha, [single]$Step)
+    for ($i = 0; $i -lt $Passes; $i++) {
+        $a = [int]($BaseAlpha * (1.0 - ($i / [double]$Passes)))
+        if ($a -lt 2) { $a = 2 }
+        $pen = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb($a, $Color.R, $Color.G, $Color.B), [single]($Step * ($i + 1)))
+        $g.DrawPath($pen, $Path)
+        $pen.Dispose()
+    }
 }
 
 function Convert-ToTransparentLogo {
@@ -147,6 +180,7 @@ $script:warningCount = 0
 $script:displayed = 0.0
 $script:progressMax = 100
 $script:startTime = Get-Date
+$script:lastPaintMs = 0
 $script:summaryShown = $false
 $script:closing = $false
 $script:allowClose = $false
@@ -166,13 +200,13 @@ $script:logoDisplay = 0
 
 # Text/UI state drawn by the backdrop
 $script:titleText = 'Installation in progress'
-$script:headText = '- Welcome to the LexBoosT OS Installation Process -'
+$script:headText = 'WELCOME TO THE LEXBOOST OS INSTALLATION PROCESS'
 $script:statusText = 'Initializing LexBoosT OS...'
 $script:statusColor = [System.Drawing.Color]::White
 $script:summaryDuration = ''
 $script:summaryResult = ''
 $script:showSummary = $false
-$script:bottomText = 'Some installation steps may take a while. Please be patient.'
+$script:bottomText = 'Some installation steps may take a while — please be patient.'
 
 # ============================================================
 # Log helpers
@@ -312,31 +346,111 @@ function Close-Overlay {
 function Layout {
     $W = $form.ClientSize.Width
     $H = $form.ClientSize.Height
-    $pad = [int](24 * $script:scale)
 
-    $script:headY = [int]($H * 0.06)
-    $script:headRect = New-Object System.Drawing.RectangleF(0, $script:headY, $W, 80)
-    $script:titleY = $script:headY + 96
-    $script:titleRect = New-Object System.Drawing.RectangleF(0, $script:titleY, $W, 90)
+    # ---- particles (positions + speeds), re-seeded on resize ----
+    if ($W -gt 0 -and $H -gt 0 -and -not $script:particles) {
+        $script:particles = New-Object object[] $script:particleCount
+        for ($i = 0; $i -lt $script:particleCount; $i++) {
+            $script:particles[$i] = @{
+                x = [single]($script:rand.NextDouble() * $W)
+                y = [single]($script:rand.NextDouble() * $H)
+                r = [single](0.8 + $script:rand.NextDouble() * 1.6)
+                spd = [single](6 + $script:rand.NextDouble() * 14)
+                phase = [single]($script:rand.NextDouble() * 6.28)
+                twinkle = [single](0.6 + $script:rand.NextDouble() * 1.2)
+            }
+        }
+    }
 
-    $script:logoW = $script:logoDisplay
+    # ---- live log terminal (right column) ----
+    $termH = [int]($H * 0.54)
+    $termW = [int][math]::Min([int]($W * 0.45), 1100)
+
+    # ---- central glass card + terminal as a centered group ----
+    $termGap = [int](20 * $script:scale)
+    $maxCardW = $W - [int](48 * $script:scale) * 2 - $termGap - $termW
+    $cardW = [int][math]::Max(420, [math]::Min(860, $maxCardW))
+    $groupW = $cardW + $termGap + $termW
+    $groupX = [int]([math]::Max([int](48 * $script:scale), ($W - $groupW) / 2))
+    $cardX = $groupX
+    $cardY = [int]($H * 0.10)
+    $cardH = [int]($H * 0.64)
+    if ($cardH -gt $H - 2 * $cardY) { $cardH = $H - 2 * $cardY }
+    $script:cardRect = New-Object System.Drawing.RectangleF([single]$cardX, [single]$cardY, [single]$cardW, [single]$cardH)
+    $script:cardRadius = [single](18 * $script:scale)
+
+    # terminal just right of the card, vertically centered on it
+    $termX = $cardX + $cardW + $termGap
+    $termY = [int]($cardY + ($cardH - $termH) / 2)
+    $script:termRect = New-Object System.Drawing.RectangleF([single]$termX, [single]$termY, [single]$termW, [single]$termH)
+    $script:termRadius = [single](14 * $script:scale)
+    $script:hackerPad = [int](14 * $script:scale)
+
+    # ---- headline / title (centered on the CARD, not the screen) ----
+    $script:headY = $cardY + [int](28 * $script:scale)
+    $script:headRect = New-Object System.Drawing.RectangleF([single]$cardX, $script:headY, [single]$cardW, 40)
+    $script:titleY = $script:headY + [int](34 * $script:scale)
+    $script:titleRect = New-Object System.Drawing.RectangleF([single]$cardX, $script:titleY, [single]$cardW, 56)
+
+    # ---- logo (with orbital ring) ----
+    $script:logoW = [int][math]::Min($script:logoDisplay, $cardW * 0.38)
     $script:logoH = $script:logoW
-    $script:logoX = [int](($W - $script:logoW) / 2)
-    $script:logoY = $script:titleY + 105
+    $script:logoCX = [single]($cardX + $cardW / 2)
+    $script:logoCY = [single]($script:titleY + [int](72 * $script:scale) + $script:logoH / 2)
+    $script:logoX = [int]($script:logoCX - $script:logoW / 2)
+    $script:logoY = [int]($script:logoCY - $script:logoH / 2)
 
-    $script:statusY = $script:logoY + $script:logoH + 40
-    $script:statusRect = New-Object System.Drawing.RectangleF(0, $script:statusY, $W, 70)
+    # ---- pre-render orbital ring (avoids per-frame GDI+ allocation) ----
+    if ($script:ringFrames) { foreach ($b in $script:ringFrames) { if ($b) { $b.Dispose() } } }
+    $script:ringFrames = $null
+    $ringR = [single]($script:logoW * 0.52)
+    $diam = [int]([math]::Ceiling($ringR * 2 * 1.15))
+    $script:ringFrames = New-Object object[] 36
+    for ($i = 0; $i -lt 36; $i++) {
+        $bmp = New-Object System.Drawing.Bitmap($diam, $diam)
+        $bg = [System.Drawing.Graphics]::FromImage($bmp)
+        $bg.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+        $cx = $diam / 2
+        $rr = New-Object System.Drawing.RectangleF([single]($cx - $ringR), [single]($cx - $ringR), [single]($ringR * 2), [single]($ringR * 2))
+        $base = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(70, 120, 130, 180), [single](1.2 * $script:scale))
+        $bg.DrawEllipse($base, $rr.X, $rr.Y, $rr.Width, $rr.Height)
+        $base.Dispose()
+        $pa = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(210, 0, 229, 255), [single](2.4 * $script:scale))
+        $pa.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $pa.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $ang = [single]($i * 10)
+        $bg.DrawArc($pa, $rr, $ang, 90)
+        $pa.Dispose()
+        $pb = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(170, 124, 77, 255), [single](2.4 * $script:scale))
+        $pb.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $pb.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $bg.DrawArc($pb, $rr, ($ang + 180) % 360, 90)
+        $pb.Dispose()
+        $bg.Dispose()
+        $script:ringFrames[$i] = $bmp
+    }
+    $script:animStep = [int]($diam / 2)
 
-    $script:barY = $script:statusY + 90
-    $script:barW = [int]($W * 0.5)
-    $script:barH = [int](20 * $script:scale)
-    $script:barX = [int](($W - $script:barW) / 2)
+    # ---- status (centered on the CARD) ----
+    $script:statusY = [int]($script:logoCY + $script:logoH / 2 + [int](28 * $script:scale))
+    $script:statusRect = New-Object System.Drawing.RectangleF([single]$cardX, $script:statusY, [single]$cardW, 40)
 
-    $script:summaryY = $script:barY + $script:barH + 24
-    $script:bottomY = [int]($H * 0.90)
+    # ---- progress bar + percent chip (centered on the CARD) ----
+    $script:barY = $script:statusY + [int](48 * $script:scale)
+    $script:barW = [int]($cardW * 0.58)
+    $script:barH = [int](14 * $script:scale)
+    $script:barX = [int]($cardX + ($cardW - $script:barW) / 2)
+    $script:chipW = [int](56 * $script:scale)
+    $script:chipH = $script:barH
+    $script:chipX = $script:barX + $script:barW + [int](12 * $script:scale)
+    $script:chipY = $script:barY
 
-    $script:hackerPad = $pad
-    $script:hackerSize = New-Object System.Drawing.Size([int]($W * 0.42), [int]($H * 0.40))
+    # ---- summary (centered on the CARD) ----
+    $script:summaryY = $script:barY + $script:barH + [int](20 * $script:scale)
+
+    # ---- footer ----
+    $script:footerY = [int]($H * 0.885)
+    $script:footerRect = New-Object System.Drawing.RectangleF(0, $script:footerY, $W, 40)
 }
 
 # ============================================================
@@ -389,25 +503,41 @@ if (Test-Path -LiteralPath $script:gifPath) {
     }
 }
 
-$script:fontTitle = New-ScaledFont 'Segoe UI' 26 ([System.Drawing.FontStyle]::Bold)
-$script:fontHead = New-ScaledFont 'Segoe UI' 34 ([System.Drawing.FontStyle]::Bold)
-$script:fontStatus = New-ScaledFont 'Segoe UI' 20 ([System.Drawing.FontStyle]::Bold)
+$script:fontHead = New-ScaledFont 'Segoe UI' 13 ([System.Drawing.FontStyle]::Bold)
+$script:fontTitle = New-ScaledFont 'Segoe UI' 25 ([System.Drawing.FontStyle]::Bold)
+$script:fontStatus = New-ScaledFont 'Segoe UI' 16 ([System.Drawing.FontStyle]::Regular)
 $script:fontSmall = New-ScaledFont 'Segoe UI' 12 ([System.Drawing.FontStyle]::Regular)
-$script:fontPercent = New-ScaledFont 'Segoe UI' 12 ([System.Drawing.FontStyle]::Bold)
+$script:fontPercent = New-ScaledFont 'Segoe UI' 11 ([System.Drawing.FontStyle]::Bold)
 $script:fontHack = New-ScaledFont 'Consolas' 10 ([System.Drawing.FontStyle]::Regular)
-$script:fontBottom = New-ScaledFont 'Segoe UI' 15 ([System.Drawing.FontStyle]::Regular)
+$script:fontFooter = New-ScaledFont 'Segoe UI' 12 ([System.Drawing.FontStyle]::Regular)
+$script:fontTermTitle = New-ScaledFont 'Segoe UI' 10 ([System.Drawing.FontStyle]::Bold)
 $script:brushWhite = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
-$script:brushHead = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(175, 255, 255, 255))
+$script:brushHead = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(150, 160, 190))
 $script:brushCyan = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(0, 229, 255))
 $script:brushGray = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(175, 180, 190))
 $script:brushDim = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(140, 145, 155))
-$script:brushBottom = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(130, 175, 180, 190))
-$script:brushTrack = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(16, 16, 20))
-$script:brushBorder = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(80, 150, 155, 170))
+$script:brushFooter = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(120, 150, 175))
+$script:brushTrack = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(200, 24, 26, 34))
+$script:brushCardFill = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(46, 16, 18, 26))
+$script:brushCardBorder = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(120, 100, 110, 140), 1)
+$script:brushTermFill = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(110, 10, 12, 17))
+$script:brushTermBorder = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(110, 70, 90, 110), 1)
 $script:penBorder = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(80, 150, 155, 170))
 $script:fmtCenter = New-Object System.Drawing.StringFormat
 $script:fmtCenter.Alignment = [System.Drawing.StringAlignment]::Center
 $script:fmtCenter.LineAlignment = [System.Drawing.StringAlignment]::Center
+$script:fmtLeft = New-Object System.Drawing.StringFormat
+$script:fmtLeft.Alignment = [System.Drawing.StringAlignment]::Near
+$script:fmtLeft.LineAlignment = [System.Drawing.StringAlignment]::Near
+
+# ---- particles: pre-allocated brushes (NO per-frame allocation) ----
+$script:brushParticles = New-Object object[] 16
+for ($i = 0; $i -lt 16; $i++) {
+    $a = [int](8 + $i * 7)
+    $script:brushParticles[$i] = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb($a, 235, 240, 255))
+}
+$script:particleCount = 36
+$script:rand = New-Object System.Random
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'LexBoosT OS'
@@ -439,37 +569,147 @@ $script:backdrop.Add_Paint({
     $g.CompositingMode = [System.Drawing.Drawing2D.CompositingMode]::SourceOver
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::AntiAlias
-    $g.Clear([System.Drawing.Color]::Black)
     $W = $script:backdrop.Width
     $H = $script:backdrop.Height
     if ($W -lt 1 -or $H -lt 1) { return }
 
-    # ---- logo (animated, transparent bg) ----
+    $nowMs = [DateTime]::Now.Ticks / 10000
+    $tSec = ([DateTime]::Now - $script:startTime).TotalSeconds
+
+    # ---- background: pure black ----
+    $g.Clear([System.Drawing.Color]::FromArgb(0, 0, 0))
+
+    # ---- white fading particles (pre-allocated brushes, no per-frame alloc) ----
+    if ($script:particles) {
+        $dt = 0.016
+        if ($script:lastPaintMs -gt 0) {
+            $dt = ($nowMs - $script:lastPaintMs) / 1000.0
+            if ($dt -gt 0.25) { $dt = 0.25 }
+            if ($dt -le 0) { $dt = 0.016 }
+        }
+        for ($i = 0; $i -lt $script:particles.Count; $i++) {
+            $pt = $script:particles[$i]
+            # drift upward, wrap at edges
+            $pt.y -= $pt.spd * $dt
+            if ($pt.y -lt -4) {
+                $pt.y = [single]($H + 4)
+                $pt.x = [single]($script:rand.NextDouble() * $W)
+            }
+            # fade: twinkle 0..1 -> brush index
+            $tw = 0.5 + 0.5 * [Math]::Sin($tSec * $pt.twinkle + $pt.phase)
+            $bi = [int]($tw * 15.5)
+            if ($bi -lt 0) { $bi = 0 } elseif ($bi -gt 15) { $bi = 15 }
+            $d = $pt.r * 2
+            $g.FillEllipse($script:brushParticles[$bi], $pt.x, $pt.y, $d, $d)
+        }
+    }
+
+    # ---- live log terminal card ----
+    $tr = $script:termRect
+    $tpath = New-RoundRect $tr $script:termRadius
+    $g.FillPath($script:brushTermFill, $tpath)
+    $g.DrawPath($script:brushTermBorder, $tpath)
+    $tpath.Dispose()
+    $hdrH = [int](30 * $script:scale)
+    $dotX = [single]($tr.X + 16 * $script:scale)
+    $dotY = [single]($tr.Y + $hdrH / 2)
+    $pulse = 0.55 + 0.45 * [Math]::Sin($tSec * 2.2)
+    $dcol = [System.Drawing.Color]::FromArgb([int](120 + 135 * $pulse), 80, 250, 140)
+    $dbrush = New-Object System.Drawing.SolidBrush($dcol)
+    $g.FillEllipse($dbrush, [single]($dotX - 4 * $script:scale), [single]($dotY - 4 * $script:scale), [single](8 * $script:scale), [single](8 * $script:scale))
+    $dbrush.Dispose()
+    $g.DrawString('LIVE INSTALL LOG', $script:fontTermTitle, $script:brushHead, [single]($dotX + 12 * $script:scale), [single]($tr.Y + [int](8 * $script:scale)), $script:fmtLeft)
+    $sepY = [single]($tr.Y + $hdrH)
+    $sep = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(60, 90, 110, 140), 1)
+    $g.DrawLine($sep, [single]($tr.X + 12 * $script:scale), $sepY, [single]($tr.Right - 12 * $script:scale), $sepY)
+    $sep.Dispose()
+    $n = $script:procBuf.Count
+    $lh = [int]($script:fontHack.Height + 4)
+    $tx = [single]($tr.X + 14 * $script:scale)
+    $ty = [single]($tr.Y + $hdrH + [int](10 * $script:scale))
+    $maxLines = [int](($tr.Height - $hdrH - 16 * $script:scale) / $lh)
+    if ($maxLines -lt 1) { $maxLines = 1 }
+    $maxTextW = [single]($tr.Width - 28 * $script:scale)
+    $clipRect = New-Object System.Drawing.RectangleF([single]$tr.X, [single]$tr.Y, [single]$tr.Width, [single]$tr.Height)
+    $oldClip = $g.Clip
+    $g.SetClip($clipRect)
+    if ($n -eq 0) {
+        $g.DrawString('Awaiting installer output...', $script:fontHack, $script:brushDim, $tx, $ty, $script:fmtLeft)
+    } else {
+        $start = 0
+        if ($n -gt $maxLines) { $start = $n - $maxLines }
+        $shown = $n - $start
+        for ($i = $start; $i -lt $n; $i++) {
+            $item = $script:procBuf[$i]
+            $lineText = $item.Text
+            if ($g.MeasureString($lineText, $script:fontHack).Width -gt $maxTextW) {
+                while ($lineText.Length -gt 1 -and $g.MeasureString($lineText + '...', $script:fontHack).Width -gt $maxTextW) {
+                    $lineText = $lineText.Substring(0, $lineText.Length - 1)
+                }
+                $lineText = $lineText.TrimEnd() + '...'
+            }
+            $fade = 0.35 + 0.65 * (($i - $start + 1) / $shown)
+            $base = $item.Color
+            $c = [System.Drawing.Color]::FromArgb([int]($base.R * $fade), [int]($base.G * $fade), [int]($base.B * $fade))
+            $sb = New-Object System.Drawing.SolidBrush($c)
+            $g.DrawString($lineText, $script:fontHack, $sb, $tx, [single]($ty + ($i - $start) * $lh), $script:fmtLeft)
+            $sb.Dispose()
+        }
+    }
+    $g.Clip = $oldClip
+    $oldClip.Dispose()
+
+    # ---- central glass card ----
+    $cr = $script:cardRect
+    $cpath = New-RoundRect $cr $script:cardRadius
+    $g.FillPath($script:brushCardFill, $cpath)
+    $g.DrawPath($script:brushCardBorder, $cpath)
+    $cpath.Dispose()
+    $hlX1 = [single]($cr.X + $script:cardRadius)
+    $hlX2 = [single]($cr.Right - $script:cardRadius)
+    $hl = New-Object System.Drawing.Drawing2D.LinearGradientBrush((New-Object System.Drawing.RectangleF($hlX1, [single]$cr.Y, [single]($hlX2 - $hlX1), 1)), [System.Drawing.Color]::FromArgb(0, 255, 255, 255), [System.Drawing.Color]::FromArgb(90, 200, 220, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
+    $hl.SetSigmaBellShape(0.6)
+    $hlPen = New-Object System.Drawing.Pen($hl, 1)
+    $g.DrawLine($hlPen, $hlX1, [single]($cr.Y + 0.5), $hlX2, [single]($cr.Y + 0.5))
+    $hlPen.Dispose(); $hl.Dispose()
+
+    # ---- eyebrow headline (spaced caps, auto-fit to card width) ----
+    $spacedCx = [single]($cr.X + $cr.Width / 2)
+    $spacedCy = [single]$script:headY
+    $spacedTr = [single](3 * $script:scale)
+    $spacedMax = [single]($cr.Width - [int](56 * $script:scale))
+    Draw-SpacedText $g $script:headText $script:fontHead $script:brushHead $spacedCx $spacedCy $spacedTr $spacedMax
+
+    # ---- title (centered, with animated dots right next to it) ----
+    if (-not $script:showSummary) {
+        Draw-AnimatedDots $g $script:titleText $script:titleRect $script:fontTitle $script:brushWhite
+    } else {
+        $g.DrawString($script:titleText, $script:fontTitle, $script:brushWhite, $script:titleRect, $script:fmtCenter)
+    }
+
+    # ---- logo: pre-rendered orbital ring + image (blit only) ----
+    if ($script:ringFrames) {
+        $rf = $script:ringFrames[[int]($tSec * 3) % 36]
+        $g.DrawImage($rf, [single]($script:logoCX - $script:animStep), [single]($script:logoCY - $script:animStep))
+    }
+
     if ($script:logoFrames -and $script:logoFrameCount -gt 0 -and $script:logoFrames[$script:logoFrameIndex]) {
         $g.DrawImage($script:logoFrames[$script:logoFrameIndex], $script:logoX, $script:logoY, $script:logoW, $script:logoH)
     }
 
-    # ---- welcome / thank you headline ----
-    $g.DrawString($script:headText, $script:fontHead, $script:brushHead, $script:headRect, $script:fmtCenter)
-
-    # ---- title (fixed) ----
-    $g.DrawString($script:titleText, $script:fontTitle, $script:brushWhite, $script:titleRect, $script:fmtCenter)
-    if (-not $script:showSummary) {
-        Draw-AnimatedDots $g $script:titleText $script:titleRect $script:fontTitle $script:brushWhite
-    }
-
-    # ---- status ----
+    # ---- status (animated dots right next to it, when summary) ----
     $statusBrush = New-Object System.Drawing.SolidBrush($script:statusColor)
-    $g.DrawString($script:statusText, $script:fontStatus, $statusBrush, $script:statusRect, $script:fmtCenter)
     if ($script:showSummary -and $script:errorCount -eq 0) {
         Draw-AnimatedDots $g $script:statusText $script:statusRect $script:fontStatus $statusBrush
+    } else {
+        $g.DrawString($script:statusText, $script:fontStatus, $statusBrush, $script:statusRect, $script:fmtCenter)
     }
     $statusBrush.Dispose()
 
     # ---- progress bar ----
-    $bhh = [math]::Max(8, $script:barH - 6)
+    $bhh = [math]::Max(8, $script:barH - 4)
     $yy = $script:barY + ($script:barH - $bhh) / 2
-    $full = New-Object System.Drawing.RectangleF([single]($script:barX + 3), [single]$yy, [single][math]::Max(0, $script:barW - 6), [single]$bhh)
+    $full = New-Object System.Drawing.RectangleF([single]$script:barX, [single]$yy, [single]$script:barW, [single]$bhh)
     if ($full.Width -gt 0 -and $full.Height -gt 0) {
         $rad = $bhh / 2
         $path = New-RoundRect $full ([single]$rad)
@@ -480,62 +720,59 @@ $script:backdrop.Add_Paint({
         $fw = $full.Width * $ratio
         if ($fw -ge 1) {
             $fill = New-Object System.Drawing.RectangleF($full.X, $full.Y, [single][math]::Max($fw, $bhh), $full.Height)
+            $glowPath = New-RoundRect $fill ([single]$rad)
+            Draw-PathGlow $g $glowPath ([System.Drawing.Color]::FromArgb(255, 0, 229, 255)) 1 40 ([single](5 * $script:scale))
+            $glowPath.Dispose()
             $path = New-RoundRect $fill ([single]$rad)
             $grad = New-Object System.Drawing.Drawing2D.LinearGradientBrush($fill, [System.Drawing.Color]::FromArgb(124, 77, 255), [System.Drawing.Color]::FromArgb(0, 229, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
             $g.FillPath($grad, $path)
             $grad.Dispose()
             $path.Dispose()
-            $ms = ([DateTime]::Now.Ticks / 10000) % 1400
-            $st = $ms / 1400.0
+            $ms = $nowMs % 1600
+            $st = $ms / 1600.0
             $sxp = $fill.X + $fill.Width * $st
             $path = New-RoundRect $fill ([single]$rad)
             $old = $g.Clip
             $g.SetClip($path)
-            $sh = New-Object System.Drawing.Drawing2D.LinearGradientBrush((New-Object System.Drawing.RectangleF([single]($sxp - 40), [single]$script:barY, [single]80, [single]$script:barH)), [System.Drawing.Color]::FromArgb(0, 255, 255, 255), [System.Drawing.Color]::FromArgb(70, 255, 255, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
+            $sh = New-Object System.Drawing.Drawing2D.LinearGradientBrush((New-Object System.Drawing.RectangleF([single]($sxp - 40), $full.Y, [single]80, $full.Height)), [System.Drawing.Color]::FromArgb(0, 255, 255, 255), [System.Drawing.Color]::FromArgb(70, 255, 255, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
             $sh.SetSigmaBellShape(0.5)
-            $g.FillRectangle($sh, [single]($sxp - 40), [single]$script:barY, [single]80, [single]$script:barH)
+            $g.FillRectangle($sh, [single]($sxp - 40), $full.Y, [single]80, $full.Height)
             $sh.Dispose()
             $g.Clip = $old
             $old.Dispose()
             $path.Dispose()
         }
-        $path = New-RoundRect $full ([single]$rad)
-        $g.DrawPath($script:penBorder, $path)
-        $path.Dispose()
     }
-
-    # ---- percent ----
+    # ---- percent chip ----
     $pctText = '{0}%' -f [int]([math]::Round($script:displayed * 100))
-    $g.DrawString($pctText, $script:fontPercent, $script:brushCyan, [single]($script:barX + $script:barW + 14), [single]($script:barY + 2))
+    $chipRect = New-Object System.Drawing.RectangleF([single]$script:chipX, [single]$script:chipY, [single]$script:chipW, [single]$script:chipH)
+    $chipPath = New-RoundRect $chipRect ([single]($script:chipH / 2))
+    $chipGrad = New-Object System.Drawing.Drawing2D.LinearGradientBrush($chipRect, [System.Drawing.Color]::FromArgb(60, 124, 77, 255), [System.Drawing.Color]::FromArgb(60, 0, 229, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
+    $g.FillPath($chipGrad, $chipPath)
+    $chipPen = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(160, 0, 229, 255), 1)
+    $g.DrawPath($chipPen, $chipPath)
+    $chipPath.Dispose(); $chipGrad.Dispose(); $chipPen.Dispose()
+    $g.DrawString($pctText, $script:fontPercent, $script:brushWhite, $chipRect, $script:fmtCenter)
 
-    # ---- summary ----
+    # ---- summary (centered on the CARD) ----
     if ($script:showSummary) {
-        $r1 = New-Object System.Drawing.RectangleF(0, $script:summaryY, $W, 24)
-        $r2 = New-Object System.Drawing.RectangleF(0, ($script:summaryY + 26), $W, 24)
+        $r1 = New-Object System.Drawing.RectangleF([single]$script:cardRect.X, $script:summaryY, [single]$script:cardRect.Width, 24)
+        $r2 = New-Object System.Drawing.RectangleF([single]$script:cardRect.X, ($script:summaryY + 26), [single]$script:cardRect.Width, 24)
         $g.DrawString($script:summaryDuration, $script:fontSmall, $script:brushGray, $r1, $script:fmtCenter)
         $g.DrawString($script:summaryResult, $script:fontSmall, $script:brushGray, $r2, $script:fmtCenter)
     }
 
-    # ---- hacker terminal ----
-    $n = $script:procBuf.Count
-    if ($n -gt 0) {
-        $lx = $script:hackerPad
-        $ly = $script:hackerPad
-        $lh = [int]($script:fontHack.Height) + 4
-        for ($i = 0; $i -lt $n; $i++) {
-            $item = $script:procBuf[$i]
-            $fade = 0.35 + 0.65 * (($i + 1) / $n)
-            $base = $item.Color
-            $c = [System.Drawing.Color]::FromArgb([int]($base.R * $fade), [int]($base.G * $fade), [int]($base.B * $fade))
-            $sb = New-Object System.Drawing.SolidBrush($c)
-            $g.DrawString($item.Text, $script:fontHack, $sb, [single]$lx, [single]$ly)
-            $sb.Dispose()
-            $ly += $lh
-        }
-    }
-    # ---- bottom patience note ----
-    $rBot = New-Object System.Drawing.RectangleF(0, $script:bottomY, $W, 44)
-    $g.DrawString($script:bottomText, $script:fontBottom, $script:brushBottom, $rBot, $script:fmtCenter)
+    # ---- footer: gradient hairline + patience note ----
+    $flX1 = [single]($W * 0.20)
+    $flX2 = [single]($W * 0.80)
+    $fl = New-Object System.Drawing.Drawing2D.LinearGradientBrush((New-Object System.Drawing.RectangleF($flX1, [single]$script:footerY, [single]($flX2 - $flX1), 1)), [System.Drawing.Color]::FromArgb(0, 0, 229, 255), [System.Drawing.Color]::FromArgb(120, 124, 77, 255), [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
+    $fl.SetSigmaBellShape(0.4)
+    $flPen = New-Object System.Drawing.Pen($fl, 1)
+    $g.DrawLine($flPen, $flX1, [single]$script:footerY, $flX2, [single]$script:footerY)
+    $flPen.Dispose(); $fl.Dispose()
+    $rBot = New-Object System.Drawing.RectangleF(0, ($script:footerY + 14 * $script:scale), $W, 40)
+    $g.DrawString($script:bottomText, $script:fontFooter, $script:brushFooter, $rBot, $script:fmtCenter)
+    $script:lastPaintMs = $nowMs
 })
 $form.Controls.Add($script:backdrop)
 

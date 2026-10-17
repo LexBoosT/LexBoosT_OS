@@ -53,6 +53,13 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'ForceUpdateFromMU', type: REG_DWORD, data: '0', onUpgrade: false}
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates', value: 'SignatureUpdateInterval', type: REG_DWORD, data: '24', onUpgrade: false}
 
+    # === Disable Windows Defender sample submission nag
+  - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender\Spynet', value: 'SubmitSamplesConsent', type: REG_DWORD, data: '2'}
+
+  # === Configure Watson events - Disabled
+  # ------> https://docs.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization
+  - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender\Reporting', value: 'DisableGenericRePorts', type: REG_DWORD, data: '1'}
+
   # ============================================
   # Windows Security Center Notifications (keep enabled)
   # ============================================

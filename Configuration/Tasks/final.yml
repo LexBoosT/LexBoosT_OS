@@ -78,12 +78,12 @@ actions:
   # ============================================
   - !status: {
       status: "Config Start Menu",
-      option: "wipe-startmenu",
+      onUpgrade: false,
     }
 
-  - !run: { exeDir: true, exe: ".\\Scripts\\STARTMENU.CMD", weight: 400, option: "wipe-startmenu"}
-  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\DELETE_PINS.PS1', option: "wipe-startmenu" }
-  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\STARTMENU_FOLDERS.PS1', option: "wipe-startmenu" }
+  - !run: { exeDir: true, exe: ".\\Scripts\\STARTMENU.CMD", weight: 400, onUpgrade: false}
+  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\DELETE_PINS.PS1', onUpgrade: false }
+  - !powerShell: { weight: 200, runas: currentUserElevated, wait: true, exeDir: true, command: '.\\Scripts\\STARTMENU_FOLDERS.PS1', onUpgrade: false }
   - !status: {
       status: "Config Scheduled Tasks",
       onUpgrade: false,
@@ -102,7 +102,6 @@ actions:
   # ============================================
   - !status: {
       status: "Copying Wallpapers",
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action CopyWallpapers',
@@ -111,11 +110,9 @@ actions:
       wait: true,
       weight: 100,
       ignoreErrors: true,
-      option: "configure-theme",
     }
   - !status: {
       status: "Config Theme",
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\WALLPAPER.PS1 -Mode Desktop -ImagePath $env:systemroot\\Web\\Wallpaper\\LexBoosTOS\\v3\\desktop.jpg',
@@ -123,7 +120,6 @@ actions:
       runas: currentUserElevated,
       wait: true,
       weight: 45,
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\WALLPAPER.PS1 -Mode LockScreen -ImagePath $env:systemroot\\Web\\Wallpaper\\LexBoosTOS\\v3\\lockscreen.jpg',
@@ -131,7 +127,6 @@ actions:
       runas: currentUserElevated,
       wait: true,
       weight: 45,
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\THEME_DEPLOY.PS1 -Action SetDefaultTile',
@@ -139,7 +134,6 @@ actions:
       runas: currentUserElevated,
       wait: true,
       weight: 45,
-      option: "configure-theme",
     }
   - !cmd: {
       command: 'copy /y "Themes" "%windir%\\Resources\\Themes" > nul',
@@ -147,25 +141,21 @@ actions:
       wait: true,
       weight: 10,
       exeDir: true,
-      option: "configure-theme",
     }
   - !status: {
       status: "Modifying User Avatar",
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\PFP.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
-      option: "configure-theme",
     }
   - !powerShell: {
       command: '.\\Scripts\\TERMINAL.PS1',
       exeDir: true,
       runas: currentUserElevated,
       wait: true,
-      option: "configure-terminal",
       onUpgrade: false,
     }
   - !powerShell: {
@@ -179,18 +169,7 @@ actions:
   # PHASE 6: LEXBOOST TOOLS (Optional)
   # ============================================
   - !status: {
-      status: "Copying Launcher Files",
-    }
-  - !powerShell: {
-      command: '.\\Scripts\\COPY_LAUNCHER_FILES.PS1',
-      exeDir: true,
-      wait: true,
-      weight: 200,
-      ignoreErrors: true,
-    }
-  - !status: {
       status: "Applying Visual Effects",
-      option: "lex-visual",
       onUpgrade: false,
     }
   - !powerShell: {
@@ -199,7 +178,6 @@ actions:
       runas: currentUserElevated,
       wait: true,
       weight: 400,
-      option: "lex-visual",
       onUpgrade: false,
     }
 
@@ -279,7 +257,7 @@ actions:
   # PHASE 9: FINALIZE OPTIMIZATIONS
   # ============================================
   - !status: {
-      status: "LexBoosT™ Optimizations 1/6",
+      status: "LexBoosT™ Optimizations 1/5",
     }
   - !run: {
       exe: ".\\Scripts\\FINALIZE1.CMD",
@@ -289,7 +267,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "1/6 Success!",
+      status: "1/5 Success!",
     }
   - !run: {
       exe: ".\\Scripts\\PAUSE.CMD",
@@ -299,7 +277,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "LexBoosT™ Optimizations 2/6",
+      status: "LexBoosT™ Optimizations 2/5",
     }
   - !run: {
       exe: ".\\Scripts\\FINALIZE2.CMD",
@@ -309,7 +287,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "2/6 Success!",
+      status: "2/5 Success!",
     }
   - !run: {
       exe: ".\\Scripts\\PAUSE.CMD",
@@ -319,7 +297,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "LexBoosT™ Optimizations 3/6",
+      status: "LexBoosT™ Optimizations 3/5",
     }
   - !run: {
       exe: ".\\Scripts\\FINALIZE3.CMD",
@@ -329,7 +307,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "3/6 Success!",
+      status: "3/5 Success!",
     }
   - !run: {
       exe: ".\\Scripts\\PAUSE.CMD",
@@ -339,7 +317,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "LexBoosT™ Optimizations 4/6",
+      status: "LexBoosT™ Optimizations 4/5",
     }
   - !run: {
       exe: ".\\Scripts\\FINALIZE4.CMD",
@@ -349,7 +327,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "4/6 Success!",
+      status: "4/5 Success!",
     }
   - !run: {
       exe: ".\\Scripts\\PAUSE.CMD",
@@ -359,7 +337,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "LexBoosT™ Optimizations 5/6",
+      status: "LexBoosT™ Optimizations 5/5",
     }
   - !run: {
       exe: ".\\Scripts\\FINALIZE5.CMD",
@@ -369,27 +347,7 @@ actions:
       weight: 200,
     }
   - !status: {
-      status: "5/6 Success!",
-    }
-  - !run: {
-      exe: ".\\Scripts\\PAUSE.CMD",
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 200,
-    }
-  - !status: {
-      status: "LexBoosT™ Optimizations 6/6",
-    }
-  - !run: {
-      exe: ".\\Scripts\\FINALIZE6.CMD",
-      exeDir: true,
-      runas: currentUserElevated,
-      wait: true,
-      weight: 200,
-    }
-  - !status: {
-      status: "6/6 Success!",
+      status: "5/5 Success!",
     }
   - !run: {
       exe: ".\\Scripts\\PAUSE.CMD",
@@ -480,19 +438,6 @@ actions:
       exeDir: true
       exe: 'powershell.exe'
       args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\RUNTIMES.PS1"'
-      runas: currentUserElevated
-      wait: true
-      weight: 100
-      onUpgrade: false
-
-  # ============================================
-  # DELETE WINDOWS AI
-  # ============================================
-  - !status: {status: 'Removing Windows AI (This may take some time, please be patient...)', onUpgrade: false}
-  - !run:
-      exeDir: true
-      exe: 'powershell.exe'
-      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\REMOVEWINDOWSAI.PS1"'
       runas: currentUserElevated
       wait: true
       weight: 100

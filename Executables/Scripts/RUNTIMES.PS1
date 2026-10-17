@@ -1,4 +1,4 @@
-﻿$OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 if (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
@@ -70,6 +70,39 @@ function Install-Chocolatey {
     }
 }
 
+# Run winget, capture stdout+stderr to a temp file, decode as UTF-8 and print
+# it cleanly. Fixes garbled/mojibake output on non-English locales where the
+# console OEM code page differs from winget's UTF-8 output.
+function Invoke-Winget {
+    param([string[]]$WingetArgs)
+
+    $outFile  = Join-Path $env:TEMP ('winget-out-' + [guid]::NewGuid().ToString() + '.txt')
+    $errFile  = $outFile + '.err'
+    $exitCode = -1
+    $text     = ''
+    $errText  = ''
+    try {
+        $process = Start-Process -FilePath 'winget.exe' `
+            -ArgumentList ($WingetArgs -join ' ') `
+            -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput $outFile `
+            -RedirectStandardError  $errFile
+        $exitCode = $process.ExitCode
+        $text     = [System.IO.File]::ReadAllText($outFile, [System.Text.Encoding]::UTF8)
+        $errText  = [System.IO.File]::ReadAllText($errFile, [System.Text.Encoding]::UTF8)
+    }
+    catch {
+        $text = 'Failed to launch winget: ' + $_.Exception.Message
+    }
+    finally {
+        Remove-Item -LiteralPath $outFile -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $errFile -Force -ErrorAction SilentlyContinue
+    }
+    foreach ($line in (($text + [Environment]::NewLine + $errText) -split "`r?`n")) {
+        if ($line.Trim()) { Write-Host ('    winget> ' + $line) }
+    }
+    return @{ ExitCode = $exitCode; Output = $text }
+}
 function Install-WingetPackage {
     param (
         [string]$PackageId,
@@ -98,12 +131,21 @@ function Install-WingetPackage {
             $wingetArgs += $ExtraArgs
         }
 
-        $process = Start-Process -FilePath "winget.exe" -ArgumentList $wingetArgs -NoNewWindow -Wait -PassThru
-        if ($process.ExitCode -eq 0) {
+        $result = Invoke-Winget -WingetArgs $wingetArgs
+        if ($result.ExitCode -eq 0) {
             Write-Log '+' "$PackageId installed successfully."
         }
         else {
-            Write-Log '-' "Failed to install $PackageId (Exit code: $($process.ExitCode))."
+            # winget exit codes are HRESULTs (negative in .NET). 0x8A15002B means
+            # "no available upgrade found" (package already installed and up to
+            # date) - not a real failure, so don't log it as one.
+            $hr = [int64]$result.ExitCode + 4294967296
+            if ($hr -eq 0x8A15002B) {
+                Write-Log '+' "$PackageId is already installed and up to date."
+            }
+            else {
+                Write-Log '-' "Failed to install $PackageId (Exit code: $($result.ExitCode), 0x$('{0:X8}' -f $hr))."
+            }
         }
     }
     catch {
@@ -129,7 +171,7 @@ function Install-WingetPackageIfMissing {
         [string[]]$ExtraArgs = @()
     )
 
-    if (& $Test) {
+    if (($Test -is [scriptblock]) -and (& $Test)) {
         Write-Log '+' "$PackageId is already installed. Skipping."
         return
     }
@@ -137,29 +179,6 @@ function Install-WingetPackageIfMissing {
     Install-Winget
     Install-WingetPackage -PackageId $PackageId -ExtraArgs $ExtraArgs
 }
-
-function Test-DotNetDesktopRuntime {
-    param ([int]$MajorVersion)
-
-    if (-not (Test-CommandAvailable -Name "dotnet")) {
-        return $false
-    }
-
-    $runtimes = & dotnet --list-runtimes 2>$null
-    return [bool]($runtimes | Where-Object { $_ -match "^Microsoft\.WindowsDesktop\.App\s+$MajorVersion\." })
-}
-
-function Test-DotNetSdk {
-    param ([int]$MajorVersion)
-
-    if (-not (Test-CommandAvailable -Name "dotnet")) {
-        return $false
-    }
-
-    $sdks = & dotnet --list-sdks 2>$null
-    return [bool]($sdks | Where-Object { $_ -match "^$MajorVersion\." })
-}
-
 
 function Test-DirectXLegacyRuntime {
     $systemRoots = @("$env:WINDIR\System32")
@@ -210,19 +229,43 @@ function Install-DirectXLegacyIfMissing {
     }
 }
 
+function Test-DotNetRuntime {
+    try {
+        $installed = & dotnet --list-runtimes 2>$null
+        if ($installed -match 'Microsoft\.NETCore\.App') { return $true }
+    } catch {}
+    return $false
+}
+
+function Install-DotNetRuntimeIfMissing {
+    if (Test-DotNetRuntime) {
+        Write-Log '+' ".NET runtime is already installed. Skipping."
+        return
+    }
+
+    Install-Chocolatey
+    if (Test-CommandAvailable -Name "choco") {
+        Write-Log '+' "Installing .NET runtime..."
+        try {
+            $process = Start-Process -FilePath "choco" -ArgumentList @("install", "-y", "dotnet-runtime", "--no-progress") -NoNewWindow -Wait -PassThru
+            if ($process.ExitCode -eq 0) {
+                Write-Log '+' ".NET runtime installed successfully."
+            } else {
+                Write-Log '-' ".NET runtime installation returned exit code $($process.ExitCode)."
+            }
+        } catch {
+            Write-Log '-' "Failed to install .NET runtime: $($_.Exception.Message)"
+        }
+    }
+    else {
+        Write-Log '-' "Cannot install .NET runtime, Chocolatey is not available."
+    }
+}
+
 # NanaZip
-Install-WingetPackageIfMissing -PackageId "M2Team.NanaZip" -Test {
-    Test-WingetPackageInstalled -PackageId "M2Team.NanaZip"
-}
-
-
-# .NET 8
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.SDK.8" -Test {
-    Test-DotNetSdk -MajorVersion 8
-}
-Install-WingetPackageIfMissing -PackageId "Microsoft.DotNet.DesktopRuntime.8" -Test {
-    Test-DotNetDesktopRuntime -MajorVersion 8
-}
+Install-WingetPackageIfMissing -PackageId "M2Team.NanaZip" -Test { Test-WingetPackageInstalled -PackageId "M2Team.NanaZip" }
+# .NET 10 (via Chocolatey)
+Install-DotNetRuntimeIfMissing
 
 # VC++ Redistributables (AIO abbodi1406 - latest release)
 $vcAioUrl = 'https://github.com/abbodi1406/vcredist/releases/latest/download/VisualCppRedist_AIO_x86_x64.exe'
@@ -293,20 +336,16 @@ function Install-OpenALIfMissing {
 Install-OpenALIfMissing
 
 # XNA Framework
-Install-WingetPackageIfMissing -PackageId "Microsoft.Xna.Framework" -Test {
-    $regPath = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\XNA\Framework\v4.0'
-    return [bool](Test-Path $regPath)
-}
+Install-WingetPackageIfMissing -PackageId "Microsoft.XNARedist" -Test { [bool](Test-Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\XNA\Framework\v4.0') }
 
 # Notepad++
-Install-WingetPackageIfMissing -PackageId "Notepad++.Notepad++" -Test {
-    Test-WingetPackageInstalled -PackageId "Notepad++.Notepad++"
-}
+Install-WingetPackageIfMissing -PackageId "Notepad++.Notepad++" -Test { Test-WingetPackageInstalled -PackageId "Notepad++.Notepad++" }
 
 # PowerShell
-Install-WingetPackageIfMissing -PackageId "Microsoft.PowerShell" -Test {
-    Test-WingetPackageInstalled -PackageId "Microsoft.PowerShell"
-}
+Install-WingetPackageIfMissing -PackageId "Microsoft.PowerShell" -Test { Test-WingetPackageInstalled -PackageId "Microsoft.PowerShell" }
+
+# Node.js LTS (includes npm)
+Install-WingetPackageIfMissing -PackageId "OpenJS.NodeJS.LTS" -Test { Test-CommandAvailable -Name "npm" }
 
 Write-Log '+' "Script completed."
 # Exit cleanly

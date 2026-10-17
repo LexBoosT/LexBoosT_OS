@@ -20,6 +20,15 @@ Write-Host '============================================'
 Write-Host '       GRAPHICS Registry Tweaks'
 Write-Host '============================================'
 
+function Test-IntelIGpu {
+    try {
+        return [bool](Get-CimInstance Win32_VideoController -ErrorAction Stop |
+            Where-Object { $_.Name -and ($_.Name -match 'Intel|Iris|UHD|Arc') } |
+            Select-Object -First 1)
+    } catch { return $false }
+}
+
+$hasIntelIGpu = Test-IntelIGpu
 $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Microsoft-Windows-Rdp-Graphics-RdpIdd-Trace'; Name = 'Start'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\MonitorDataStore'; Name = 'AutoColorManagementEnabled'; Value = '0'; Type = 'REG_DWORD' }
@@ -31,10 +40,37 @@ $regValues = @(
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler'; Name = 'FrameServerAutoBoostPriority'; Value = '0'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage'; Name = 'EnableDirectStorage'; Value = '1'; Type = 'REG_DWORD' }
     @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DirectStorage'; Name = 'EnableOptimizations'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; Name = 'UseGpuTimer'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; Name = 'EnableAggressivePStateBoost'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultLatencyToleranceNoContext'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultLatencyToleranceIdle0'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultLatencyToleranceIdle1'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultLatencyToleranceOther'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultD3TransitionLatencyActivelyUsed'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultD3TransitionLatencyIdleNoContext'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'DefaultD3TransitionLatencyIdleShortTime'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'LatencyToleranceDefault'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'LatencyToleranceFSVP'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'MonitorLatencyTolerance'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'MonitorRefreshLatencyTolerance'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'ExitLatencyCheckEnabled'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Direct3D'; Name = 'EnableDebugging'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power'; Name = 'ExitLatency'; Value = '1'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\Direct3D'; Name = 'DisableVidMemVBs'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKLM\SOFTWARE\Microsoft\DirectDraw'; Name = 'DisableMMX'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Direct3D'; Name = 'EnableDebugging'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Direct3D'; Name = 'FullDebug'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Direct3D'; Name = 'LoadDebugRuntime'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Direct3D'; Name = 'DisableMMX'; Value = '0'; Type = 'REG_DWORD' }
+    @{ Path = 'Registry::HKCU\SOFTWARE\Microsoft\Direct3D\Drivers'; Name = 'SoftwareOnly'; Value = '0'; Type = 'REG_DWORD' }
 )
 
 $set = 0
 foreach ($entry in $regValues) {
+    if ($hasIntelIGpu -and ($entry.Path -match 'GraphicsDrivers\\Power' -or $entry.Name -in @('UseGpuTimer','EnableAggressivePStateBoost'))) {
+        Write-Log '-' "Skipped (Intel iGPU): $($entry.Name)"
+        continue
+    }
     try {
         if (-not (Test-Path $entry.Path)) { New-Item -Path $entry.Path -Force -ErrorAction Stop | Out-Null }
         $propType = switch ($entry.Type) { 'REG_SZ' { 'String' } 'REG_EXPAND_SZ' { 'ExpandString' } 'REG_DWORD' { 'DWord' } 'REG_BINARY' { 'Binary' } 'REG_NONE' { 'None' } default { 'String' } }

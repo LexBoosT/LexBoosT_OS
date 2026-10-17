@@ -26,9 +26,6 @@ actions:
   - !status: {status: 'Copying LexBoosT OS Files'}
   - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\COPY_LEXBOOSTOS.PS1"', wait: true, weight: 10}
 
-  - !status: {status: 'Configuring AV Exclusions', onUpgrade: false}
-  - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\AVEXCLUDE.PS1"', runas: currentUserElevated, wait: true, weight: 200, onUpgrade: false}
-
   - !status: {status: 'Running NGEN'}
   - !run: {exeDir: true, exe: 'powershell.exe', args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\NGEN.PS1"', runas: currentUserElevated, wait: true, weight: 200}
 

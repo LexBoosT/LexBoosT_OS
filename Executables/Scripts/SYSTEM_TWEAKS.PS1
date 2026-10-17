@@ -100,6 +100,16 @@ reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_HEAP_SERIALIZATION_ENABLED' 
 reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_MAP_HEAP_ALLOCATIONS' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Microsoft\DirectX' /v 'D3D12_RESIDENCY_MANAGEMENT_ENABLED' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 
+function Test-IntelIGpu {
+    try {
+        return [bool](Get-CimInstance Win32_VideoController -ErrorAction Stop |
+            Where-Object { $_.Name -and ($_.Name -match 'Intel|Iris|UHD|Arc') } |
+            Select-Object -First 1)
+    } catch { return $false }
+}
+
+$hasIntelIGpu = Test-IntelIGpu
+if (-not $hasIntelIGpu) {
 # ================================================
 # DXGKrnl (DIRECTX GRAPHICS KERNEL)
 # ================================================
@@ -140,6 +150,8 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'ShortLin
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\DMM' /v 'LongLinkTrainingTimeout' /t REG_DWORD /d 500 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Power' /v 'DisableDevicePowerRequired' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler' /v 'EnableFrameBufferCompression' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+}
+# (fin garde iGPU Intel - DXGKrnl + GraphicsDrivers)
 
 # ================================================
 # DIRECT3D / DIRECTDRAW
@@ -196,12 +208,23 @@ reg add 'HKLM\SOFTWARE\WOW6432Node\Microsoft\DirectDraw' /v 'EmulationOnly' /t R
 # Timer kernel tweaks
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'TimerCheckFlags' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'SerializeTimerExpiration' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+# Timer resolution kernel tweaks (TimerTweaks)
+# reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DisableDynamicTick' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+if (-not (Test-IsAMD3DVCache)) {
+    reg add 'HKLM\SYSTEM\CurrentControlSet\Services\TimeBroker' /v 'TimerResolution' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
+
+# Psched (QoS) timer tweaks (TimerTweaks)
+reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'TimerResolution' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'MaxOutstandingSends' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'NonBestEffortLimit' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 if (-not (Test-IsAMD3DVCache)) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'EnablePerCpuClockTickScheduling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 }
 
 # Memory Management
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'DisablePageCombining' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'DisablePagingExecutive' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverride' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverrideMask' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 
@@ -219,12 +242,6 @@ reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'RITdemon
 reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows' /v 'DesktopHeapLogging' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
-# MULTIMEDIA / SYSTEM PROFILE
-# ================================================
-
-reg add 'HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl' /v 'Win32PrioritySeparation' /t REG_DWORD /d 38 /f 2>&1 | Out-Null
-
-# ================================================
 # DIRECTX (existing)
 # ================================================
 
@@ -235,6 +252,13 @@ reg add 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences' /v 'DirectXUserGlob
 # ================================================
 
 reg add 'HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' /v 'DisableBandwidthThrottling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+
+# Windows Search: respect power modes (battery-friendly indexing)
+reg add 'HKLM\Software\Microsoft\Windows Search\Gather\Windows\SystemIndex' /v 'RespectPowerModes' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+
+# Background apps: disable (RAM/IO savings)
+reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications' /v 'GlobalUserDisabled' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search' /v 'BackgroundAppGlobalToggle' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 
 # ================================================
 # EXPLORER DESKTOP TWEAKS (existing)
@@ -248,6 +272,25 @@ reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\Name
 reg delete 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' /f 2>&1 | Out-Null
 reg add 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v 'TaskbarBadges' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v 'TaskbarFlashing' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+# ==================================================
+# IFEO - background process CPU priority
+# NOTE: Windows Search AND Defender stay FUNCTIONAL (indexer + anti-malware
+# engine untouched). Only CPU/IO scheduling priority of background processes
+# is lowered so they do not steal cycles from network/gaming threads.
+# ==================================================
+reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SearchIndexer.exe\PerfOptions' /v 'CpuPriorityClass' /t REG_DWORD /d 5 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SearchProtocolHost.exe\PerfOptions' /v 'CpuPriorityClass' /t REG_DWORD /d 5 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\MoUsoCoreWorker.exe\PerfOptions' /v 'CpuPriorityClass' /t REG_DWORD /d 5 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\PhoneExperienceHost.exe\PerfOptions' /v 'CpuPriorityClass' /t REG_DWORD /d 5 /f 2>&1 | Out-Null
+reg add 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\spoolsv.exe\PerfOptions' /v 'CpuPriorityClass' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+foreach ($ifeoP in 'SecurityHealthService.exe','SecurityHealthSystray.exe','SecurityHealthHost.exe') {
+    $k = "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\$ifeoP\PerfOptions"
+    reg add $k /v 'CpuPriorityClass' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+    reg add $k /v 'IoPriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+    reg add $k /v 'PagePriority' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+    reg add $k /v 'EcoQoS' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+    reg add $k /v 'WorkingSetLimitInKB' /t REG_DWORD /d 65536 /f 2>&1 | Out-Null
+}
 
 Write-Log '+' 'System tweaks applied'
 exit 0
