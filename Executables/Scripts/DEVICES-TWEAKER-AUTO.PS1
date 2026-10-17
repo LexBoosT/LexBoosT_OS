@@ -222,7 +222,8 @@ foreach ($dev in $rawDevices) {
     elseif ($dclass -in @('SCSIAdapter','HDC','IDE','Storage')) { $kind = 'STOR' }
     elseif ($dclass -in @('MEDIA','AudioEndpoint') -or $dname -match '(?i)High Definition Audio|HD Audio|Audio Controller') { $kind = 'AUDIO' }
     elseif ($dclass -eq 'HID' -and $dname -match '(?i)mouse|USB Input Device') { $kind = 'MOUSE' }
-    elseif ($dclass -eq 'USB') { $kind = 'XHCI' }  # IM key present (checked below) -> xHCI host controller
+    # xHCI host controllers: no longer classified (MSI forcing disabled by user).
+    # Every USB-class device falls through to 'OTHER' -> SCAN.SKIP.OTHER.
 
     if ($kind -eq 'OTHER') { _log "SCAN.SKIP.OTHER: $did class=$dclass"; continue }
 
@@ -409,35 +410,6 @@ if ($gpuEntries.Count -and $pool.Count -ge 1) {
     }
 } elseif ($gpuEntries.Count) {
     _warn "AUTO.GPU: no core in pool - GPU MSI + priority only"
-}
-# ---------------------------------------------------------------------------
-# INPUT (USB mouse / keyboard): the HID child device has no IM key; its
-# interrupt is serviced by the xHCI host controller (the USB-class device WITH
-# an IM key). Pin that controller's IRQ/DPC to a dedicated physical core (MSI +
-# High priority + affinity). The GPU already owns the best P-core, so the input
-# takes the next best (pool[0] now = 2nd best). That core is reserved: no
-# NIC/storage/audio interrupt is assigned to it, so the input IRQ/DPC path is
-# never preempted by a network burst or a GPU interrupt.
-# ---------------------------------------------------------------------------
-$inputEntries = @($Devices | Where-Object { $_.Kind -eq 'XHCI' })
-if ($inputEntries.Count -and $pool.Count -ge 1) {
-    $inputCore = $pool[0]
-    $inputLps = @($inputCore.LPS)
-    $inputMask = [UInt64]0
-    foreach ($l in $inputLps) { $inputMask = $inputMask -bor ([UInt64]1 -shl $l) }
-    $inputValid = (Test-AffinityMaskValid -Mask $inputMask -LogicalCount $CpuInfo.Logical)
-    foreach ($d in $inputEntries) {
-        [void]$Results.Add([PSCustomObject]@{ Device=$d; LPs=$inputLps; Mask=$inputMask; Policy='SpecCPU'; Prio='High'; AffinityValid=$inputValid })
-        _ok "AUTO.INPUT: $($d.Name) -> Core=$($inputLps -join '+') Mask=0x$($inputMask.ToString('X')) valid=$inputValid"
-    }
-    if ($pool.Count -ge 2) {
-        $pool = @($pool | Where-Object { ($_.LPS -join '+') -ne ($inputCore.LPS -join '+') })
-        _log "AUTO.INPUT.RESERVE: core [$($inputCore.LPS -join '+')] reserved - USB input dedicated (2nd best P-core)"
-    } else {
-        _log "AUTO.INPUT.SHARE: single-core pool - USB input shares core (no reservation possible)"
-    }
-} elseif ($inputEntries.Count) {
-    _warn "AUTO.INPUT: no core in pool - USB input MSI + priority only"
 }
 
 $pi = 0
