@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexBoosT OS™ V26.10 / V26.09.1 / V26.09 / V26.08.1 / V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
+    <title>LexBoosT OS™ V26.10.1 / V26.10 / V26.09.1 / V26.09 / V26.08.1 / V26.08 / V26.07 / V26.06.2 / V26.06.1 / V26.06 — Changelog</title>
     <style>
         :root {
             --bg: #050508;
@@ -182,6 +182,29 @@
 </nav>
 
 <div class="container">
+    <h1>LexBoosT OS&#8482; V26.10.1</h1>
+
+    <div class="stats">
+        <div class="stat"><strong>12</strong> changements</div>
+        <div class="stat">&#x1FA9B; <strong>1</strong> fixes</div>
+        <div class="stat">&#x2728; <strong>11</strong> improvements</div>
+    </div>
+
+    <ul class="changelog-list">
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Improvements of privacy optimizations (telemetry, ads, AI, app permissions).</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Added Monthly drive optimizations.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Added more Defender optimizations.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Enables full drive indexing.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Disabling Store wake tasks.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Replace %windir% by %SystemRoot%.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Delete more Appx Packages: Microsoft.WritingAssistant, Microsoft.Edge.GameAssist.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Audio stability: CPU guard added to MMCSS-NIC.PS1 and AUDIO.PS1 (Pro Audio profile) — the aggressive audio scheduling profile (5ms timer resolution, high scheduling category) is now skipped on CPUs with &lt; 6 physical cores or CPU family &lt; 6 (pre-Haswell), fixing sound crackling on old machines.</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>Added on Disk Cleanup: Printer spooler files, Prefetch files, Offline Web Pages, System Restore Points (keep last 3).</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>AI coverage (telemetry.yml, +36 entries): Win+Copilot TurnOffWindowsCopilot, WindowsAI DisableAIDataAnalysis / AllowRecallEnablement / DisableClickToDo / TurnOffSavingSnapshots / DisableSettingsAgent, Copilot IsCopilotAvailable / CopilotDisabledReason=FeatureIsDisabled, ShowCopilotButton + InsightsEnabled + DisableSearchBoxSuggestions, 8 Edge Copilot policies, AutoOpenCopilotLargeScreens, LetAppsAccessSystemAIModels=2, AllowCopilotRuntime, Notepad DisableAIFeatures, 3 HKCR delete (ms-office-ai, ms-copilot, ms-clicktodo). Gain: -5/20ms input (Copilot/Edge), ~1% frametime, -15/40ms sleep resume (Recall/Settings).</li>
+        <li><span class="tag tag-feat">&#x2728; IMPROVEMENT</span>22 registry values desktopPowerSettings (DEVICES.PS1): Control\Power x15, NDIS\Parameters x5, I/O System, Session Mgr\Power x4, Configuration Manager x3. Gain: -1/-3ms input latency, ~1-2% GPU frametime, -5/15ms resume (NAPs + watchdog).</li>
+        <li><span class="tag tag-fix">&#x1FA9B; FIX</span>Fix error 0x80004002 on Windows Update and Microsoft Store.</li>
+    </ul>
+
     <h1>LexBoosT OS&#8482; V26.10</h1>
 
     <div class="stats">
