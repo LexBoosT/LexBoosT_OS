@@ -24,9 +24,6 @@ fltmc > nul 2>&1 || (
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "3" /f > nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /t REG_DWORD /d "3" /f > nul
 
-:: Disable Structured Exception Handling Overwrite Protection (SEHOP)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "DisableExceptionChainValidation" /t REG_DWORD /d "1" /f > nul
-
 :: Disable Control Flow Guard (CFG)
 PowerShell -NoP -C "Set-ProcessMitigation -System -Disable CFG" > nul
 

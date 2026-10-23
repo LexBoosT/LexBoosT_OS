@@ -24,7 +24,7 @@ menu(where=sel.count>0 type='file|dir|drive|namespace|back' mode="multiple" titl
 	}
 
 	item(type='file|dir|back.dir|drive' title=loc.take_ownership image=[\uE194,#f00] admin
-		cmd args='/K %windir%\LexBoosTOS\Utilities\NilesoftShell\Lex_Nilesoft_Shell\takeown-lang.bat "@sel.path" @if(sel.type==1,file,dir)')
+		cmd args='/K %SystemRoot%\LexBoosTOS\Utilities\NilesoftShell\Lex_Nilesoft_Shell\takeown-lang.bat "@sel.path" @if(sel.type==1,file,dir)')
 	separator
 	menu(title=loc.show_hide image=icon.show_hidden_files)
 	{

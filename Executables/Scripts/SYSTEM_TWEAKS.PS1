@@ -40,37 +40,64 @@ Write-Log '+' 'Applying YML system registry tweaks...'
 # DPC KERNEL TWEAKS
 # ================================================
 
+Write-Log '+' 'Checking CPU before timer/DPC kernel tweaks...'
+$skipTimerTweaks = $false
+try {
+    $cpuG    = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+    $coresG  = [int]$cpuG.NumberOfCores
+    $familyG = [int]$cpuG.Family
+} catch {
+    $coresG = 0; $familyG = 0
+    Write-Log '-' 'CPU guard: detection failed (tweaks applied anyway): $_'
+}
+if ($coresG -gt 0 -and $coresG -lt 6) {
+    Write-Log 'SKIP' "CPU guard: only $coresG physical cores (< 6) - timer/DPC kernel tweaks skipped (audio stability)"
+    $skipTimerTweaks = $true
+} elseif ($coresG -gt 0 -and $familyG -lt 6) {
+    Write-Log 'SKIP' "CPU guard: CPU family $familyG (< 6, pre-Haswell) - timer/DPC kernel tweaks skipped (audio stability)"
+    $skipTimerTweaks = $true
+}
+if (-not $skipTimerTweaks) {
 Write-Log '+' 'Applying DPC kernel tweaks...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'IdealDpcRate' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DpcQueueDepth' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MinimumDpcRate' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 # ================================================
 # SPLIT LARGE CACHES
 # ================================================
 
+if (-not $skipTimerTweaks) {
 Write-Log '+' 'Enabling split large caches...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'SplitLargeCaches' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 # ================================================
 # THREAD DPC
 # ================================================
 
+if (-not $skipTimerTweaks) {
 Write-Log '+' 'Enabling Thread DPC (restored from v5.1)...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'ThreadDpcEnable' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 # ================================================
 # KERNEL QUEUE / SCHEDULING
 # ================================================
 
+if (-not $skipTimerTweaks) {
 Write-Log '+' 'Applying kernel scheduling tweaks...'
 if (Test-IsIntelCPU) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaxDynamicTickDuration' /t REG_DWORD /d 10 /f 2>&1 | Out-Null
 }
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'MaximumSharedReadyQueueSize' /t REG_DWORD /d 128 /f 2>&1 | Out-Null
+}
+
 # ================================================
 # CLOCK TIMER SETTINGS (KERNEL) - Performance
 # ================================================
+if (-not $skipTimerTweaks) {
 Write-Log '+' 'Applying clock timer kernel tweaks...'
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClockTimerPerCpu' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerPerCpu' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
@@ -78,6 +105,7 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClo
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerHighLatency' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'KiClockTimerAlwaysOnPresent' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel' /v 'ClockTimerAlwaysOnPresent' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 
 # ================================================
@@ -208,18 +236,30 @@ reg add 'HKLM\SOFTWARE\WOW6432Node\Microsoft\DirectDraw' /v 'EmulationOnly' /t R
 # Timer kernel tweaks
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'TimerCheckFlags' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'SerializeTimerExpiration' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'EnableWerUserReporting' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'InterruptSteeringFlags' /t REG_DWORD /d 17 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DriveRemappingMitigation' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DisableExceptionChainValidation' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DisableControlFlowGuardExportSuppression' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+
 # Timer resolution kernel tweaks (TimerTweaks)
 # reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'DisableDynamicTick' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+if (-not $skipTimerTweaks) {
 if (-not (Test-IsAMD3DVCache)) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Services\TimeBroker' /v 'TimerResolution' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 }
+}
 
 # Psched (QoS) timer tweaks (TimerTweaks)
+if (-not $skipTimerTweaks) {
 reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'TimerResolution' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'MaxOutstandingSends' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
 reg add 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched' /v 'NonBestEffortLimit' /t REG_DWORD /d 0 /f 2>&1 | Out-Null
+}
+if (-not $skipTimerTweaks) {
 if (-not (Test-IsAMD3DVCache)) {
     reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'EnablePerCpuClockTickScheduling' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 }
 
 # Memory Management
@@ -228,7 +268,9 @@ reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverride' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' /v 'FeatureSettingsOverrideMask' /t REG_DWORD /d 3 /f 2>&1 | Out-Null
 
+if (-not $skipTimerTweaks) {
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel' /v 'GlobalTimerResolutionRequests' /t REG_DWORD /d 1 /f 2>&1 | Out-Null
+}
 
 # DisableDiagnosticTracing
 reg add 'HKLM\SYSTEM\CurrentControlSet\Control\Diagnostics\Performance' /v 'DisableDiagnosticTracing' /t REG_DWORD /d 1 /f 2>&1 | Out-Null

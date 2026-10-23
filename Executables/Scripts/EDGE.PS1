@@ -173,7 +173,7 @@ function Remove-EdgeChromium {
                 $envPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
                 try {
                     Set-ItemProperty -Path $envPath -Name 'windir' -Value '' -Type ExpandString -Force -ErrorAction SilentlyContinue
-                    $env:windir = ''
+                    $env:SystemRoot = ''
                     if ($uninstallPath) {
                         Start-Process -Wait -FilePath $uninstallPath -ArgumentList "$uninstallArgs --force-uninstall --delete-profile" -WindowStyle Hidden
                     } else {
@@ -297,11 +297,11 @@ function Remove-EdgeFiles {
     $paths = @(
         "$env:SystemDrive\Users\Public\Desktop\Microsoft Edge.lnk",
         "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk",
-        "$env:windir\system32\MicrosoftEdgeBCHost.exe",
-        "$env:windir\system32\MicrosoftEdgeCP.exe",
-        "$env:windir\system32\MicrosoftEdgeDevTools.exe",
-        "$env:windir\system32\MicrosoftEdgeSH.exe",
-        "$env:windir\system32\Tasks\MicrosoftEdge*",
+        "$env:SystemRoot\system32\MicrosoftEdgeBCHost.exe",
+        "$env:SystemRoot\system32\MicrosoftEdgeCP.exe",
+        "$env:SystemRoot\system32\MicrosoftEdgeDevTools.exe",
+        "$env:SystemRoot\system32\MicrosoftEdgeSH.exe",
+        "$env:SystemRoot\system32\Tasks\MicrosoftEdge*",
         "$env:ProgramFiles(x86)\Internet Explorer",
         "$env:ProgramW6432\Internet Explorer",
         "$env:ProgramFiles(x86)\Microsoft\Edge",

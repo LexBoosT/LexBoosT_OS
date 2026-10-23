@@ -19,8 +19,6 @@ actions:
   - !task: {path: 'Tasks\registry\search.yml'}
   - !status: {status: 'Config notifications'}
   - !task: {path: 'Tasks\registry\notifications.yml'}
-  - !status: {status: 'Config gamebar'}
-  - !task: {path: 'Tasks\registry\gamebar.yml'}
   - !status: {status: 'Config clipboard'}
   - !task: {path: 'Tasks\registry\clipboard.yml'}
   - !status: {status: 'Config themes'}

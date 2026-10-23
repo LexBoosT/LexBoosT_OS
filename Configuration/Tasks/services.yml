@@ -25,10 +25,13 @@ actions:
   - !service: { name: 'WdiServiceHost', operation: change, startup: 4 }
   - !service: { name: 'WdiSystemHost', operation: change, startup: 4 }
   - !service: { name: 'wercplsupport', operation: change, startup: 4 }
-  - !service: { name: 'WerSvc', operation: change, startup: 4 }
+  - !service: { name: 'wersvc', operation: change, startup: 3 }
+  - !service: { name: 'cdpsvc', operation: change, startup: 3 }
+  - !service: { name: 'cdpusersvc', operation: change, startup: 3 }
   - !service: { name: 'Wecsvc', operation: change, startup: 4 }
   - !service: { name: 'pla', operation: change, startup: 4 }
   - !service: { name: 'dmwappushservice', operation: change, startup: 4 }
+  - !service: { name: 'dmwappushsvc', operation: change, startup: 3 }
   - !service: { name: 'dusmsvc', operation: change, startup: 4 }
   - !service: { name: 'UCPD', operation: change, startup: 4 }
   - !service: { name: 'Ndu', operation: change, startup: 2 }
@@ -59,6 +62,7 @@ actions:
   # ============================================
   # -- Manual --
   - !service: { name: 'DoSvc', operation: change, startup: 3 }
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\DoSvc', value: 'Start', type: REG_DWORD, data: '3'}
   - !service: { name: 'icssvc', operation: change, startup: 3 }
   - !service: { name: 'LanmanServer', operation: change, startup: 3 }
   - !service: { name: 'NetBT', operation: change, startup: 3 }
@@ -160,7 +164,7 @@ actions:
   - !service: { name: 'GpuEnergyDrv', operation: change, startup: 3 }
   - !service: { name: 'VacSvc', operation: change, startup: 3 }
   - !service: { name: 'VSS', operation: change, startup: 3 }
-  - !service: { name: 'WpnService', operation: change, startup: 3 }
+  - !service: { name: 'WpnService', operation: change, startup: 2 }
   - !service: { name: 'camsvc', operation: change, startup: 3 }
   - !service: { name: 'CscService', operation: change, startup: 3 }
   - !service: { name: 'defragsvc', operation: change, startup: 3 }
@@ -300,3 +304,4 @@ actions:
   # skipping the protected services (Xbox/GameBar, NVIDIA/GPU, VM).
   # Single source of truth in the playbook : the network finalize step no longer touches this registry.
   - !powerShell: {command: '.\\Scripts\\SVC-SPLIT-DISABLE.PS1', exeDir: true, runas: currentUserElevated, wait: true}
+

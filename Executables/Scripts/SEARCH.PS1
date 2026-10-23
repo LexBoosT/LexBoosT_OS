@@ -185,7 +185,7 @@ $protectedAutologgers = @(
     @{ Path = 'HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\RadioMgr'; Value = 0 }
 )
 
-$minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+$minSudo = Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\MinSudo.exe'
 foreach ($auto in $protectedAutologgers) {
     $key = $auto.Path
     $val = $auto.Value

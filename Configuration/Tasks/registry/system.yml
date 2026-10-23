@@ -52,5 +52,21 @@ actions:
     weight: 200
     onUpgrade: false
 
+  # Win32PrioritySeparation - 24 = 0x18 = 3 (foreground boost, background normal)
   - !status: {status: 'Configuring Win32PrioritySeparation', onUpgrade: false}
-  - !registryValue: {path: HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl', value: 'Win32PrioritySeparation', type: REG_DWORD, data: '38', onUpgrade: false}
+  - !registryValue: {path: HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl', value: 'Win32PrioritySeparation', type: REG_DWORD, data: '24', onUpgrade: false}
+
+  # Enables full drive indexing
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows Search\Gather\Windows\SystemIndex', value: 'EnableFindMyFiles', type: REG_DWORD, data: '1'}
+
+  # Monthly drive optimization
+  - !powerShell:
+    command: |
+      $defragTask = Get-ScheduledTask -TaskPath '\Microsoft\Windows\Defrag\' -TaskName 'ScheduledDefrag' -ErrorAction SilentlyContinue
+      if ($null -ne $defragTask) {
+        $trigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval 4 -DaysOfWeek Sunday -At 3am
+        Set-ScheduledTask -TaskPath '\Microsoft\Windows\Defrag\' -TaskName 'ScheduledDefrag' -Trigger $trigger | Out-Null
+        Enable-ScheduledTask -TaskPath '\Microsoft\Windows\Defrag\' -TaskName 'ScheduledDefrag' | Out-Null
+      }
+    wait: true
+

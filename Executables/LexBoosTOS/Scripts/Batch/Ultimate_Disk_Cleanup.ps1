@@ -40,17 +40,17 @@ function Clear-File([string]$Path) {
 # ---------- 1) Temporary / system folders ----------
 Banner '1. Temporary / system folders'
 @(
-  '%WINDIR%\Temp',
+  '%SystemRoot%\Temp',
   '%TEMP%',
-  '%WINDIR%\Prefetch',
+  '%SystemRoot%\Prefetch',
   '%SystemDrive%\$GetCurrent',
   '%SystemDrive%\$SysReset',
   '%SystemDrive%\$Windows.~BT',
   '%SystemDrive%\$Windows.~WS',
   '%SystemDrive%\$WinREAgent',
   '%SystemDrive%\OneDriveTemp',
-  '%WINDIR%\Logs',
-  '%WINDIR%\Installer\$PatchCache$',
+  '%SystemRoot%\Logs',
+  '%SystemRoot%\Installer\$PatchCache$',
   '%SYSTEMROOT%\Temp\CBS',
   '%SYSTEMROOT%\Logs\waasmedic',
   '%SYSTEMROOT%\Logs\SIH',
@@ -178,7 +178,7 @@ try { Start-Process -FilePath cleanmgr.exe -ArgumentList '/sagerun:1337' -Window
 # ---------- 10) Leftovers (Windows subfolders) ----------
 Banner '10. Leftovers (Windows subfolders)'
 @('CbsTemp','Logs','SoftwareDistribution','System32\LogFiles','System32\LogFiles\WMI','System32\SleepStudy','System32\sru','System32\WDI\LogFiles','System32\winevt\Logs','SystemTemp','Temp') | ForEach-Object {
-    Clear-Folder ('%WINDIR%\' + $_)
+    Clear-Folder ('%SystemRoot%\' + $_)
 }
 # ---------- 11) Bonus: Windows.old + thumbnail/icon cache ----------
 Banner '11. Bonus (Windows.old + thumbnail/icon cache)'
@@ -208,6 +208,40 @@ try {
     ipconfig /flushdns | Out-Null
     Ok 'DNS resolver cache flushed (ipconfig /flushdns)'
 } catch { Fail ('DNS flush : ' + $_.Exception.Message) }
+
+# ---------- 13) Printer spooler files ----------
+Banner '13. Printer spooler files'
+if (Get-Service -Name Spooler -EA SilentlyContinue) {
+    Stop-Service -Name Spooler -Force -EA SilentlyContinue
+    Start-Sleep -Milliseconds 500
+    Clear-Folder '%SYSTEMROOT%\System32\spool\PRINTERS'
+    Start-Service -Name Spooler -EA SilentlyContinue
+} else { Skip 'Spooler service not present' }
+
+# ---------- 14) Prefetch files ----------
+Banner '14. Prefetch files'
+Clear-Folder '%SYSTEMROOT%\Prefetch'
+
+# ---------- 15) Offline Web Pages ----------
+Banner '15. Offline Web Pages'
+Clear-Folder '%SYSTEMROOT%\Offline Web Pages'
+
+# ---------- 16) System Restore Points (keep last 3) ----------
+Banner '16. System Restore Points'
+try {
+    $restorePoints = @(Get-Content env:windir | ForEach-Object {
+        Get-CimInstance Win32_ShadowCopy | Where-Object { $_.OriginatingProgram -match 'Windows Backup' -or $_.OriginatingProgram -match 'Volume Shadow Copy' }
+    })
+    if ($restorePoints -and $restorePoints.Count -gt 3) {
+        $toDelete = $restorePoints | Select-Object -Skip 3
+        $toDelete | ForEach-Object {
+            Remove-CimInstance -InputObject $_ -EA SilentlyContinue
+        }
+        Ok ('System restore points cleaned (kept last 3, removed ' + $toDelete.Count + ')')
+    } else {
+        Skip '3 or fewer restore points exist'
+    }
+} catch { Fail ('Restore points : ' + $_.Exception.Message) }
 
 # ---------- Summary ----------
 $afterFree = [math]::Round((Get-PSDrive C).Free / 1MB)

@@ -37,7 +37,7 @@ actions:
       path: 'HKCR\\powerscheme\\DefaultIcon',
       value: "",
       type: REG_SZ,
-      data: "%windir%\\System32\\powercpl.dll,1",
+      data: "%SystemRoot%\\System32\\powercpl.dll,1",
       onUpgrade: false,
     }
   - !registryValue: {
@@ -136,7 +136,7 @@ actions:
       weight: 45,
     }
   - !cmd: {
-      command: 'copy /y "Themes" "%windir%\\Resources\\Themes" > nul',
+      command: 'copy /y "Themes" "%SystemRoot%\\Resources\\Themes" > nul',
       runas: currentUserElevated,
       wait: true,
       weight: 10,

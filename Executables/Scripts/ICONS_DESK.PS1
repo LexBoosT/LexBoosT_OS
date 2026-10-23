@@ -17,7 +17,7 @@ $script:CLSID_THIS_PC = "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 $script:CLSID_USER_FOLDER = "{59031a47-3f72-44a7-89c5-5595fe6b30ee}"
 
 # Paths
-$script:LEXBOOST_ROOT = "$env:WINDIR\LexBoosTOS"
+$script:LEXBOOST_ROOT = "$env:SystemRoot\LexBoosTOS"
 $script:LEXBOOST_OTHER = Join-Path $script:LEXBOOST_ROOT "Resources\Icons"
 $script:DESKTOP_PATH = [Environment]::GetFolderPath("Desktop")
 

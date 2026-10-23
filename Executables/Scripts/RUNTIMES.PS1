@@ -181,9 +181,9 @@ function Install-WingetPackageIfMissing {
 }
 
 function Test-DirectXLegacyRuntime {
-    $systemRoots = @("$env:WINDIR\System32")
+    $systemRoots = @("$env:SystemRoot\System32")
     if ([Environment]::Is64BitOperatingSystem) {
-        $systemRoots += "$env:WINDIR\SysWOW64"
+        $systemRoots += "$env:SystemRoot\SysWOW64"
     }
 
     $requiredFiles = @(
@@ -299,9 +299,9 @@ Install-DirectXLegacyIfMissing
 
 # OpenAL
 function Test-OpenALInstalled {
-    $paths = @("$env:WINDIR\System32\OpenAL32.dll")
+    $paths = @("$env:SystemRoot\System32\OpenAL32.dll")
     if ([Environment]::Is64BitOperatingSystem) {
-        $paths += "$env:WINDIR\SysWOW64\OpenAL32.dll"
+        $paths += "$env:SystemRoot\SysWOW64\OpenAL32.dll"
     }
     foreach ($p in $paths) {
         if (Test-Path -LiteralPath $p) { return $true }

@@ -14,7 +14,7 @@ try {
     # --- 1. Locate bundled ViVeTool.exe ---
     # Try multiple candidate paths (playbook source + deployed location)
     $candidates = @(
-        (Join-Path $env:windir 'LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe'),
+        (Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe'),
         (Join-Path $env:ProgramData 'LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe'),
         (Join-Path $PSScriptRoot '..\LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe')
     )
@@ -30,7 +30,7 @@ try {
 
     if (-not $exePath) {
         Write-Log '-' "ViVeTool.exe not found in bundled locations."
-        Write-Log '-' "Expected at: $env:windir\LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe"
+        Write-Log '-' "Expected at: $env:SystemRoot\LexBoosTOS\Utilities\ViVeTool\ViVeTool.exe"
         Write-Log '-' "Skipping low-latency feature activation."
         exit 0
     }

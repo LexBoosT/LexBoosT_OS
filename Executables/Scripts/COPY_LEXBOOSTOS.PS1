@@ -93,7 +93,7 @@ function Copy-GpuProfileVariant {
 $scriptDir = Split-Path -Parent $PSCommandPath
 $executablesDir = Split-Path -Parent $scriptDir
 $sourcePath = Join-Path -Path $executablesDir -ChildPath "LexBoosTOS"
-$destPath = Join-Path -Path $env:WINDIR -ChildPath "LexBoosTOS"
+$destPath = Join-Path -Path $env:SystemRoot -ChildPath "LexBoosTOS"
 
 if (-not (Test-Path -LiteralPath $destPath)) {
     New-Item -ItemType Directory -Path $destPath -Force | Out-Null

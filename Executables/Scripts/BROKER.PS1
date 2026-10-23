@@ -54,7 +54,7 @@ $regValues = @(
 
 function Set-RegistryWithFallback {
     param([array]$Entries)
-    $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+    $minSudo = Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\MinSudo.exe'
     foreach ($entry in $Entries) {
         $key = $entry.Path -replace '^Registry::', ''
         $name = $entry.Name

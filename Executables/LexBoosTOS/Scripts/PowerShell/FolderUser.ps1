@@ -5,7 +5,7 @@
 
 Function Set-UserFolderIcon {
     param(
-        [string]$IconPath = "$env:WINDIR\LexBoosTOS\Resources\Icons\FolderUser.ico"
+        [string]$IconPath = "$env:SystemRoot\LexBoosTOS\Resources\Icons\FolderUser.ico"
     )
 
     $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{59031A47-3F72-44A7-89C5-5595FE6B30EE}\DefaultIcon"

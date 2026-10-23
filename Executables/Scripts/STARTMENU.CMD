@@ -16,7 +16,7 @@ copy /y "%SCRIPT_DIR%settings.json" "%SYSTEMDRIVE%\Users\Default\AppData\Local\P
 
 :: Start Menu shortcut "LexBoosT Tweaks & Tools" - Default profile (Roaming)
 if not exist "%SYSTEMDRIVE%\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs" mkdir "%SYSTEMDRIVE%\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws=New-Object -ComObject WScript.Shell; $s=$ws.CreateShortcut('%SYSTEMDRIVE%\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\LexBoosT Tweaks & Tools.lnk'); $s.TargetPath='%WINDIR%\LexBoosTOS\Scripts\Programs\INSTALLSOFTS.exe'; $s.IconLocation='%WINDIR%\LexBoosTOS\Resources\Icons\soft.ico'; $s.Description='LexBoosT Tweaks & Tools'; $s.Save()"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws=New-Object -ComObject WScript.Shell; $s=$ws.CreateShortcut('%SYSTEMDRIVE%\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\LexBoosT Tweaks & Tools.lnk'); $s.TargetPath='%SystemRoot%\LexBoosTOS\Scripts\Programs\INSTALLSOFTS.exe'; $s.IconLocation='%SystemRoot%\LexBoosTOS\Resources\Icons\soft.ico'; $s.Description='LexBoosT Tweaks & Tools'; $s.Save()"
 
 for /f "usebackq tokens=2 delims=\" %%a in (`reg query "HKEY_USERS" ^| findstr /r /x /c:"HKEY_USERS\\S-.*" /c:"HKEY_USERS\\AME_UserHive_[^_]*"`) do (
 
@@ -36,7 +36,7 @@ for /f "usebackq tokens=2 delims=\" %%a in (`reg query "HKEY_USERS" ^| findstr /
 
 			:: Start Menu shortcut "LexBoosT Tweaks & Tools" - per user (Roaming)
 			if not exist "!USER_ROAMING!\Microsoft\Windows\Start Menu\Programs" mkdir "!USER_ROAMING!\Microsoft\Windows\Start Menu\Programs"
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws=New-Object -ComObject WScript.Shell; $s=$ws.CreateShortcut('!USER_ROAMING!\Microsoft\Windows\Start Menu\Programs\LexBoosT Tweaks & Tools.lnk'); $s.TargetPath='%%WINDIR%%\LexBoosTOS\Scripts\Programs\INSTALLSOFTS.exe'; $s.IconLocation='%%WINDIR%%\LexBoosTOS\Resources\Icons\soft.ico'; $s.Description='LexBoosT Tweaks & Tools'; $s.Save()"
+			powershell -NoProfile -ExecutionPolicy Bypass -Command "$ws=New-Object -ComObject WScript.Shell; $s=$ws.CreateShortcut('!USER_ROAMING!\Microsoft\Windows\Start Menu\Programs\LexBoosT Tweaks & Tools.lnk'); $s.TargetPath='%%SystemRoot%%\LexBoosTOS\Scripts\Programs\INSTALLSOFTS.exe'; $s.IconLocation='%%SystemRoot%%\LexBoosTOS\Resources\Icons\soft.ico'; $s.Description='LexBoosT Tweaks & Tools'; $s.Save()"
 
 			for /f "usebackq delims=" %%d in (`dir /b "%%c\Packages" /a:d ^| findstr /c:"Microsoft.DesktopAppInstaller"`) do (
 				mkdir "%%c\Packages\%%d\LocalState" 2>nul

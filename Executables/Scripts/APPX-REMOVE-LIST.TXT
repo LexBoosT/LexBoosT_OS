@@ -1,4 +1,4 @@
-ContentDeliveryManager*
+﻿ContentDeliveryManager*
 *CopilotNudges*
 *CrossDeviceResume*
 *CrossDeviceResumeApp*
@@ -54,6 +54,8 @@ ContentDeliveryManager*
 *VisualAssist*
 *Voiess*
 *WidgetsPlatformRuntime*
+*Microsoft.WritingAssistant*
+*Microsoft.Edge.GameAssist*
 *WindowsBackup*
 *XGpuEjectDialog*
 *c5e2524a-ea46-4f67-841f-6a9465d9d515*
@@ -98,3 +100,10 @@ MicrosoftWindows.UndockedDevKit*
 OutlookForWindows*
 SpotifyAB.SpotifyMusic*
 microsoft.windowscommunicationsapps*
+Microsoft.WindowsCamera*
+Microsoft.YourPhone*
+*Microsoft.Copilot*
+*Microsoft.Windows.Copilot*
+*Client.CoPilot*
+*Ai.Copilot*
+*Client.CoreAI*

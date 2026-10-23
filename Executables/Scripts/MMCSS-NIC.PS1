@@ -1,5 +1,29 @@
 ﻿#Requires -RunAsAdministrator
 
+# ============================================================
+# CPU GUARD (sound crackle fix):
+# The aggressive MMCSS profile (5ms timer resolution, NoLazyMode,
+# high scheduling category on audio tasks) can cause audio
+# crackling on old / low-core CPUs (e.g. Sandy Bridge i5-2310).
+# Skipped when the CPU has < 6 physical cores OR CPU family < 6
+# (Haswell). Detection failure = guard is not applied.
+# ============================================================
+try {
+    $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+    $cores = [int]$cpu.NumberOfCores
+    $family = [int]$cpu.Family
+    if ($cores -lt 6) {
+        Write-Host "[SKIP] CPU guard: only $cores physical cores (< 6) - MMCSS aggressive profile not applied."
+        exit 0
+    }
+    if ($family -lt 6) {
+        Write-Host "[SKIP] CPU guard: CPU family $family (< 6, pre-Haswell) - MMCSS aggressive profile not applied."
+        exit 0
+    }
+} catch {
+    Write-Host "[WARN] CPU guard: detection failed (applied anyway): $_"
+}
+
 $MP      = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile'
 $MMCSS   = 'HKLM:\SYSTEM\CurrentControlSet\Services\MMCSS'
 
@@ -73,16 +97,16 @@ if (-not $primaryType) {
 # ── Apply ─────────────────────────────────────────────────────────────────────
 if ($primaryType -eq 'NetAdapterCx') {
     Set-Reg $MMCSS 'Start' DWord 4
-    Set-Reg $MP 'SystemResponsiveness'      DWord 10
+    Set-Reg $MP 'SystemResponsiveness'      DWord 100
 } else {
     # NDIS detected — applying custom MMCSS profile
     Set-Reg $MMCSS 'Start' DWord 2
-    Set-Reg $MP 'SystemResponsiveness'      DWord 10
+    Set-Reg $MP 'SystemResponsiveness'      DWord 100
     Set-Reg $MP 'NoLazyMode'                DWord 1
     Set-Reg $MP 'NetworkThrottlingIndex' DWord 4294967295
-    Set-Reg $MP 'LazyModeTimeout' DWord 25000
+    Set-Reg $MP 'LazyModeTimeout' DWord 4294967295
     Set-Reg $MP 'SchedulerPeriod' DWord 1000000
-    Set-Reg $MP 'IdleDetectionCycles'      DWord 6
+    Set-Reg $MP 'IdleDetectionCycles'      DWord 1
     Set-Reg $MP 'SchedulerTimerResolution' DWord 5000
 
     foreach ($task in 'Audio', 'Pro Audio', 'Playback') {

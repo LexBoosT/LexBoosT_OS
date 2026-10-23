@@ -581,11 +581,11 @@ function Set-LexBoostPowerScheme {
     foreach ($s in $settings) {
         if ($null -ne $s.AC) {
             if (Invoke-PowerCfg "setacvalueindex $schemeGuid $($s.Sub) $($s.Set) $($s.AC)") { $applied++ } else { $failed++; Write-Log - ""AC failed: $($s.Sub)/$($s.Set)"" }
-            
+
         }
         if ($null -ne $s.DC) {
             if (Invoke-PowerCfg "setdcvalueindex $schemeGuid $($s.Sub) $($s.Set) $($s.DC)") { $applied++ } else { $failed++; Write-Log - ""DC failed: $($s.Sub)/$($s.Set)"" }
-            
+
         }
     }
 
@@ -624,7 +624,7 @@ function Set-LexBoostPowerScheme {
 
     # Activate the plan
     if (Invoke-PowerCfg "setactive $schemeGuid") {
-        
+
         Write-Log '+' "Plan '$schemeName' activated"
         return $true
     } else {
@@ -1059,7 +1059,6 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'CoalescingFlushInterval'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'PowerSettingProfile'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'Win32CalloutWatchdogBugcheckEnabled'; Value = 1 },
-        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel'; Name = 'SerializeTimerExpiration'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel'; Name = 'PowerOffFrozenProcessors'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'; Name = 'IdlePowerMode'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device'; Name = 'DisableDSTThrottle'; Value = 1 },
@@ -1070,6 +1069,28 @@ function Set-DesktopPowerOptimizations {
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'NoPauseOnSuspend'; Value = 1 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'EnableNicAutoPowerSaverInSleepStudy'; Value = 0 },
         @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'DisableNaps'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'AlwaysComputeQosHints'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'CoalescingTimerInterval'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'IpiLastClockOwnerDisable'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableVsyncLatencyUpdate'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'PerfCalculateActualUtilization'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'AllowSystemRequiredPowerRequests'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'DisableDisplayBurstOnPowerSourceChange'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'PoFxSystemIrpWaitForReportDevicePowered'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power'; Name = 'AllowAudioToEnableExecutionRequiredPowerRequests'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'TrackNblOwner'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'SriovSupportTestOverride'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'DebugLoggingMode'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'DisableNDISWatchDog'; Value = 1 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Services\NDIS\Parameters'; Name = 'DirectedMacForNapsEnabled'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System'; Name = 'IoAllowLoadCrashDumpDriver'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'IdleScanInterval'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'WatchdogSleepTimeout'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'WatchdogResumeTimeout'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; Name = 'SleepStudyDeviceAccountingLevel'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager'; Name = 'SelfHealingEnabled'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager'; Name = 'VirtualizationEnabled'; Value = 0 }
+        @{ Path = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager'; Name = 'BugcheckRecoveryEnabled'; Value = 0 }
     )
 
     $build = [System.Environment]::OSVersion.Version.Build
@@ -1254,11 +1275,11 @@ function Set-MobileSyncOptimizations {
     Start-Sleep -Milliseconds 500
 
     try {
-        $mobsync = "$env:windir\system32\mobsync.exe"
-        $mobsyncOld = "$env:windir\system32\mobsync.old"
+        $mobsync = "$env:SystemRoot\system32\mobsync.exe"
+        $mobsyncOld = "$env:SystemRoot\system32\mobsync.old"
         if (Test-Path $mobsync) {
             # mobsync.exe is owned by TrustedInstaller — need MinSudo to rename.
-            $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+            $minSudo = Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\MinSudo.exe'
             if (Test-Path $minSudo) {
                 # Use cmd `ren` under TrustedInstaller (handles both fresh rename and replace-existing).
                 $renCmd = "if exist `"$mobsyncOld`" del /f /q `"$mobsyncOld`" & ren `"$mobsync`" mobsync.old"
@@ -1407,7 +1428,7 @@ function Set-RegistryPowerTweaks {
     $clsidPath = 'HKLM\Software\Classes\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder'
     $clsidValue = 'Attributes'
     $clsidData = '2962489444'
-    $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+    $minSudo = Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\MinSudo.exe'
     if (Test-Path $minSudo) {
         $regCmd = "reg add `"$clsidPath`" /v `"$clsidValue`" /t REG_DWORD /d `"$clsidData`" /f"
         $proc = Start-Process -FilePath $minSudo -ArgumentList "--NoLogo --TrustedInstaller --Privileged cmd.exe /c `"$regCmd`"" -Wait -PassThru -WindowStyle Hidden
@@ -1437,6 +1458,8 @@ function Set-RegistryPowerTweaks {
     if (-not $isDesktop) {
         # Laptop: keep NVMe idle power management (battery). Desktop: 0 (perf) set by Set-DesktopPowerOptimizations.
         Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 1
+    } else {
+        Set-RegistryValue -Path $stornvme -Name 'IdlePowerMode' -Type DWORD -Value 0
     }
     # QueueDepth=254 and MSI=1 REMOVED: forcing these on stornvme is a known trigger of
     # INACCESSIBLE_BOOT_DEVICE (0x7B) on some NVMe controllers/drives at next boot.

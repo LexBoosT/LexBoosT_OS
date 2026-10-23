@@ -27,7 +27,7 @@ if %errorlevel%==2 (
 
 :main
 echo]
-set "___ps=powershell -nop -noni -c "^& """%windir%\LexBoosTOS\Scripts\PowerShell\RemoveEdge.ps1""" -NonInteractive -InstallWebView"
+set "___ps=powershell -nop -noni -c "^& """%SystemRoot%\LexBoosTOS\Scripts\PowerShell\RemoveEdge.ps1""" -NonInteractive -InstallWebView"
 if %___edge%==0 (
 	%___ps% -InstallEdge"
 ) else (

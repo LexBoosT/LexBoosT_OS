@@ -68,3 +68,19 @@ actions:
   - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
   - !registryValue: {path: 'HKCU\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableEnhancedNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
   - !registryValue: {path: 'HKLM\Software\Policies\Microsoft\Windows Defender Security Center\Notifications', value: 'DisableEnhancedNotifications', type: REG_DWORD, data: '0', onUpgrade: false}
+
+  # Limiting Defender scans
+  - !powerShell:
+    command: |
+      Set-MpPreference `
+        -ScanAvgCPULoadFactor 20 `
+        -EnableLowCpuPriority $true `
+        -ScanOnlyIfIdleEnabled $true `
+        -DisableCpuThrottleOnIdleScans $false `
+        -DisableCatchupQuickScan $true `
+        -DisableCatchupFullScan $true
+    option: enable-defender
+    wait: true
+    onUpgrade: false
+
+

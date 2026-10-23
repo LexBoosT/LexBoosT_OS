@@ -377,7 +377,7 @@ public class TokenManipulator {
     function Add-RebootDeletion {
         param([string]$path)
         if (-not (Test-Path -LiteralPath $path)) { return $true }
-        Write-Log '-' "26.10: reboot-deletion disabled (PendingFileRenameOperations) - leftover folder kept: $path"
+        Write-Log '-' "26.10.1: reboot-deletion disabled (PendingFileRenameOperations) - leftover folder kept: $path"
         return $false
     }
 
@@ -645,7 +645,7 @@ public class TokenManipulator {
                                 Where-Object { $_ -and (Test-Path -LiteralPath $_) }
                             $stillRegistered = [bool](Get-AppxPackage -AllUsers -Name $pkg.Name -ErrorAction SilentlyContinue)
                             if ($leftovers -or $stillRegistered) {
-                                Write-Log '-' "Still locked after SYSTEM purge - leftover folder kept (reboot-deletion disabled, 26.10): '$fullPackageName'"
+                                Write-Log '-' "Still locked after SYSTEM purge - leftover folder kept (reboot-deletion disabled, 26.10.1): '$fullPackageName'"
                                 foreach ($p in $leftovers) {
                                     Add-RebootDeletion -path $p | Out-Null
                                 }

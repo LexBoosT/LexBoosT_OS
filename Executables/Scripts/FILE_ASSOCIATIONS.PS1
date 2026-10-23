@@ -45,11 +45,11 @@ $regKeys = @(
 $regValues = @(
     # .bat
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.bat';                        Name = '';         Value = 'batfile';                        Type = 'String'       },
-    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.bat\ShellNew';               Name = 'ItemName'; Value = '%windir%\System32\acppage.dll,-6002'; Type = 'ExpandString' },
+    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.bat\ShellNew';               Name = 'ItemName'; Value = '%SystemRoot%\System32\acppage.dll,-6002'; Type = 'ExpandString' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.bat\ShellNew';               Name = 'NullFile'; Value = '';                                    Type = 'String'       },
     # .cmd
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.cmd';                        Name = '';         Value = 'cmdfile';                        Type = 'String'       },
-    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.cmd\ShellNew';               Name = 'ItemName'; Value = '%windir%\System32\acppage.dll,-6002'; Type = 'ExpandString' },
+    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.cmd\ShellNew';               Name = 'ItemName'; Value = '%SystemRoot%\System32\acppage.dll,-6002'; Type = 'ExpandString' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.cmd\ShellNew';               Name = 'NullFile'; Value = '';                                    Type = 'String'       },
     # .ps1
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.ps1';                        Name = '';                  Value = 'Microsoft.PowerShellScript.1'; Type = 'String' },
@@ -59,11 +59,11 @@ $regValues = @(
     # .reg
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.reg';                        Name = '';         Value = 'regfile';                        Type = 'String'       },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.reg\ShellNew';               Name = 'NullFile'; Value = '';                         Type = 'String'       },
-    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.reg\ShellNew';               Name = 'ItemName'; Value = '%windir%\regedit.exe,-309'; Type = 'ExpandString' },
+    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.reg\ShellNew';               Name = 'ItemName'; Value = '%SystemRoot%\regedit.exe,-309'; Type = 'ExpandString' },
     # .vbs
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs';                        Name = '';                  Value = 'VBSFile';                     Type = 'String' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs\ShellNew';               Name = 'NullFile';          Value = '';                           Type = 'String'       },
-    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs\ShellNew';               Name = 'ItemName';          Value = '%windir%\System32\wscript.exe,-4804'; Type = 'ExpandString' },
+    @{ Path = 'Registry::HKEY_CLASSES_ROOT\.vbs\ShellNew';               Name = 'ItemName';          Value = '%SystemRoot%\System32\wscript.exe,-4804'; Type = 'ExpandString' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile';                     Name = '';                  Value = 'VBScript File';               Type = 'String' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile\shell\open\command';  Name = '';                  Value = '%SystemRoot%\System32\WScript.exe "%1" %*'; Type = 'ExpandString' },
     @{ Path = 'Registry::HKEY_CLASSES_ROOT\VBSFile';                     Name = 'FriendlyTypeName';  Value = 'VBScript File';               Type = 'String' },

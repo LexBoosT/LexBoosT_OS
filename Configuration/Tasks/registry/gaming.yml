@@ -3,9 +3,14 @@ title: Gaming
 description: Applies Gaming tweaks via registry values and scripts
 privilege: TrustedInstaller
 actions:
-  - !status: {status: 'Enable Gamemode'}
-  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AllowAutoGameMode', type: REG_DWORD, data: '1'}
-  - !registryValue: {path: 'HKCU\\SOFTWARE\\Microsoft\\GameBar', value: 'AutoGameModeEnabled', type: REG_DWORD, data: '1'}
+
+  # Disable opening gamebar when pressing the xbox button on an xbox controller
+  - !registryValue: {path: 'HKCU\Software\Microsoft\GameBar', value: 'UseNexusForGameBarEnabled', type: REG_DWORD, data: '0'}
+  # Disable opening gamebar when connecting xbox controller
+  - !registryValue: {path: 'HKCR\ms-gamebar', value: '', type: REG_SZ, data: 'URL:ms-gamebar'}
+  - !registryValue: {path: 'HKCR\ms-gamebar', value: 'URL Protocol', type: REG_SZ, data: ''}
+  - !registryValue: {path: 'HKCR\ms-gamebar', value: 'NoOpenWith', type: REG_SZ, data: ''}
+  - !registryValue: {path: 'HKCR\ms-gamebar\shell\open\command', value: '', type: REG_EXPAND_SZ, data: '%WINDIR%\System32\systray.exe'}
 
   - !registryValue: {path: 'HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games', value: 'BackgroundPriority', type: REG_DWORD, data: '1'}
 
@@ -55,3 +60,8 @@ actions:
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'FpsStatusGames', type: REG_DWORD, data: '10'}
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'FpsAll', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKCU\\Software\\Microsoft\\Games', value: 'GameFluidity', type: REG_DWORD, data: '1'}
+
+  # ============================================
+  # Enable Optimizations for Windowed/Borderless Games
+  # ============================================
+  - !registryValue: {path: 'HKCU\Software\Microsoft\DirectX\UserGpuPreferences', value: 'SwapEffectUpgradeEnable', type: REG_DWORD, data: '1'}

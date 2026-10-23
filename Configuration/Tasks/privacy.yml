@@ -1,0 +1,201 @@
+---
+title: Privacy Shield
+description: Disable telemetry, ads, tracking, AI features, and unnecessary background services
+privilege: TrustedInstaller
+actions:
+  - !status: {status: 'Applying privacy optimizations'}
+
+  # ============================================
+  # TELEMETRY
+  # ============================================
+  - !status: {status: 'Disabling Windows telemetry'}
+
+  # Delivery Optimization (P2P Windows Update sharing)
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization', value: 'DODownloadMode', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # ADS & PERSONALIZATION
+  # ============================================
+  - !status: {status: 'Disabling ads and personalization'}
+
+  # Advertising ID
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo', value: 'Enabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo', value: 'Enabled', type: REG_DWORD, data: '0'}
+
+  # Tailored Experiences (personalized ads)
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'ShowTailoredExperiencesWithAdvertising', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'ShowTailoredExperiencesWithAdvertising', type: REG_DWORD, data: '0'}
+
+  # Cloud personalized content in Settings
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent', value: 'DisablePersonalizedAds', type: REG_DWORD, data: '1'}
+
+  # ============================================
+  # STARTUP & EXPLORER SEARCH
+  # ============================================
+  - !status: {status: 'Disabling startup and Explorer search telemetry'}
+
+  # Startup apps telemetry
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\EnableStartupApps', value: 'EnableStartupApps', type: REG_DWORD, data: '0'}
+
+  # Explorer search telemetry
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search', value: 'CortanaConsent', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search', value: 'AllowSearchToUseLocation', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search', value: 'IsDynamicSearchBoxEnabled', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # TASKS (Disable telemetry tasks)
+  # ============================================
+  - !status: {status: 'Disabling telemetry tasks'}
+
+  - !run:
+      exeDir: true
+      exe: 'powershell.exe'
+      args: '-NoProfile -ExecutionPolicy Bypass -File ".\Scripts\DISABLE-TELEMETRY-TASKS.PS1"'
+      runas: currentUserElevated
+      wait: true
+
+  # ============================================
+  # SYNC
+  # ============================================
+  - !status: {status: 'Disabling sync features'}
+
+  # Settings sync (device settings)
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SyncManager', value: 'EnableSyncProvider', type: REG_DWORD, data: '0'}
+
+  # App settings sync
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache', value: 'EnableSyncProvider', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # KERNEL
+  # ============================================
+  - !status: {status: 'Disabling kernel telemetry'}
+
+  # Kernel telemetry (WHEA error reporting)
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\WHEA-Logger', value: 'Enable', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # NETWORK
+  # ============================================
+  - !status: {status: 'Disabling network telemetry'}
+
+  # SMB Direct (network feature that leaks data)
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters', value: 'EnableSMBDirect', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # ACCESS (App permissions)
+  # ============================================
+  - !status: {status: 'Restricting app permissions'}
+
+  # Microphone
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Camera
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Location
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Account Info
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Calendar
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\calendar', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\calendar', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Contacts
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Email
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Phone Call History
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Messages
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCalls', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCalls', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Radios
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\radios', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\radios', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Notifications
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments', value: 'Value', type: REG_SZ, data: 'Deny'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments', value: 'RecordUsageData', type: REG_DWORD, data: '0'}
+
+  # Diagnostic & Usage Info (HKCU)
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\diagnosticInfo', value: 'Value', type: REG_SZ, data: 'Deny'}
+
+  # ============================================
+  # AI FEATURES
+  # ============================================
+  - !status: {status: 'Disabling AI features'}
+
+  # Windows Copilot
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot', value: 'TurnOffWindowsCopilot', type: REG_DWORD, data: '1'}
+
+  # Spotlight features
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer', value: 'DisableSpotlight', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer', value: 'HideWindowsSpotlightFeatures', type: REG_DWORD, data: '1'}
+
+  # Cortana
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Search', value: 'SearchboxTaskbarMode', type: REG_DWORD, data: '0'}
+
+  # AI host service
+  - !service: {name: 'AiHost', operation: change, startup: 4}
+
+  # Edge Compose AI
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'ComposeEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'ComposeForEveryoneEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'ComposeModel', type: REG_SZ, data: 'local'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'ComposeLocalModel', type: REG_DWORD, data: '0'}
+
+  # Paint AI
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableImageCreator', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableCocreator', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableGenerativeFill', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableGenerativeErase', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Paint', value: 'DisableRemoveBackground', type: REG_DWORD, data: '1'}
+
+  # Notepad AI
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Notepad', value: 'DisableRewrite', type: REG_DWORD, data: '1'}
+
+  # ============================================
+  # BROWSER (Edge)
+  # ============================================
+  - !status: {status: 'Disabling browser telemetry'}
+
+  # Edge metrics reporting
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'MetricsReportingEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeCrashpadHandler', type: REG_DWORD, data: '0'}
+
+  # Edge site info collection
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'SendSiteInfoToImproveServices', type: REG_DWORD, data: '0'}
+
+  # Edge personalization reporting
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'PersonalizationReportingEnabled', type: REG_DWORD, data: '0'}
+
+  # Edge Copilot
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeCopilotEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeCopilotSidePanelEnabled', type: REG_DWORD, data: '0'}
+
+  # Edge Discover
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeDiscoverEnabled', type: REG_DWORD, data: '0'}
+
+  # Edge Sidebar
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeSidebarEnabled', type: REG_DWORD, data: '0'}
+
+  # Edge Shopping
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeShoppingAssistantEnabled', type: REG_DWORD, data: '0'}
+
+  # ============================================
+  # DONE
+  # ============================================
+  - !status: {status: 'Privacy optimizations complete'}

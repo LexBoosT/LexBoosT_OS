@@ -113,6 +113,44 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableAgentWorkspaces', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableRemoteAgentConnectors', type: REG_DWORD, data: '1'}
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'AllowCopilotRuntime', type: REG_DWORD, data: '0'}
+  # --- WindowsCopilot policy (HKLM + HKCU) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot', value: 'TurnOffWindowsCopilot', type: REG_DWORD, data: '1'}
+  # --- Windows AI agents (HKCU) ---
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableAIDataAnalysis', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'AllowRecallEnablement', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableClickToDo', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'TurnOffSavingSnapshots', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\WindowsAI', value: 'DisableSettingsAgent', type: REG_DWORD, data: '1'}
+  # --- Copilot availability (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\Shell\Copilot', value: 'IsCopilotAvailable', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\Shell\Copilot', value: 'CopilotDisabledReason', type: REG_SZ, data: 'FeatureIsDisabled'}
+  # --- Copilot availability (HKCU) ---
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\Shell\Copilot', value: 'IsCopilotAvailable', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\Shell\Copilot', value: 'CopilotDisabledReason', type: REG_SZ, data: 'FeatureIsDisabled'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'ShowCopilotButton', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\Software\Microsoft\input\Settings', value: 'InsightsEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer', value: 'DisableSearchBoxSuggestions', type: REG_DWORD, data: '1'}
+  # --- Edge Copilot policies (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'CopilotCDPPageContext', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'CopilotPageContext', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'HubsSidebarEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeEntraCopilotPageContext', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'Microsoft365CopilotChatIconEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'EdgeHistoryAISearchEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'ComposeInlineEnabled', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'GenAILocalFoundationalModelSettings', type: REG_DWORD, data: '1'}
+  # --- Copilot notifications (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings', value: 'AutoOpenCopilotLargeScreens', type: REG_DWORD, data: '0'}
+  # --- AppPrivacy: system AI models (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy', value: 'LetAppsAccessSystemAIModels', type: REG_DWORD, data: '2'}
+  # --- Copilot runtime per-app (HKCU) ---
+  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsCopilot', value: 'AllowCopilotRuntime', type: REG_DWORD, data: '0'}
+  # --- Notepad AI (HKLM) ---
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\WindowsNotepad', value: 'DisableAIFeatures', type: REG_DWORD, data: '1'}
+  # --- HKCR protocol handlers ---
+  - !registryKey: {path: 'HKCR\ms-office-ai', operation: delete}
+  - !registryKey: {path: 'HKCR\ms-copilot', operation: delete}
+  - !registryKey: {path: 'HKCR\ms-clicktodo', operation: delete}
   # --- Copilot availability & eligibility (HKCU + HKLM) ---
   - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\Shell\Copilot', value: 'IsCopilotAvailable', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\Software\Microsoft\Windows\Shell\Copilot\BingChat', value: 'IsUserEligible', type: REG_DWORD, data: '0'}

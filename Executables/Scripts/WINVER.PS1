@@ -12,8 +12,8 @@ if (-not $isAdmin) {
 }
 
 $sourceFile = Join-Path $PSScriptRoot '..\winver.exe'
-$targetPath = "$env:windir\System32\winver.exe"
-$targetBak  = "$env:windir\System32\winver.exe.bak"
+$targetPath = "$env:SystemRoot\System32\winver.exe"
+$targetBak  = "$env:SystemRoot\System32\winver.exe.bak"
 
 $sourceFile = Resolve-Path $sourceFile -ErrorAction SilentlyContinue
 if (-not $sourceFile) {
@@ -35,7 +35,7 @@ Write-Log '+' 'Replacing file...'
 
 try {
     # winver.exe in System32 is owned by TrustedInstaller. Use MinSudo to take ownership + copy.
-    $minSudo = Join-Path $env:windir 'LexBoosTOS\Utilities\MinSudo.exe'
+    $minSudo = Join-Path $env:SystemRoot 'LexBoosTOS\Utilities\MinSudo.exe'
     if (Test-Path $minSudo) {
         $tiCmd = "takeown /F `"$targetPath`" >nul 2>&1 & icacls `"$targetPath`" /grant *S-1-5-32-544:(F) /C >nul 2>&1 & copy /Y `"$sourceFile`" `"$targetPath`""
         $proc = Start-Process -FilePath $minSudo -ArgumentList "--NoLogo --TrustedInstaller --Privileged cmd.exe /c `"$tiCmd`"" -Wait -PassThru -WindowStyle Hidden

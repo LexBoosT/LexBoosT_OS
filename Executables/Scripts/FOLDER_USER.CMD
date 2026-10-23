@@ -1,6 +1,6 @@
 @echo off
 
-set "psScriptPath=%windir%\LexBoosTOS\Scripts\PowerShell\FolderUser.ps1"
+set "psScriptPath=%SystemRoot%\LexBoosTOS\Scripts\PowerShell\FolderUser.ps1"
 
 :: Verifier si le script PowerShell existe
 if not exist "%psScriptPath%" (

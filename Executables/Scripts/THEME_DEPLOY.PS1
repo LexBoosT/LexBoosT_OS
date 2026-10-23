@@ -33,7 +33,7 @@ switch ($Action) {
 
     'CopyThemeFile' {
         Write-Log '+' "Copying theme file..."
-        $themeDir = Join-Path -Path $env:WINDIR 'Resources\Themes'
+        $themeDir = Join-Path -Path $env:SystemRoot 'Resources\Themes'
         if (-not (Test-Path $themeDir)) {
             New-Item -ItemType Directory -Path $themeDir -Force | Out-Null
         }
@@ -60,7 +60,7 @@ switch ($Action) {
 
     'InstallTheme' {
         Write-Log '+' "Installing theme..."
-        $installScript = Join-Path -Path $env:windir 'LexBoosTOS\Scripts\PowerShell\INSTALL-THEME.ps1'
+        $installScript = Join-Path -Path $env:SystemRoot 'LexBoosTOS\Scripts\PowerShell\INSTALL-THEME.ps1'
         if (Test-Path $installScript) {
             & $installScript
             if ($LASTEXITCODE -ne 0) {

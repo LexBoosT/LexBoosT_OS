@@ -72,6 +72,9 @@ echo ================================================
 echo [+] Creating persistent QoS task...
 powershell -Command "try { $trigger = New-ScheduledTaskTrigger -AtStartup; $psCommand = 'Get-NetQosPolicy -PolicyStore ActiveStore | Remove-NetQosPolicy -Confirm:$false; New-NetQosPolicy -Name Bufferbloat_throttle -PolicyStore ActiveStore -NetworkProfile 2 -IPProtocol TCP -Precedence 254 -DSCPAction 24 -MinBandwidthWeightAction 2; New-NetQosPolicy -Name Bufferbloat_priority -PolicyStore ActiveStore -NetworkProfile 2 -Default -Precedence 252 -DSCPAction 40 -MinBandwidthWeightAction 98'; $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-ExecutionPolicy Bypass -Command \"\"' + $psCommand + '\"\"'); Register-ScheduledTask -TaskName 'Bufferbloat' -Action $action -Trigger $trigger -User 'NT AUTHORITY\SYSTEM' -Force -ErrorAction SilentlyContinue } catch { Write-Warning 'Failed to create QoS task' }" >nul 2>&1
 echo [OK] QoS task configured
+echo [+] Disabling TCP Nagle Algorithm (reduces latency)...
+powershell -NoProfile -Command "Get-NetTCPSetting -Profile Internet | Where-Object { $_.TCPNoDelay -eq 1 } | Set-NetTCPSetting -TCPNoDelay 0" >nul 2>&1
+echo [OK] TCP Nagle disabled (TCP_NODELAY)
 goto :eof
 
 :RegistryCleanup
@@ -88,3 +91,4 @@ reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\D
 schtasks /Change /TN "\Microsoft\Windows\UpdateOrchestrator\Driver Install" /Enable >NUL 2>nul
 echo [OK] Registry cleanup complete
 goto :eof
+

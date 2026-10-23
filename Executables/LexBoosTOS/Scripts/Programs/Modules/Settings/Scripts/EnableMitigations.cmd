@@ -1,10 +1,5 @@
 @echo off
-rem =====================================================================
-rem EnableMitigations.cmd - restore Windows default exploit mitigations
-rem Ported from AtmosphereOS playbook
-rem (Executables\AtmosphereDesktop\7. Security\Mitigations\Set Windows Default Mitigations.cmd)
-rem Usage: EnableMitigations.cmd [/silent]
-rem =====================================================================
+
 setlocal EnableDelayedExpansion
 
 if "%~1" == "/silent" goto main
@@ -23,9 +18,6 @@ fltmc > nul 2>&1 || (
 :: Restore Spectre/Meltdown defaults
 reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /f > nul 2>&1
 reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /f > nul 2>&1
-
-:: Restore SEHOP default
-reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "DisableExceptionChainValidation" /f > nul 2>&1
 
 :: Restore default mitigation masks (deleting the values = Windows defaults, incl. CFG)
 reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "MitigationAuditOptions" /f > nul 2>&1

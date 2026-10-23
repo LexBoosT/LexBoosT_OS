@@ -1,3 +1,18 @@
+﻿# LexBoosT OS™ V26.10.1
+
+- ✨ Improvements of privacy optimizations. (telemetry, ads, AI, app permissions).
+- ✨ Added Monthly drive optimizations.
+- ✨ Added more Defender optimizations.
+- ✨ Enables full drive indexing.
+- ✨ Disabling Store wake tasks.
+- ✨ Replace %windir% by %SystemRoot%\.
+- ✨ Delete more Appx Packages: *Microsoft.WritingAssistant*, *Microsoft.Edge.GameAssist*.
+- ✨ Audio stability: CPU guard added to MMCSS-NIC.PS1 and AUDIO.PS1 (Pro Audio profile) — the aggressive audio scheduling profile (5ms timer resolution, high scheduling category) is now skipped on CPUs with < 6 physical cores or CPU family < 6 (pre-Haswell), fixing sound crackling on old machines.
+- ✨ Added on Disk Cleanup: Printer spooler files, Prefetch files, Offline Web Pages, System Restore Points (keep last 3).
+- ✨ AI coverage (telemetry.yml, +36 entries): Win+Copilot TurnOffWindowsCopilot (HKLM/HKCU), WindowsAI DisableAIDataAnalysis / AllowRecallEnablement / DisableClickToDo / TurnOffSavingSnapshots / DisableSettingsAgent (HKLM/HKCU), Copilot IsCopilotAvailable / CopilotDisabledReason=FeatureIsDisabled (HKLM/HKCU), ShowCopilotButton + InsightsEnabled + DisableSearchBoxSuggestions (HKCU), 8 Edge Copilot policies (CopilotCDP/PageContext, HubsSidebar, Entra, M365ChatIcon, EdgeHistoryAISearch, ComposeInline, GenAILocalFoundationalModel, HKLM), AutoOpenCopilotLargeScreens, LetAppsAccessSystemAIModels=2, AllowCopilotRuntime (HKCU), Notepad DisableAIFeatures, 3 HKCR delete (ms-office-ai, ms-copilot, ms-clicktodo). Gain: -5/20ms input (Copilot/Edge), ~1% frametime, -15/40ms sleep resume (Recall/Settings).
+- ✨ 22 registry values desktopPowerSettings (DEVICES.PS1): Control\Power x15, NDIS\Parameters x5, I/O System (IoAllowLoadCrashDumpDriver), Session Mgr\Power x4 (IdleScanInterval, WatchdogSleep/ResumeTimeout, SleepStudyDeviceAccountingLevel), Configuration Manager x3 (SelfHealingEnabled, VirtualizationEnabled, BugcheckRecoveryEnabled). Gain: -1/-3ms input latency, ~1-2% GPU frametime, -5/15ms resume (NAPs + watchdog).
+- 🪛 Fix error 0x80004002 on Windows Update and Microsoft Store.
+
 # LexBoosT OS™ V26.10
 
 ## Timer resolution
@@ -548,7 +563,7 @@
 - 🪛 APPX-REMOVER.ps1: wildcard path protection added — package cleanup skipped if $packageFamilyName is empty/null. SystemApps path check now rejects junction/symlink targets.
 - 🪛 Set-RegistryValue in DEVICES.ps1: all registry types (DWORD, String, QWORD, MultiString, ExpandString, Binary) now explicitly handled; MultiString values properly cast to [string[]].
 - 🪛 RUNTIMES.ps1: VC++ detection refactored — uses registry view (x64->native, x86->WOW6432Node) instead of fragile DisplayName string matching. Winget install now verified via Test-CommandAvailable. DirectX detection expanded to 6 DLLs, logic relaxed (any DLL found = installed).
-- 🪛 EDGE.ps1: $env:windir="" now wrapped in try/finally — windir restored on all code paths (previously commented out restoration line, left windir empty on early returns).
+- 🪛 EDGE.ps1: $env:SystemRoot="" now wrapped in try/finally — windir restored on all code paths (previously commented out restoration line, left windir empty on early returns).
 - 🪛 DisableCoInstallers warning added: documents that it breaks Realtek/Creative audio drivers and specialty hardware.
 - 🪛 SystemResponsiveness raised from 10 to 14 (safe minimum for audio — prevents crackling on DAC/USB devices).
 - 🪛 DWM FrameLatency lowered from 2 to 1 (reduces input lag from 33ms to 16ms at 60Hz).

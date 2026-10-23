@@ -1,12 +1,12 @@
 ---
-title: LexBoosT OS™ 26.10
-description: Applies LexBoosT OS™ 26.10 configuration tasks, including registry tweaks, service tweaks, and system tweaks
+title: LexBoosT OS™ 26.10.1
+description: Applies LexBoosT OS™ 26.10.1 configuration tasks, including registry tweaks, service tweaks, and system tweaks
 privilege: TrustedInstaller
 actions:
   - !status: {status: 'Starting Playbook Setup'}
 
   - !status: {
-      status: "LexBoosT OS™ 26.10",
+      status: "LexBoosT OS™ 26.10.1",
     }
 
   # ============================================
@@ -62,6 +62,9 @@ tasks:
 
   # Phase 4: Registry tweaks by category
   - Tasks\registry.yml
+
+  # Phase 4.5: Privacy shield (telemetry, ads, AI, app permissions)
+  - Tasks\privacy.yml
 
   # Phase 5: Final cleanup
   - Tasks\final.yml

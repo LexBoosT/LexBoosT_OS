@@ -438,6 +438,10 @@
           "enum": ["disable", "delete", "deleteFolder"],
           "description": "Action: disable the task, delete the task, or delete the entire task folder"
         },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Continue even if this action fails"
+        },
         "option": {
           "type": "string",
           "description": "Conditional gate — only apply if this option is enabled"

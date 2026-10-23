@@ -26,7 +26,7 @@ $edgeScript = $null
 $candidates = @(
     Join-Path $PSScriptRoot '..\..\..\..\Scripts\EDGE.PS1'           # from Executables\LexBoosTOS\Scripts\PowerShell\
     Join-Path $PSScriptRoot '..\..\..\Scripts\EDGE.PS1'              # alternative depth
-    Join-Path $env:windir 'LexBoosTOS\Scripts\EDGE.PS1'              # deployed location
+    Join-Path $env:SystemRoot 'LexBoosTOS\Scripts\EDGE.PS1'              # deployed location
     Join-Path $env:ProgramData 'LexBoosTOS\Scripts\EDGE.PS1'         # deployed alt
 )
 

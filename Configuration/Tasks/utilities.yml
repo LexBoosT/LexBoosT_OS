@@ -81,6 +81,8 @@ actions:
       wait: true,
     }
 
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run', value: 'SecurityHealth', type: REG_SZ, data: 'C:\Windows\System32\SecurityHealthSystray.exe'}
+
   # ============================================
   # END OF INSTALLATION - completion marker
   # ============================================
